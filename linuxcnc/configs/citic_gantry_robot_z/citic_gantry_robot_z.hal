@@ -1,0 +1,148 @@
+loadrt [KINS]KINEMATICS
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS
+
+loadrt hostmot2
+loadrt hm2_eth board_ip="10.56.32.37" config="num_encoders=5 num_pwmgens=0 num_stepgens=1"
+loadrt pid names=pid.z
+loadrt estop_latch
+loadrt oneshot
+loadrt logic names=logic.fault personality=0x203
+loadrt ddt names=ddt.motor-pos-cmd,ddt.encoder-pos
+
+# loadusr -Wn igus_drive_d1_z /home/gtec/linuxcnc/modules/igus_dryve_d1 \
+#     -p 20 -l debug 10.56.32.34
+
+
+# set 7i96s watchdog timeout
+setp hm2_7i96s.0.watchdog.timeout_ns 5000000
+
+# configure hostmod2 dpll (phased locked loop)
+setp hm2_7i96s.0.dpll.01.timer-us -100
+setp hm2_7i96s.0.stepgen.timer-number 1
+setp hm2_7i96s.0.encoder.timer-number 1
+
+# add functions to servo thread
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+addf pid.z.do-pid-calcs servo-thread
+addf hm2_7i96s.0.read servo-thread
+addf hm2_7i96s.0.write servo-thread
+addf estop-latch.0 servo-thread
+addf oneshot.0 servo-thread
+addf logic.fault servo-thread
+
+addf ddt.motor-pos-cmd servo-thread
+addf ddt.encoder-pos servo-thread
+
+
+
+# ******************
+# AXIS Z --- JOINT 0
+# ******************
+
+# --- PID parameters ---
+
+setp pid.z.Pgain     [JOINT_0]P
+setp pid.z.Igain     [JOINT_0]I
+setp pid.z.Dgain     [JOINT_0]D
+setp pid.z.bias      [JOINT_0]BIAS
+setp pid.z.FF0       [JOINT_0]FF0
+setp pid.z.FF1       [JOINT_0]FF1
+setp pid.z.FF2       [JOINT_0]FF2
+setp pid.z.deadband  [JOINT_0]DEADBAND
+setp pid.z.maxoutput [JOINT_0]MAX_OUTPUT
+setp pid.z.error-previous-target true
+
+# --- Step Gen parameters ---
+
+setp hm2_7i96s.0.stepgen.00.control-type   1  # Velocity control
+setp hm2_7i96s.0.stepgen.00.step_type      0  # Step/dir
+# setp hm2_7i96s.0.stepgen.00.direction.invert_output 1 # Invert direction signal
+setp hm2_7i96s.0.stepgen.00.dirsetup       [JOINT_0]DIRSETUP
+setp hm2_7i96s.0.stepgen.00.dirhold        [JOINT_0]DIRHOLD
+setp hm2_7i96s.0.stepgen.00.steplen        [JOINT_0]STEPLEN
+setp hm2_7i96s.0.stepgen.00.stepspace      [JOINT_0]STEPSPACE
+setp hm2_7i96s.0.stepgen.00.position-scale [JOINT_0]STEP_SCALE
+setp hm2_7i96s.0.stepgen.00.maxaccel       [JOINT_0]STEPGEN_MAXACCEL
+setp hm2_7i96s.0.stepgen.00.maxvel         [JOINT_0]STEPGEN_MAXVEL
+
+# --- Encoder parameters ---
+
+setp hm2_7i96s.0.encoder.03.counter-mode 0
+setp hm2_7i96s.0.encoder.03.filter 1
+setp hm2_7i96s.0.encoder.03.scale [JOINT_0]ENCODER_SCALE
+
+# --- Connect pid / stepgen / motion signals ----
+
+net pid-z-index-enable => pid.z.index-enable
+
+net pid-z-output <= pid.z.output
+net pid-z-output => hm2_7i96s.0.stepgen.00.velocity-cmd
+
+net pid-z-enable <= joint.0.amp-enable-out
+net pid-z-enable => pid.z.enable
+net pid-z-enable => hm2_7i96s.0.stepgen.00.enable
+
+net pid-z-pos-cmd <= joint.0.motor-pos-cmd
+net pid-z-pos-cmd => pid.z.command
+
+# net pid-z-pos-fb <= hm2_7i96s.0.stepgen.00.position-fb
+net pid-z-pos-fb <= hm2_7i96s.0.encoder.03.position
+net pid-z-pos-fb => pid.z.feedback
+net pid-z-pos-fb => joint.0.motor-pos-fb
+
+
+# --- setup home / limit switch signals ---
+
+net z-sw <= hm2_7i96s.0.gpio.003.in_not
+net z-sw => joint.0.home-sw-in
+net z-sw => joint.0.neg-lim-sw-in
+
+
+# *********************
+# Miscellaneous signals
+# *********************
+
+# --- Controller alert/error signals ---
+
+net z-alert <= hm2_7i96s.0.7i77.0.0.input-09
+net z-error <= hm2_7i96s.0.7i77.0.0.input-10
+
+# --- Fault signal ---
+# We set the fault signal if any controller signals an error or alert
+# or if the user press the estop button
+
+net remote-estop <= hm2_7i96s.0.7i77.0.0.input-13
+
+net z-alert => logic.fault.in-00
+net z-error => logic.fault.in-01
+
+net remote-estop => logic.fault.in-02
+
+# --- ESTOP ---
+
+net user-enable <= iocontrol.0.user-enable-out
+net user-enable => estop-latch.0.ok-in
+
+net user-request-enable <= iocontrol.0.user-request-enable
+net user-request-enable => estop-latch.0.reset
+
+net fault <= logic.fault.or
+net fault => estop-latch.0.fault-in
+
+net emc-enable <= estop-latch.0.ok-out
+net emc-enable => iocontrol.0.emc-enable-in
+
+# --- Enable joints ---
+
+net machine-on <= halui.machine.is-on
+net machine-on => hm2_7i96s.0.7i77.0.0.output-00
+
+
+# *********************
+# Testing signals
+# *********************
+
+# Velocity
+net z-vel-cmd <= joint.0.vel-cmd
+net z-vel-encoder <= hm2_7i96s.0.encoder.03.velocity

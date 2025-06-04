@@ -1,0 +1,5 @@
+CompileFlags:
+  Add:
+    - "-xc"
+    - "-DRTAPI"
+    - "-I/usr/include/linuxcnc"

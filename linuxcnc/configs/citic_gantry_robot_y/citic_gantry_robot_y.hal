@@ -1,0 +1,170 @@
+# Cargar módulo de cinemática
+loadrt [KINS]KINEMATICS
+
+# TODO: check num_encoders
+# Cargar módulo controlador de movimiento
+# Con la opción "servo_period_nsec" se crea el hilo "servo-thread"
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS
+
+# Cargar controlador de placas MESA
+loadrt hostmot2
+
+# TODO: check num_encoders
+# Cargar controlador de bajo nivel de placas MESA con Ethernet
+# (Mesa Electronics Ethernet Anything IO boards)
+loadrt hm2_eth board_ip="10.56.32.37" config="num_encoders=5 num_pwmgens=0 num_stepgens=0"
+
+# Cargar módulo pid y crear un controlador para el eje
+loadrt pid names=pid.x
+
+# Cargar módulo estop_latch para manejar la parada de emergencia
+loadrt estop_latch
+
+# Cargar módulo oneshot (generador de pulsos)
+loadrt oneshot
+
+# Cargar módulo logic y definir una función OR de 3 entradas
+loadrt logic names=logic.fault personality=0x203
+
+# Configurar el tiempo del watchdog de la placa MESA 7I96S
+setp hm2_7i96s.0.watchdog.timeout_ns 5000000
+
+# Configurar dpll (digital phase locked loop) del módulo hostmod2
+setp hm2_7i96s.0.dpll.01.timer-us -100
+setp hm2_7i96s.0.encoder.timer-number 1
+
+# Configurar parámetros de pulso del módulo oneshot
+setp oneshot.0.width 0.1
+
+# Añadir funciones al hilo "servo-thread"
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+addf pid.x.do-pid-calcs servo-thread
+addf hm2_7i96s.0.read servo-thread
+addf hm2_7i96s.0.write servo-thread
+addf estop-latch.0 servo-thread
+addf oneshot.0 servo-thread
+addf logic.fault servo-thread
+
+
+#********************
+# AXIS X --- JOINT 0
+#********************
+
+# --- Parámetros del controlador PID ---
+
+setp pid.x.Pgain     [JOINT_0]P
+setp pid.x.Igain     [JOINT_0]I
+setp pid.x.Dgain     [JOINT_0]D
+setp pid.x.bias      [JOINT_0]BIAS
+setp pid.x.FF0       [JOINT_0]FF0
+setp pid.x.FF1       [JOINT_0]FF1
+setp pid.x.FF2       [JOINT_0]FF2
+setp pid.x.deadband  [JOINT_0]DEADBAND
+setp pid.x.maxoutput [JOINT_0]MAX_OUTPUT
+setp pid.x.error-previous-target true
+
+
+# --- Parámetros de la salida analógica ---
+
+setp hm2_7i96s.0.7i77.0.1.analogout2-maxlim [JOINT_0]ANALOGOUT_MAXLIM
+setp hm2_7i96s.0.7i77.0.1.analogout2-minlim [JOINT_0]ANALOGOUT_MINLIM
+setp hm2_7i96s.0.7i77.0.1.analogout2-scalemax [JOINT_0]ANALOGOUT_SCALE
+
+
+# --- Parámetros del encoder ---
+
+setp hm2_7i96s.0.encoder.02.counter-mode 0
+setp hm2_7i96s.0.encoder.02.filter 1
+setp hm2_7i96s.0.encoder.02.scale [JOINT_0]ENCODER_SCALE
+
+
+# --- Conectar señales de pid / stepgen / motion ---
+
+net pid-y-index-enable => pid.x.index-enable
+
+net pid-y-output <= pid.x.output
+net pid-y-output => hm2_7i96s.0.7i77.0.1.analogout2
+
+net pid-y-enable <= joint.0.amp-enable-out
+net pid-y-enable => pid.x.enable
+net pid-y-enable => hm2_7i96s.0.7i77.0.1.analogena
+
+net pid-y-pos-cmd <= joint.0.motor-pos-cmd
+net pid-y-pos-cmd => pid.x.command
+
+net pid-y-pos-fb <= hm2_7i96s.0.encoder.02.position
+net pid-y-pos-fb => pid.x.feedback
+net pid-y-pos-fb => joint.0.motor-pos-fb
+
+
+# --- Configurar señales de home / limit ---
+
+net y-sw <= hm2_7i96s.0.gpio.002.in_not
+net y-sw => joint.0.home-sw-in
+net y-sw => joint.0.neg-lim-sw-in
+
+
+# *************
+# Otras señales
+# *************
+
+# --- Señales de alerta y error de los controladores Igus ---
+
+net y-alert <= hm2_7i96s.0.7i77.0.0.input-07
+net y-error <= hm2_7i96s.0.7i77.0.0.input-08
+
+
+# --- Parada de emergencia externa ---
+
+net remote-estop <= hm2_7i96s.0.7i77.0.0.input-13
+
+
+# --- Señal de fallo (logic.fault) ---
+# La señal de fallo se activará si un controlador Igus emite una 
+# señal de error o alerta o el usuario presiona el botón de parada
+# de emergencia (ESTOP).
+
+net y-alert => logic.fault.in-00
+net y-error => logic.fault.in-01
+
+net remote-estop => logic.fault.in-02
+
+
+# --- Parada de emergencia (ESTOP) ---
+
+net user-enable <= iocontrol.0.user-enable-out
+net user-enable => estop-latch.0.ok-in
+
+net user-request-enable <= iocontrol.0.user-request-enable
+net user-request-enable => estop-latch.0.reset
+
+net fault <= logic.fault.or
+net fault => estop-latch.0.fault-in
+
+net emc-enable <= estop-latch.0.ok-out
+net emc-enable => iocontrol.0.emc-enable-in
+
+
+# --- Habilitar motores ---
+
+net machine-on <= halui.machine.is-on
+net machine-on => hm2_7i96s.0.7i77.0.0.output-00
+
+
+# --- Pulso para iniciar programa de rotación del motor sin escobillas ---
+
+net y-ready <= hm2_7i96s.0.7i77.0.0.input-06
+net y-ready => oneshot.0.in
+
+net controller-start <= oneshot.0.out
+net controller-start => hm2_7i96s.0.7i77.0.0.output-01
+
+
+# *********************
+# Testing signals
+# *********************
+
+# Velocity
+net y-vel-cmd <= joint.0.vel-cmd
+net y-vel-encoder <= hm2_7i96s.0.encoder.02.velocity

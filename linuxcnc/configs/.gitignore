@@ -1,0 +1,4 @@
+*.bak
+autosave.halscope
+linuxcnc.var
+halshow.preferences

@@ -1,0 +1,8080 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "d70af69b-26d7-4f79-9b4a-99b07ea5a006")
+	(paper "A4")
+	(title_block
+		(title "Gantry Robot ")
+		(date "2024-03-18")
+		(company "CITIC Research Center & Department of Computer Engineering, University of A Coruña.")
+	)
+	(lib_symbols
+		(symbol "Device:NetTie_2"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom no)
+			(on_board yes)
+			(property "Reference" "NT"
+				(at 0 1.27 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "NetTie_2"
+				(at 0 -1.27 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Net tie, 2 pins"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "net tie short"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "Net*Tie*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "NetTie_2_0_1"
+				(polyline
+					(pts
+						(xy -1.27 0) (xy 1.27 0)
+					)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "NetTie_2_1_1"
+				(pin passive line
+					(at -2.54 0 0)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 2.54 0 180)
+					(length 2.54)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Gantry_Robot_Components:MDR-20-5"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "PS"
+				(at 0 7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "MDR-20-5"
+				(at 0 -7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.meanwell-web.com/content/files/pdfs/productPdfs/MW/Mdr-20/MDR-20-spec.pdf"
+				(at 0 -12.7 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "MEAN WELL 5V Power Source"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "Power Source 5V"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "MDR-20-5_0_1"
+				(rectangle
+					(start -7.62 6.35)
+					(end 7.62 -6.35)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.334 -3.175) (xy -2.794 -3.175)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -4.064 -1.905)
+					(mid -4.699 -2.2905)
+					(end -5.334 -1.905)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -4.064 -1.905)
+					(mid -3.429 -1.5328)
+					(end -2.794 -1.905)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.794 -1.905) (xy 3.302 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.794 -3.175) (xy 5.334 -3.175)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -1.905) (xy 4.318 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 4.826 -1.905) (xy 5.334 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "MDR-20-5_1_1"
+				(polyline
+					(pts
+						(xy 0 6.35) (xy 0 -6.35)
+					)
+					(stroke
+						(width 0)
+						(type dash)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 7.62 1.27) (xy -7.62 1.27)
+					)
+					(stroke
+						(width 0)
+						(type dash)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin power_in line
+					(at -10.16 5.08 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -10.16 0 0)
+					(length 2.54)
+					(name "AC/L"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -10.16 -5.08 0)
+					(length 2.54)
+					(name "AC/N"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 5.08 180)
+					(length 2.54)
+					(name "DC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 2.54 180)
+					(length 2.54)
+					(name "OK"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 10.16 0 180)
+					(length 2.54)
+					(name "+V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 10.16 -5.08 180)
+					(length 2.54)
+					(name "-V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Gantry_Robot_Components:SDR-240-24"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "PS"
+				(at 0 7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "SDR-240-24"
+				(at 0 -7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at -11.43 43.18 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.meanwell-web.com/content/files/pdfs/productPdfs/MW/SDR-240/SDR-240-spec.pdf"
+				(at 0 -12.7 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "MEAN WELL 24V Power Source"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "Power Source 24V"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "SDR-240-24_0_1"
+				(rectangle
+					(start -7.62 6.35)
+					(end 7.62 -6.35)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.334 -3.175) (xy -2.794 -3.175)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -4.064 -1.905)
+					(mid -4.699 -2.2905)
+					(end -5.334 -1.905)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -4.064 -1.905)
+					(mid -3.429 -1.5328)
+					(end -2.794 -1.905)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.794 -1.905) (xy 3.302 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.794 -3.175) (xy 5.334 -3.175)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -1.905) (xy 4.318 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 4.826 -1.905) (xy 5.334 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "SDR-240-24_1_1"
+				(polyline
+					(pts
+						(xy 0 6.35) (xy 0 -6.35)
+					)
+					(stroke
+						(width 0)
+						(type dash)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 7.62 1.27) (xy -7.62 1.27)
+					)
+					(stroke
+						(width 0)
+						(type dash)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin power_in line
+					(at -10.16 5.08 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -10.16 0 0)
+					(length 2.54)
+					(name "AC/L"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -10.16 -5.08 0)
+					(length 2.54)
+					(name "AC/N"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 5.08 180)
+					(length 2.54)
+					(name "DC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 2.54 180)
+					(length 2.54)
+					(name "OK"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 10.16 0 180)
+					(length 2.54)
+					(name "+V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 10.16 -5.08 180)
+					(length 2.54)
+					(name "-V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Gantry_Robot_Components:SDR-960-48"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "PS"
+				(at 0 7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "SDR-960-48"
+				(at 0 -7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.meanwell-web.com/content/files/pdfs/productPdfs/MW/SDR-960/SDR-960-Spec.pdf"
+				(at 0 -12.7 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "MEAN WELL 48V Power Source"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "Power Source 48V"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "SDR-960-48_0_1"
+				(rectangle
+					(start -7.62 6.35)
+					(end 7.62 -6.35)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+				(polyline
+					(pts
+						(xy -5.334 -3.175) (xy -2.794 -3.175)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -4.064 -1.905)
+					(mid -4.699 -2.2905)
+					(end -5.334 -1.905)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start -4.064 -1.905)
+					(mid -3.429 -1.5328)
+					(end -2.794 -1.905)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.794 -1.905) (xy 3.302 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.794 -3.175) (xy 5.334 -3.175)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 3.81 -1.905) (xy 4.318 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 4.826 -1.905) (xy 5.334 -1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "SDR-960-48_1_1"
+				(polyline
+					(pts
+						(xy 0 6.35) (xy 0 -6.35)
+					)
+					(stroke
+						(width 0)
+						(type dash)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 7.62 1.27) (xy -7.62 1.27)
+					)
+					(stroke
+						(width 0)
+						(type dash)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin power_in line
+					(at -10.16 5.08 0)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -10.16 0 0)
+					(length 2.54)
+					(name "AC/L"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -10.16 -5.08 0)
+					(length 2.54)
+					(name "AC/N"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 5.08 180)
+					(length 2.54)
+					(name "DC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 10.16 2.54 180)
+					(length 2.54)
+					(name "OK"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 10.16 0 180)
+					(length 2.54)
+					(name "+V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_out line
+					(at 10.16 -5.08 180)
+					(length 2.54)
+					(name "-V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Gantry_Robot_Components:SW_push_closed_open"
+			(pin_names
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "SW"
+				(at 2.54 5.08 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "SW_push_closed_open_0_1"
+				(circle
+					(center -2.032 2.54)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center -2.032 -2.54)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 1.905) (xy 0 3.683)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 1.016) (xy 0 1.524)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0.508) (xy 0 0)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 -0.508) (xy 0 -1.016)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.032 2.54)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.032 -2.54)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 1.905) (xy -2.54 1.905)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 2.54 -1.27) (xy -2.54 -1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(pin passive line
+					(at -5.08 2.54 0)
+					(length 2.54)
+					(name "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at -5.08 -2.54 0)
+					(length 2.54)
+					(name "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 2.54 180)
+					(length 2.54)
+					(name "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 -2.54 180)
+					(length 2.54)
+					(name "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "Switch:SW_SPST"
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "SW"
+				(at 0 3.175 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "SW_SPST"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Single Pole Single Throw (SPST) switch"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "switch lever"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "SW_SPST_0_0"
+				(circle
+					(center -2.032 0)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy -1.524 0.254) (xy 1.524 1.778)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 2.032 0)
+					(radius 0.508)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "SW_SPST_1_1"
+				(pin passive line
+					(at -5.08 0 0)
+					(length 2.54)
+					(name "A"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin passive line
+					(at 5.08 0 180)
+					(length 2.54)
+					(name "B"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:AC"
+			(power)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#PWR"
+				(at 0 -2.54 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "AC"
+				(at 0 6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"AC\""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "AC_0_1"
+				(arc
+					(start -1.27 3.175)
+					(mid -0.635 3.8073)
+					(end 0 3.175)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(circle
+					(center 0 3.175)
+					(radius 1.905)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+				(arc
+					(start 1.27 3.175)
+					(mid 0.635 2.5427)
+					(end 0 3.175)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "AC_1_1"
+				(pin power_in line
+					(at 0 0 90)
+					(length 0)
+					(hide yes)
+					(name "AC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:GND"
+			(power)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#PWR"
+				(at 0 -6.35 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "GND"
+				(at 0 -3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "global power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "GND_0_1"
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 -1.27) (xy 1.27 -1.27) (xy 0 -2.54) (xy -1.27 -1.27) (xy 0 -1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(symbol "GND_1_1"
+				(pin power_in line
+					(at 0 0 270)
+					(length 0)
+					(hide yes)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "power:PWR_FLAG"
+			(power)
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+				(hide yes)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "#FLG"
+				(at 0 1.905 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Value" "PWR_FLAG"
+				(at 0 3.81 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "~"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "Special symbol for telling ERC where power comes from"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "flag power"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "PWR_FLAG_0_0"
+				(pin power_out line
+					(at 0 0 90)
+					(length 0)
+					(name "pwr"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(symbol "PWR_FLAG_0_1"
+				(polyline
+					(pts
+						(xy 0 0) (xy 0 1.27) (xy -1.016 1.905) (xy 0 2.54) (xy 1.016 1.905) (xy 0 1.27)
+					)
+					(stroke
+						(width 0)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(rectangle
+		(start 16.51 125.73)
+		(end 71.12 144.78)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 448aa462-f9db-4645-9c4d-b9317aa99f00)
+	)
+	(rectangle
+		(start 16.51 31.75)
+		(end 71.12 50.8)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 701aa1b0-8c63-4442-96a4-ff12e0a8dd09)
+	)
+	(rectangle
+		(start 16.51 77.47)
+		(end 71.12 96.52)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 7e4014d7-edcb-4ed5-9a6d-b45544d4ccd9)
+	)
+	(rectangle
+		(start 162.56 21.59)
+		(end 177.8 34.29)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid 87fcb8bd-b6c8-4fc1-baa8-54262e889a5d)
+	)
+	(rectangle
+		(start 16.51 54.61)
+		(end 71.12 73.66)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid b17abe1c-0342-4201-86f9-df1568b1a0fd)
+	)
+	(rectangle
+		(start 16.51 149.86)
+		(end 71.12 195.58)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid d696e448-c1ea-4046-9bb2-ded3b172ee31)
+	)
+	(rectangle
+		(start 16.51 100.33)
+		(end 71.12 119.38)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(fill
+			(type none)
+		)
+		(uuid d75abc25-bbe2-43f3-8c12-f5e6ac4a9c30)
+	)
+	(text "Power Source: Motor Y"
+		(exclude_from_sim no)
+		(at 16.51 77.47 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3db41871-285f-4ed6-aa01-a32d6cf4ac98")
+	)
+	(text "Normally open"
+		(exclude_from_sim no)
+		(at 179.07 31.75 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "485374a9-dea4-4c27-82e8-2d4bb394ef5a")
+	)
+	(text "Power Source: Motor X2"
+		(exclude_from_sim no)
+		(at 16.51 54.61 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "76e20439-b700-4747-94c7-2b5d32dc71d3")
+	)
+	(text "Power Source: Motor X1"
+		(exclude_from_sim no)
+		(at 16.51 31.75 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "9ce157ea-e37c-46a9-8d3e-3e379cd0a039")
+	)
+	(text "Power Source: Motor Z"
+		(exclude_from_sim no)
+		(at 16.51 100.33 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b3edb844-4fb8-44b2-bd77-8949bc85f891")
+	)
+	(text "Normally closed"
+		(exclude_from_sim no)
+		(at 179.07 26.67 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b7f4f63e-108a-4173-af61-a25dba709a4a")
+	)
+	(text "Power Source 24V"
+		(exclude_from_sim no)
+		(at 22.86 152.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c317b586-c1d3-4683-97cd-26539a62ed7e")
+	)
+	(text "Power Source: Motor Z Rotation"
+		(exclude_from_sim no)
+		(at 16.51 125.73 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d50ace2b-a69d-47ac-9898-1d3c48ce9609")
+	)
+	(text "Power Sources: Logic"
+		(exclude_from_sim no)
+		(at 16.51 149.86 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e2c17112-5eb2-4cf4-b31f-2a4a47de03c3")
+	)
+	(text "Power Source 5V"
+		(exclude_from_sim no)
+		(at 22.86 177.8 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e3a86551-8d6e-42fe-9a41-fa4640d36e76")
+	)
+	(text "Emergency stop switch"
+		(exclude_from_sim no)
+		(at 158.75 20.32 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fb9e38f6-ebf0-492e-906f-3b9c76376e29")
+	)
+	(text_box "MESA 7i96S and 7i77 are connected via a 25 pin ribbon cable."
+		(exclude_from_sim no)
+		(at 243.84 109.22 0)
+		(size 22.86 7.62)
+		(margins 0.9525 0.9525 0.9525 0.9525)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type none)
+		)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left top)
+		)
+		(uuid "c3a96545-589f-4211-bb50-577e951f174f")
+	)
+	(no_connect
+		(at 55.88 157.48)
+		(uuid "09ed4288-a9da-483d-a754-85c2ee979ab0")
+	)
+	(no_connect
+		(at 55.88 58.42)
+		(uuid "0f679528-cd96-45db-8591-c56bf0a83e0d")
+	)
+	(no_connect
+		(at 55.88 154.94)
+		(uuid "266adf6b-c203-4d48-bd99-c5246383b42c")
+	)
+	(no_connect
+		(at 55.88 132.08)
+		(uuid "3065379b-b45e-4ce0-b518-9727b8cd4ae2")
+	)
+	(no_connect
+		(at 55.88 81.28)
+		(uuid "412e3bc0-e530-4c47-a2f5-d32b623db0f8")
+	)
+	(no_connect
+		(at 55.88 83.82)
+		(uuid "4a163e3c-cf3b-4369-a0eb-4607a4eb5011")
+	)
+	(no_connect
+		(at 55.88 38.1)
+		(uuid "521fca0d-4c42-46cd-a808-a9005b1c0d3e")
+	)
+	(no_connect
+		(at 55.88 60.96)
+		(uuid "58d0c1ab-c6e3-4b3d-a5bd-5c8faf3c9e79")
+	)
+	(no_connect
+		(at 55.88 180.34)
+		(uuid "758c179b-90a5-4779-bae4-499b192ed68c")
+	)
+	(no_connect
+		(at 55.88 129.54)
+		(uuid "7feb94e2-a487-49ab-b6d5-6b2d21338318")
+	)
+	(no_connect
+		(at 55.88 104.14)
+		(uuid "94afbb26-e9fc-4929-9a0d-9094359bf6bc")
+	)
+	(no_connect
+		(at 55.88 182.88)
+		(uuid "bbaa6956-8f5a-498f-bd21-4b8d24cb9a41")
+	)
+	(no_connect
+		(at 55.88 35.56)
+		(uuid "c79c02b3-c094-4ac9-9776-5c24d1f6a2a4")
+	)
+	(no_connect
+		(at 55.88 106.68)
+		(uuid "e6e4d19a-e2e8-46f6-89aa-5a4c4de6524d")
+	)
+	(bus
+		(pts
+			(xy 116.84 129.54) (xy 208.28 129.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0093f76c-f0e8-4848-b99b-2a34dfa83cb9")
+	)
+	(wire
+		(pts
+			(xy 154.94 31.75) (xy 165.1 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "067d7612-fe99-4d76-a252-a0028c1aa1fa")
+	)
+	(wire
+		(pts
+			(xy 50.8 20.32) (xy 50.8 21.59)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "077ed24b-f8ea-4f22-914f-5fc6c1cb254d")
+	)
+	(wire
+		(pts
+			(xy 33.02 134.62) (xy 35.56 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "08311b2d-17f8-4b19-87da-0765e3ae6af1")
+	)
+	(wire
+		(pts
+			(xy 33.02 40.64) (xy 35.56 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0921b123-7940-45fb-9522-6732fa25e474")
+	)
+	(wire
+		(pts
+			(xy 137.16 99.06) (xy 147.32 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0b433e0e-ee62-4d0f-a167-ea28eeec56e9")
+	)
+	(wire
+		(pts
+			(xy 35.56 68.58) (xy 33.02 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0c23f0b5-3cbd-4181-9f81-bfb853037f0c")
+	)
+	(bus
+		(pts
+			(xy 177.8 132.08) (xy 177.8 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0d773bfe-8a50-4e56-b582-4195ad40d411")
+	)
+	(polyline
+		(pts
+			(xy 238.76 101.6) (xy 238.76 127)
+		)
+		(stroke
+			(width 0)
+			(type dash)
+		)
+		(uuid "0dd360d2-4f27-4657-b47a-f5404d4394b1")
+	)
+	(wire
+		(pts
+			(xy 62.23 165.1) (xy 63.5 165.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "0fb5b984-5d0e-46ba-86f2-dd08857571b4")
+	)
+	(wire
+		(pts
+			(xy 116.84 101.6) (xy 127 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1583b236-cc34-48ce-ac26-7e5ad79ed9ba")
+	)
+	(wire
+		(pts
+			(xy 116.84 71.12) (xy 127 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "16ee9f4a-a9c8-4867-a6f9-e4c7022443d0")
+	)
+	(wire
+		(pts
+			(xy 116.84 40.64) (xy 127 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1a72b3f2-eae8-415a-af21-78a7633d2b6e")
+	)
+	(bus
+		(pts
+			(xy 180.34 134.62) (xy 180.34 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1b6d1a9a-1900-4438-a867-90eb52841dc6")
+	)
+	(wire
+		(pts
+			(xy 35.56 114.3) (xy 33.02 114.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "20d364f0-0a80-46ec-8e2a-2cd38ad638ed")
+	)
+	(wire
+		(pts
+			(xy 55.88 165.1) (xy 57.15 165.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "21512d87-24f1-4cd9-b219-45f9143140d4")
+	)
+	(wire
+		(pts
+			(xy 33.02 104.14) (xy 35.56 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "226bbbb3-7ea3-422f-aa6e-e5881f943f22")
+	)
+	(bus
+		(pts
+			(xy 116.84 76.2) (xy 152.4 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "24fc7abe-7e35-4a33-9419-9341f737e39a")
+	)
+	(wire
+		(pts
+			(xy 116.84 137.16) (xy 127 137.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "272fba50-68bc-4d7f-9fa6-2cd44b577fed")
+	)
+	(bus
+		(pts
+			(xy 116.84 48.26) (xy 208.28 48.26)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2db95ce0-e467-44c8-b80a-435d8e7a6b2b")
+	)
+	(wire
+		(pts
+			(xy 116.84 55.88) (xy 127 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2f172839-9e89-45af-b687-2cbbcf320dea")
+	)
+	(bus
+		(pts
+			(xy 152.4 60.96) (xy 208.28 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2f483974-687f-4c8a-8aa4-5687491e745f")
+	)
+	(wire
+		(pts
+			(xy 116.84 109.22) (xy 170.18 109.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3555cec7-a2ae-4dd5-81d9-cd8d188a7b29")
+	)
+	(wire
+		(pts
+			(xy 55.88 139.7) (xy 57.15 139.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "35c2435f-a25f-4dcb-b37b-e08a5a914f26")
+	)
+	(bus
+		(pts
+			(xy 167.64 106.68) (xy 167.64 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3a6baddc-8b7f-42ad-85db-69e4fe86f8c4")
+	)
+	(wire
+		(pts
+			(xy 55.88 68.58) (xy 57.15 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3ffdb9c7-be86-4cb0-b66c-1e77b3499dae")
+	)
+	(wire
+		(pts
+			(xy 116.84 149.86) (xy 127 149.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "41caa20a-c28f-4249-a8d7-a259becb37a9")
+	)
+	(wire
+		(pts
+			(xy 116.84 124.46) (xy 127 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "41fe19a5-2ae1-4083-8c26-7c47eab6fafc")
+	)
+	(wire
+		(pts
+			(xy 35.56 190.5) (xy 33.02 190.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "43c4dcef-a2cc-498e-8f2f-58f388028306")
+	)
+	(wire
+		(pts
+			(xy 116.84 68.58) (xy 127 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "454e3b2b-f0eb-4bd0-abee-55d78a5f1037")
+	)
+	(wire
+		(pts
+			(xy 157.48 66.04) (xy 208.28 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "476a61d2-5c8b-47b0-ba8a-cec388d8a9ad")
+	)
+	(wire
+		(pts
+			(xy 55.88 91.44) (xy 57.15 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4798818a-b586-4c45-889e-9914912dba5a")
+	)
+	(wire
+		(pts
+			(xy 200.66 43.18) (xy 208.28 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "47cbd034-7e58-4487-9195-ca683378db0c")
+	)
+	(bus
+		(pts
+			(xy 167.64 76.2) (xy 208.28 76.2)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "494fe198-dacc-4e1a-8356-77633cbb275e")
+	)
+	(wire
+		(pts
+			(xy 62.23 68.58) (xy 63.5 68.58)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4b767f0a-9961-4a3b-977e-aeb2322aba10")
+	)
+	(wire
+		(pts
+			(xy 33.02 180.34) (xy 35.56 180.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "546712db-02ff-41a9-8e32-950fb185914d")
+	)
+	(bus
+		(pts
+			(xy 154.94 63.5) (xy 208.28 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "548b0c6d-25fc-410a-b98e-aaad66453310")
+	)
+	(wire
+		(pts
+			(xy 62.23 190.5) (xy 63.5 190.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "559661c3-6522-454c-b323-6207473ab850")
+	)
+	(wire
+		(pts
+			(xy 200.66 35.56) (xy 208.28 35.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "579ce2cc-1e52-4630-8abc-07df56d9a506")
+	)
+	(wire
+		(pts
+			(xy 33.02 58.42) (xy 35.56 58.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "57c1d0ec-c593-434a-9993-10d12a02d2ad")
+	)
+	(wire
+		(pts
+			(xy 35.56 139.7) (xy 33.02 139.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "594bdb58-5f1b-4c45-b163-917350a98647")
+	)
+	(wire
+		(pts
+			(xy 33.02 160.02) (xy 35.56 160.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5ca85846-6fc3-416f-a507-798b3503a16a")
+	)
+	(bus
+		(pts
+			(xy 190.5 157.48) (xy 190.5 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5d132514-a03d-4ea0-8e73-78e43e79fa24")
+	)
+	(wire
+		(pts
+			(xy 62.23 139.7) (xy 63.5 139.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5f730249-2bc5-4bb8-89fa-edda13781131")
+	)
+	(bus
+		(pts
+			(xy 116.84 78.74) (xy 154.94 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5fab64fc-dc90-4d62-9119-8e835ecb3660")
+	)
+	(wire
+		(pts
+			(xy 55.88 185.42) (xy 58.42 185.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5fd3db99-2f5f-4450-9682-10f48735016b")
+	)
+	(wire
+		(pts
+			(xy 193.04 40.64) (xy 193.04 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "643a3c08-8d79-4f9f-8533-81bea441ea16")
+	)
+	(wire
+		(pts
+			(xy 196.85 139.7) (xy 208.28 139.7)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6458650e-6f36-4398-9f17-01d543e58f1b")
+	)
+	(wire
+		(pts
+			(xy 62.23 45.72) (xy 63.5 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "67726b1e-eb58-40db-aa34-6c4435e744f1")
+	)
+	(bus
+		(pts
+			(xy 116.84 50.8) (xy 208.28 50.8)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "680be1e4-8ef9-431c-925f-0e7a29070e3c")
+	)
+	(wire
+		(pts
+			(xy 116.84 127) (xy 127 127)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6864ac20-db9c-410c-b6ab-996d872e9126")
+	)
+	(wire
+		(pts
+			(xy 116.84 43.18) (xy 127 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "686c76f9-e423-43cc-8f9a-25930046655b")
+	)
+	(bus
+		(pts
+			(xy 190.5 96.52) (xy 208.28 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6d7c69a0-3964-4419-a911-cefb88545573")
+	)
+	(wire
+		(pts
+			(xy 55.88 190.5) (xy 57.15 190.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "70cdbd00-ecd6-4eed-9554-d98b24da29fa")
+	)
+	(wire
+		(pts
+			(xy 33.02 81.28) (xy 35.56 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "74f57a60-caa6-4ae9-943b-ad171266e1f8")
+	)
+	(wire
+		(pts
+			(xy 170.18 109.22) (xy 170.18 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "77f6387c-a713-4bab-83cb-0338cafe71ff")
+	)
+	(bus
+		(pts
+			(xy 116.84 132.08) (xy 177.8 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7fb5bc6d-9e3c-414c-bcfb-8d36a4269c51")
+	)
+	(wire
+		(pts
+			(xy 35.56 91.44) (xy 33.02 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "80b4de03-282b-42f9-adac-7cc12043b4e7")
+	)
+	(wire
+		(pts
+			(xy 116.84 53.34) (xy 208.28 53.34)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8225ccab-e3a1-482b-89ed-f8d1982d2135")
+	)
+	(wire
+		(pts
+			(xy 137.16 43.18) (xy 147.32 43.18)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "82bbc913-cfbc-4d95-88fa-f13de7aead13")
+	)
+	(bus
+		(pts
+			(xy 180.34 88.9) (xy 208.28 88.9)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "82ca2222-ca79-48ea-827f-d5ae98b8ff42")
+	)
+	(bus
+		(pts
+			(xy 177.8 86.36) (xy 208.28 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8370bbb9-e353-4632-bc6a-5b592275fec6")
+	)
+	(wire
+		(pts
+			(xy 58.42 63.5) (xy 55.88 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "839e1cdb-61d6-44c3-a99e-d0f484eb1812")
+	)
+	(wire
+		(pts
+			(xy 58.42 109.22) (xy 55.88 109.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8416001e-01e1-49f9-a09c-01d655f81f79")
+	)
+	(wire
+		(pts
+			(xy 58.42 40.64) (xy 55.88 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "86791487-4fc7-417c-a799-38b77fd42e86")
+	)
+	(wire
+		(pts
+			(xy 170.18 78.74) (xy 208.28 78.74)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "88dcadcc-0550-4ea9-99c3-703f8c24a9b0")
+	)
+	(wire
+		(pts
+			(xy 33.02 35.56) (xy 35.56 35.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8af44f18-e9a4-4788-9765-25b4f578655a")
+	)
+	(wire
+		(pts
+			(xy 55.88 45.72) (xy 57.15 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8b32638e-e442-470a-9b45-0693fa8d835e")
+	)
+	(wire
+		(pts
+			(xy 116.84 96.52) (xy 127 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8d007706-f24f-40e1-b4b8-fcfa5186fc5f")
+	)
+	(bus
+		(pts
+			(xy 165.1 73.66) (xy 208.28 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8f551e05-ecc1-4db4-83da-f33a2e4b3b50")
+	)
+	(wire
+		(pts
+			(xy 116.84 99.06) (xy 127 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "90abe736-952b-4f62-94f4-99cfed2ca9d2")
+	)
+	(wire
+		(pts
+			(xy 33.02 129.54) (xy 35.56 129.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "92153e42-baa1-42de-b45f-bbd5edeb5219")
+	)
+	(bus
+		(pts
+			(xy 165.1 104.14) (xy 165.1 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "94289f66-d6d8-4264-aaf8-32718f45d052")
+	)
+	(wire
+		(pts
+			(xy 58.42 86.36) (xy 55.88 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "979c7a5e-fd53-4fcf-9a66-66cafac62366")
+	)
+	(wire
+		(pts
+			(xy 33.02 154.94) (xy 35.56 154.94)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9c2c8e6d-b769-44cb-9057-da0725a135e7")
+	)
+	(bus
+		(pts
+			(xy 116.84 106.68) (xy 167.64 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9d31cd90-3db8-4cfd-a90d-d570a6844ecd")
+	)
+	(wire
+		(pts
+			(xy 196.85 137.16) (xy 208.28 137.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9d5a3ac6-eb79-407b-bb63-394b1ce7206e")
+	)
+	(wire
+		(pts
+			(xy 55.88 114.3) (xy 57.15 114.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9f24e0ce-dcf1-47eb-a295-6e7b6a5b2218")
+	)
+	(wire
+		(pts
+			(xy 62.23 91.44) (xy 63.5 91.44)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a062760f-911f-4274-a793-8dbbfd720447")
+	)
+	(wire
+		(pts
+			(xy 33.02 109.22) (xy 35.56 109.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a62246be-2cdb-4655-85c1-459941c74adb")
+	)
+	(wire
+		(pts
+			(xy 196.85 144.78) (xy 208.28 144.78)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a6890038-3103-400b-80cf-d1ee6b344a02")
+	)
+	(bus
+		(pts
+			(xy 193.04 99.06) (xy 193.04 160.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a6f36533-5202-4dac-9309-cd016948166e")
+	)
+	(wire
+		(pts
+			(xy 116.84 152.4) (xy 127 152.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "aa1e4f0b-6c4d-4326-abbe-d9969ed7858a")
+	)
+	(bus
+		(pts
+			(xy 152.4 76.2) (xy 152.4 60.96)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ac5c76ba-124d-415f-9e35-9e5f31a5fd73")
+	)
+	(wire
+		(pts
+			(xy 116.84 81.28) (xy 157.48 81.28)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ac7dda70-b0a9-4b65-be3a-abe02517e943")
+	)
+	(wire
+		(pts
+			(xy 40.64 20.32) (xy 40.64 21.59)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b74f9a5f-93d6-44cd-a1ab-4ddb5977dff2")
+	)
+	(bus
+		(pts
+			(xy 187.96 132.08) (xy 208.28 132.08)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b9102c7a-673f-4e3a-adfa-d40ef8b76655")
+	)
+	(wire
+		(pts
+			(xy 196.85 142.24) (xy 208.28 142.24)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bf2543d3-d855-4cf4-91a2-a96c2f37bc15")
+	)
+	(wire
+		(pts
+			(xy 116.84 83.82) (xy 127 83.82)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c1cfa251-2512-4f6d-be93-d96ccbb0b6f2")
+	)
+	(wire
+		(pts
+			(xy 175.26 31.75) (xy 193.04 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c40afea2-51b1-4b70-ab09-3a096d6e0d49")
+	)
+	(wire
+		(pts
+			(xy 35.56 165.1) (xy 33.02 165.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c4e0666e-2498-4ff9-b101-502f87b027e6")
+	)
+	(wire
+		(pts
+			(xy 35.56 45.72) (xy 33.02 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c8e24285-1d07-4141-8c02-134f1378b703")
+	)
+	(bus
+		(pts
+			(xy 187.96 132.08) (xy 187.96 154.94)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c8f7be7b-3564-4e32-8d2d-a0af24fac114")
+	)
+	(bus
+		(pts
+			(xy 116.84 154.94) (xy 187.96 154.94)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cb7a8257-f60e-42bd-8b2e-44b18954a016")
+	)
+	(bus
+		(pts
+			(xy 116.84 134.62) (xy 180.34 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cda9c68b-f6d3-4b57-b3bf-72906c48018b")
+	)
+	(polyline
+		(pts
+			(xy 238.76 113.03) (xy 243.84 113.03)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ce1d91fb-1d6f-4fab-ad93-4e38ad195efb")
+	)
+	(wire
+		(pts
+			(xy 137.16 124.46) (xy 147.32 124.46)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cf2b5c61-c76c-4e68-be56-599bfadd11b4")
+	)
+	(wire
+		(pts
+			(xy 55.88 134.62) (xy 58.42 134.62)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d059fcf4-bc97-4d9a-83c0-6d03466cde88")
+	)
+	(wire
+		(pts
+			(xy 195.58 38.1) (xy 195.58 26.67)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d4602fb5-db81-4ee7-b1a9-a3812d36c1c3")
+	)
+	(wire
+		(pts
+			(xy 195.58 38.1) (xy 208.28 38.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d46dac96-ade5-42e2-9427-230807eca527")
+	)
+	(wire
+		(pts
+			(xy 116.84 73.66) (xy 127 73.66)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d5ef7e3b-f0af-4c28-9ff1-edf04a9441cf")
+	)
+	(wire
+		(pts
+			(xy 55.88 160.02) (xy 58.42 160.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d61b2310-4fea-4b5b-be25-97b7d9f6deb9")
+	)
+	(wire
+		(pts
+			(xy 152.4 26.67) (xy 165.1 26.67)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "d7c8dfe8-e7c8-4623-9086-0ef7abd4bddf")
+	)
+	(bus
+		(pts
+			(xy 193.04 99.06) (xy 208.28 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "de74c5c4-5fc4-4db3-9559-da1c882e4daf")
+	)
+	(bus
+		(pts
+			(xy 154.94 78.74) (xy 154.94 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "dec13602-7063-4062-849e-496d4f0364e0")
+	)
+	(bus
+		(pts
+			(xy 116.84 104.14) (xy 165.1 104.14)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e08663f2-c083-434a-ab56-238848b5a597")
+	)
+	(wire
+		(pts
+			(xy 137.16 71.12) (xy 147.32 71.12)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e08ae5ff-de37-46dc-9d06-addc48e424be")
+	)
+	(wire
+		(pts
+			(xy 175.26 26.67) (xy 195.58 26.67)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e14330af-be57-4f48-9f38-32e41d13e4cd")
+	)
+	(bus
+		(pts
+			(xy 116.84 157.48) (xy 190.5 157.48)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e1c305f6-a3bd-4df8-9c52-d4847a52acfb")
+	)
+	(wire
+		(pts
+			(xy 157.48 81.28) (xy 157.48 66.04)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e1fe4dea-d905-4f2e-902b-e13d6f468d28")
+	)
+	(wire
+		(pts
+			(xy 33.02 86.36) (xy 35.56 86.36)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ed8816ed-464b-453d-b426-fc50be44f203")
+	)
+	(wire
+		(pts
+			(xy 137.16 149.86) (xy 147.32 149.86)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ee0b12cf-c28d-48e7-8d7c-748d2f5219c0")
+	)
+	(wire
+		(pts
+			(xy 33.02 185.42) (xy 35.56 185.42)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ee9c6cd3-3b9a-410f-974e-f8fb24869aab")
+	)
+	(wire
+		(pts
+			(xy 193.04 40.64) (xy 208.28 40.64)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f22ba485-92ee-4f56-9807-24dbd399efe0")
+	)
+	(bus
+		(pts
+			(xy 116.84 160.02) (xy 193.04 160.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f2745229-28d7-45c0-b858-8b8a7d54eaf3")
+	)
+	(wire
+		(pts
+			(xy 116.84 45.72) (xy 127 45.72)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fa3300f9-6ee6-4597-af1c-ae1997481f10")
+	)
+	(wire
+		(pts
+			(xy 116.84 111.76) (xy 127 111.76)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fc2cd584-83be-4ad7-8590-ff3d64695ae1")
+	)
+	(wire
+		(pts
+			(xy 33.02 63.5) (xy 35.56 63.5)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fd25c1ce-cf58-41eb-ae18-fc4b0715afcf")
+	)
+	(wire
+		(pts
+			(xy 62.23 114.3) (xy 63.5 114.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "fec86c0b-9103-4fde-ab04-fc23cce1ec85")
+	)
+	(label "Limit_Z"
+		(at 119.38 137.16 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "008f3565-b560-44ab-85b9-b54a0971b579")
+	)
+	(label "Enable"
+		(at 139.7 149.86 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "019c8b37-8823-4689-89a6-d6c55e9477eb")
+	)
+	(label "Limit_X1"
+		(at 196.85 137.16 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0d7ec129-60b0-4e17-99e6-fd671e2fb683")
+	)
+	(label "Reset"
+		(at 119.38 152.4 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1b7bd41e-bf70-4bbd-83ea-d31ee7f0f4cc")
+	)
+	(label "Limit_Z"
+		(at 196.85 144.78 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "22c89df5-e374-4ffc-b3ea-f7cb2f081296")
+	)
+	(label "Start"
+		(at 119.38 40.64 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2d1c330f-ed0c-4180-8278-63962be84b7f")
+	)
+	(label "Enable"
+		(at 139.7 43.18 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4097cf0e-867f-450b-bb83-b540ce3056d1")
+	)
+	(label "Reset"
+		(at 119.38 127 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4b386f4d-24fa-4194-b3d3-72f4eda52808")
+	)
+	(label "Enable"
+		(at 139.7 99.06 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4b54ee7d-c343-44c6-9a6a-3f90e440b37b")
+	)
+	(label "Enable"
+		(at 152.4 26.67 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5048011a-7456-4d6c-b301-463dd7ebf47c")
+	)
+	(label "Limit_Y"
+		(at 119.38 111.76 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5190d41e-9752-4068-a9e7-ef165648f17f")
+	)
+	(label "Start"
+		(at 119.38 68.58 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "7bb210f5-3fad-4aa8-b9b8-d00d0fd0c256")
+	)
+	(label "Start"
+		(at 200.66 35.56 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8acc50d6-d589-4831-ab85-e877242881e6")
+	)
+	(label "Reset"
+		(at 119.38 101.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "992f361f-119c-4dcd-9ffc-591c77a32731")
+	)
+	(label "Reset"
+		(at 119.38 73.66 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "9dec4c88-7081-4458-86af-66d698dc7d00")
+	)
+	(label "Enable"
+		(at 139.7 124.46 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b26ad758-0b10-4697-8a25-90865ae0825a")
+	)
+	(label "Start"
+		(at 119.38 96.52 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "b388198f-9df8-45da-9db9-3e71332e4148")
+	)
+	(label "Enable"
+		(at 139.7 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bcd3dc48-e752-426f-83ad-e4cdbdda8d3c")
+	)
+	(label "Limit_X2"
+		(at 119.38 83.82 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "bf4df7ce-013f-407f-9dfc-3ce2c7470562")
+	)
+	(label "Limit_X1"
+		(at 119.38 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c44db105-69c7-44fd-b01a-d75fecf8e973")
+	)
+	(label "Reset"
+		(at 200.66 43.18 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c7793072-f247-48b7-a3ea-b2a6977ef05f")
+	)
+	(label "Limit_X2"
+		(at 196.85 139.7 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d0deb923-41dc-4428-9ffd-772f2cbcce06")
+	)
+	(label "Limit_Y"
+		(at 196.85 142.24 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d3f1b6c7-4613-4830-bdd8-5958126d35fb")
+	)
+	(label "Reset"
+		(at 119.38 45.72 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f96f8f5b-a948-4bda-9fbd-7eab5646bbf3")
+	)
+	(global_label "24V-ZR"
+		(shape output)
+		(at 58.42 134.62 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "10642b43-8c4b-4e66-be64-66b1002da1f6")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 69.0486 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "48V-X1"
+		(shape output)
+		(at 58.42 40.64 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "1707078e-507f-45b1-a84b-bd6b666eccde")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 69.0063 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "24V-Z"
+		(shape output)
+		(at 58.42 109.22 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "29b69a9e-f1c0-4541-b3c4-e5d0babcd48c")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 68.1596 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "24V"
+		(shape output)
+		(at 58.42 160.02 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "34ce8e4f-285f-4d4f-8941-6d0a4670d710")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 64.9128 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "5V"
+		(shape output)
+		(at 58.42 185.42 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "5b4e5373-39c7-42e0-a322-e18194998b55")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 66.1034 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "48V-X2"
+		(shape output)
+		(at 58.42 63.5 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a027b5d2-29d6-4b93-ac5d-7d696f078afd")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 69.0063 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "48V-Y"
+		(shape output)
+		(at 58.42 86.36 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "a73761eb-4e7f-488b-959b-77fcb4089678")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 68.0749 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "5V"
+		(shape input)
+		(at 154.94 31.75 180)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right)
+		)
+		(uuid "dfad47d2-f0f5-4ff8-abb0-da990cf97d76")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 149.7361 31.75 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Gantry_Robot_Components:MDR-20-5")
+		(at 45.72 160.02 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "026493ab-b972-43b1-8333-9cc46304b48d")
+		(property "Reference" "PS6"
+			(at 45.72 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "Unknown"
+			(at 45.72 167.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 45.72 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.meanwell-web.com/content/files/pdfs/productPdfs/MW/Mdr-20/MDR-20-spec.pdf"
+			(at 45.72 172.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 45.72 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "141b925b-40dc-4162-b561-1ee847bdafcf")
+		)
+		(pin "2"
+			(uuid "d2408f99-ef84-4ce9-87ab-faea3cd80b15")
+		)
+		(pin "3"
+			(uuid "be5c219f-19c7-4e32-ac39-e5a41e48b0f6")
+		)
+		(pin "4"
+			(uuid "1d07fec4-83f7-43d0-b7c5-6db4a739e6d5")
+		)
+		(pin "5"
+			(uuid "c6ae190b-520c-4436-99ad-c36204f11d0b")
+		)
+		(pin "6"
+			(uuid "170c9064-c945-4b42-b14e-346b54e82b79")
+		)
+		(pin "7"
+			(uuid "9dbad10a-4569-40b8-9d88-ea09eb959524")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "PS6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:PWR_FLAG")
+		(at 50.8 21.59 180)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "038af6bb-d46d-4ef7-b282-a4a8e6e34040")
+		(property "Reference" "#FLG03"
+			(at 50.8 23.495 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "PWR_FLAG"
+			(at 50.8 26.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 50.8 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 50.8 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 50.8 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1806f8eb-6c29-4a4e-a08f-9443461021f6")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#FLG03")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 45.72 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "06c059b1-2b0a-43c8-aecc-6ec4aa958521")
+		(property "Reference" "#PWR026"
+			(at 63.5 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 59.69 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "90332b8e-4c8a-4f0d-bdae-ebb5586beeb5")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR026")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 114.3 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "16b47b77-862b-4396-9eb3-c625e7e44d8e")
+		(property "Reference" "#PWR012"
+			(at 33.02 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "cd10c64f-4c1e-4dd5-b4eb-13b130c3c8c7")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR012")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Gantry_Robot_Components:SDR-960-48")
+		(at 45.72 40.64 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "19ce015c-b66e-44fb-91aa-c532355c844f")
+		(property "Reference" "PS1"
+			(at 45.72 33.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SDR-960-48"
+			(at 45.72 48.26 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 45.72 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.meanwell-web.com/content/files/pdfs/productPdfs/MW/SDR-960/SDR-960-Spec.pdf"
+			(at 45.72 53.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 45.72 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ea8f3c0c-672c-4d69-96fc-262ac8d2668b")
+		)
+		(pin "2"
+			(uuid "b6b240f8-3cc4-47eb-94f6-df50ba5d6530")
+		)
+		(pin "3"
+			(uuid "4637e655-e618-41f6-98c9-ca6e73f9ad28")
+		)
+		(pin "4"
+			(uuid "71f75685-93ef-47c0-9560-f6bace016c0c")
+		)
+		(pin "5"
+			(uuid "29f654da-c81b-44c3-bdf0-01ecaaec3f31")
+		)
+		(pin "6"
+			(uuid "1b78ceac-5cc9-4a32-b7bb-2853745ec255")
+		)
+		(pin "7"
+			(uuid "e8e6d391-a5fc-4319-a3f5-47d88b92b1f0")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "PS1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 81.28 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "1a0d6984-6346-480a-81f1-a044a881d3bb")
+		(property "Reference" "#PWR022"
+			(at 33.02 87.63 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 82.55 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 33.02 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 81.28 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "81da5be1-845d-49ab-ba0a-2a6c1723e2b0")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR022")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:AC")
+		(at 33.02 134.62 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "1bdcd988-5f80-4dad-9dab-1f2380bfca9f")
+		(property "Reference" "#PWR014"
+			(at 35.56 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "AC"
+			(at 26.67 135.255 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "77fb159c-a001-4625-9d95-0d9af3850801")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR014")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 68.58 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "1c8cb859-0f51-471d-a0b6-b59b2a9d6654")
+		(property "Reference" "#PWR027"
+			(at 63.5 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 59.69 69.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "58696d1f-bcbb-4a76-a026-487e69cddf28")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR027")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:PWR_FLAG")
+		(at 40.64 20.32 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "299f41a2-ddcb-4688-877c-013e6f228da3")
+		(property "Reference" "#FLG02"
+			(at 40.64 18.415 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "PWR_FLAG"
+			(at 40.64 16.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 40.64 20.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 40.64 20.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 40.64 20.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "8671e7b4-8e6b-4401-8602-3e6ddd82f3d3")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#FLG02")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:AC")
+		(at 33.02 40.64 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "2e68bdde-87b2-42c9-b743-7be8db6cfc31")
+		(property "Reference" "#PWR02"
+			(at 35.56 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "AC"
+			(at 26.67 41.275 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 40.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4dd88c66-be3b-491b-8f2e-19eff93acb5a")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR02")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Gantry_Robot_Components:SDR-240-24")
+		(at 45.72 134.62 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "39b46727-c744-4a1d-aced-77390c738a99")
+		(property "Reference" "PS5"
+			(at 43.18 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "SDR-240-24"
+			(at 39.37 142.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 40.64 132.08 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.meanwell-web.com/content/files/pdfs/productPdfs/MW/SDR-240/SDR-240-spec.pdf"
+			(at 40.64 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 45.72 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "6c72ed1d-20b6-4926-a9fa-10fa20065310")
+		)
+		(pin "2"
+			(uuid "eec16b92-3d6d-4699-8790-d58a4790d578")
+		)
+		(pin "3"
+			(uuid "298d0667-a079-46b1-8670-9c397aefa993")
+		)
+		(pin "4"
+			(uuid "1b2ffffb-7776-4605-bad7-fdcfb847affa")
+		)
+		(pin "5"
+			(uuid "39173244-d00e-4159-ba18-643a3cf0d46a")
+		)
+		(pin "6"
+			(uuid "f3d38e7d-f3b3-4724-a472-0c08bc6ef396")
+		)
+		(pin "7"
+			(uuid "0f295235-12e8-4882-a6ba-2dc44ebafca9")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "PS5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Switch:SW_SPST")
+		(at 132.08 124.46 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "3d42e924-5d44-4da9-9037-668bc0b7de42")
+		(property "Reference" "SW5"
+			(at 132.08 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SW_SPST"
+			(at 132.08 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 132.08 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 132.08 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "af8922c8-7278-440e-a5bd-1c2d33285247")
+		)
+		(pin "2"
+			(uuid "79e2ff03-5cd0-4d7d-981f-d97b4ed9bbbb")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "SW5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 91.44 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "4df81912-4333-4aeb-9ad3-a5d843568145")
+		(property "Reference" "#PWR09"
+			(at 33.02 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 92.71 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bece35d9-36e3-4168-b317-a79f4319b369")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR09")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 154.94 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "51d54065-1a93-4ae8-acee-f251847456b8")
+		(property "Reference" "#PWR025"
+			(at 33.02 161.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 156.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 33.02 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 154.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "09e814f1-0924-4799-917b-242c16b4fe98")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR025")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Gantry_Robot_Components:MDR-20-5")
+		(at 45.72 185.42 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "6880e934-5713-40fc-8e4a-901c3673dbb4")
+		(property "Reference" "PS7"
+			(at 45.72 177.8 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "MDR-20-5"
+			(at 45.72 193.04 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 45.72 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.meanwell-web.com/content/files/pdfs/productPdfs/MW/Mdr-20/MDR-20-spec.pdf"
+			(at 45.72 198.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 45.72 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "28a658b6-ba35-4e6f-9ff3-52bd968a378d")
+		)
+		(pin "2"
+			(uuid "f1bac434-0cff-4733-be9b-a43503f88920")
+		)
+		(pin "3"
+			(uuid "21c45e54-8091-447a-9a63-419f16bfd75a")
+		)
+		(pin "4"
+			(uuid "21b1a842-957a-48d6-a27e-0c18d4e71875")
+		)
+		(pin "5"
+			(uuid "d426de6e-3d5c-4ffd-8aa2-670ed192ab0b")
+		)
+		(pin "6"
+			(uuid "11fbbf4a-3643-4f2b-9676-3191973d135f")
+		)
+		(pin "7"
+			(uuid "f8f3d882-2c8a-4a9c-8d02-3270a7390dbf")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "PS7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 68.58 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "72b31c35-c9c9-4429-b58a-3c9720a85347")
+		(property "Reference" "#PWR06"
+			(at 33.02 74.93 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 69.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c529ce75-1891-4f9a-a979-511e31c28cec")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR06")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Switch:SW_SPST")
+		(at 132.08 43.18 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "768882db-3163-4436-bfde-686fbaad5491")
+		(property "Reference" "SW2"
+			(at 132.08 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SW_SPST"
+			(at 132.08 39.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 132.08 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 132.08 43.18 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "85f32d03-de3b-4893-8b2c-1b26ec7fd194")
+		)
+		(pin "2"
+			(uuid "e0888ed7-cdf1-47b6-9162-454a7112a2bd")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "SW2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Gantry_Robot_Components:SDR-240-24")
+		(at 45.72 109.22 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "769e5308-282a-4365-9151-cf4ab16e8fe8")
+		(property "Reference" "PS4"
+			(at 43.18 101.6 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "SDR-240-24"
+			(at 39.37 116.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 40.64 106.68 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.meanwell-web.com/content/files/pdfs/productPdfs/MW/SDR-240/SDR-240-spec.pdf"
+			(at 40.64 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 45.72 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "86911228-a465-482b-8c03-db83c97cc65d")
+		)
+		(pin "2"
+			(uuid "f0b0551b-7ddd-4a1d-b8a5-d9c41655c787")
+		)
+		(pin "3"
+			(uuid "95fa79ba-cb13-4299-a374-911950cfeae3")
+		)
+		(pin "4"
+			(uuid "6158c090-8d9b-466a-be4e-d9625d3c7608")
+		)
+		(pin "5"
+			(uuid "79b613c2-349d-4fe8-8e2c-6ca7da7d2ecb")
+		)
+		(pin "6"
+			(uuid "bd557f21-e3cb-4233-a53a-5e3d1314391f")
+		)
+		(pin "7"
+			(uuid "404a361c-4c7f-47b7-99e8-eacae962a4e2")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "PS4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 114.3 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "77202cc2-b731-4945-9f99-f3f8aaa93369")
+		(property "Reference" "#PWR029"
+			(at 63.5 120.65 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 59.69 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "a4e8e2aa-18ab-4622-ace8-04ac2d0f8555")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR029")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 190.5 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "7f874ce4-c61d-4fff-b81b-5c88818f5f05")
+		(property "Reference" "#PWR010"
+			(at 33.02 196.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 191.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b32e3454-9f46-4d1f-8879-5c910abd4d86")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR010")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:NetTie_2")
+		(at 59.69 114.3 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "84c475a9-e57e-453b-8c43-e3c71e0d260f")
+		(property "Reference" "NT4"
+			(at 59.69 118.11 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "NetTie_2"
+			(at 59.69 115.57 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 59.69 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 59.69 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 59.69 114.3 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "5d26d8fb-483a-4296-99c2-c2d166516fff")
+		)
+		(pin "2"
+			(uuid "3818ec7f-4d51-47ae-9edd-2970cbb19397")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "NT4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 139.7 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "8b5995b0-7d89-4112-ba55-24a4f2c8d400")
+		(property "Reference" "#PWR030"
+			(at 63.5 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 59.69 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "86b43f64-9dc4-4f4f-b95a-868cf073b1a2")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR030")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:AC")
+		(at 33.02 86.36 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "8f065166-dc68-4a50-9daf-9565bade384c")
+		(property "Reference" "#PWR08"
+			(at 35.56 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "AC"
+			(at 26.67 86.995 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "402985e5-9887-4c17-b51c-c1a80b48790d")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR08")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Gantry_Robot_Components:SW_push_closed_open")
+		(at 170.18 29.21 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9b0f3f9e-0dcb-404e-849b-2c49ab96d5e0")
+		(property "Reference" "SW1"
+			(at 170.18 24.13 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "~"
+			(at 170.18 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 170.18 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 170.18 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 170.18 29.21 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "39ba0e32-50b0-4b50-9d4f-69664f5355d4")
+		)
+		(pin "2"
+			(uuid "72d52864-8d1b-4630-b6d2-616a4132e5ea")
+		)
+		(pin "3"
+			(uuid "39eafc75-67b5-4a55-baac-0e075d3ff583")
+		)
+		(pin "4"
+			(uuid "062a1a7d-62e1-468f-808a-26f50dc79f0f")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "SW1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 190.5 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9ba7698c-0552-473e-a002-a552bfdfe0f2")
+		(property "Reference" "#PWR013"
+			(at 63.5 196.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 59.69 191.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "8dacaa82-96fb-4475-8d71-6799ff4c4776")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR013")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:AC")
+		(at 50.8 20.32 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "9d175dda-2f28-473d-8c6d-3dba2689cb3b")
+		(property "Reference" "#PWR021"
+			(at 50.8 22.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "AC"
+			(at 50.8 13.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 50.8 20.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 50.8 20.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 50.8 20.32 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "526d358f-f512-4ec5-9abe-bdbf9b7c4fad")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR021")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 91.44 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "9f52db8b-1f57-404a-8696-0bc0c623562f")
+		(property "Reference" "#PWR028"
+			(at 63.5 97.79 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 59.69 92.71 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "2af2c311-4c72-4c5f-a408-2f21ee42b0f0")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR028")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:NetTie_2")
+		(at 59.69 68.58 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "a2c2a44a-af18-4a74-b46e-56fbb7b3e203")
+		(property "Reference" "NT2"
+			(at 59.69 72.39 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "NetTie_2"
+			(at 59.69 69.85 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 59.69 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 59.69 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 59.69 68.58 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c38967fc-1651-4ef9-be0b-a395e3bace87")
+		)
+		(pin "2"
+			(uuid "d5800e2a-48ac-46a6-82fb-3c4e25b14920")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "NT2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Switch:SW_SPST")
+		(at 132.08 149.86 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a4a8e97a-d42e-4453-891a-54df4644fe86")
+		(property "Reference" "SW6"
+			(at 132.08 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SW_SPST"
+			(at 132.08 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 149.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 132.08 149.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 132.08 149.86 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0c1f0abc-d37e-4e30-b644-20397a870ffd")
+		)
+		(pin "2"
+			(uuid "3fd907e6-0dea-4866-9175-7d130d5536bd")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "SW6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 35.56 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a50cc5c7-7145-482d-ac73-a9479add7cb0")
+		(property "Reference" "#PWR016"
+			(at 33.02 41.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 36.83 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 33.02 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3f8873bd-f46d-4550-be71-8c70a95b3b00")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR016")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 139.7 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a6045faf-5413-4a2d-9ab4-fc0065c46a80")
+		(property "Reference" "#PWR015"
+			(at 33.02 146.05 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "6c967fa1-f146-4ca2-a0fb-a02362cd8918")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR015")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Gantry_Robot_Components:SDR-960-48")
+		(at 45.72 63.5 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a7d03334-7532-4882-b8ea-336a331a2054")
+		(property "Reference" "PS2"
+			(at 45.72 55.88 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SDR-960-48"
+			(at 45.72 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 45.72 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.meanwell-web.com/content/files/pdfs/productPdfs/MW/SDR-960/SDR-960-Spec.pdf"
+			(at 45.72 76.2 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 45.72 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "4261b5dd-a79d-4824-9f9e-363fda1ce23f")
+		)
+		(pin "2"
+			(uuid "bcb82145-7e68-41b2-a4c7-994b0c0db30b")
+		)
+		(pin "3"
+			(uuid "85a64e5f-16eb-4a8c-bab2-2abaa1c9a977")
+		)
+		(pin "4"
+			(uuid "5d47722e-0259-46a2-909f-c4ce72c402ae")
+		)
+		(pin "5"
+			(uuid "60a56648-7237-409d-b082-e1da7a1aacaa")
+		)
+		(pin "6"
+			(uuid "d155da7b-7a6b-45ea-b45c-d50eb13713f0")
+		)
+		(pin "7"
+			(uuid "cd4bb9b1-2733-4ec2-883a-cbaf8e15dbb2")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "PS2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Gantry_Robot_Components:SDR-960-48")
+		(at 45.72 86.36 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "a93b3616-7afb-41ae-a5d9-329a93295c13")
+		(property "Reference" "PS3"
+			(at 45.72 78.74 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SDR-960-48"
+			(at 45.72 93.98 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 45.72 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.meanwell-web.com/content/files/pdfs/productPdfs/MW/SDR-960/SDR-960-Spec.pdf"
+			(at 45.72 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 45.72 86.36 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7fd16128-1892-4e79-81e4-f8110ebc655c")
+		)
+		(pin "2"
+			(uuid "8108593c-e1f7-4e7e-9cee-09be3284e798")
+		)
+		(pin "3"
+			(uuid "c26d4a4b-2ad0-4e11-a33e-e4c3badf5f16")
+		)
+		(pin "4"
+			(uuid "10bfb429-6fe8-4c64-96e5-469e20cf0c4f")
+		)
+		(pin "5"
+			(uuid "97b89490-83e5-45e0-b196-aab7c1cff9ed")
+		)
+		(pin "6"
+			(uuid "742624c3-6203-4b7f-b340-6e0dc92b9938")
+		)
+		(pin "7"
+			(uuid "b543d1cb-b85e-481a-a3a5-f20dca946f7d")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "PS3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 40.64 21.59 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "abaa3d51-3f73-4dd8-929b-6e2d4d54b914")
+		(property "Reference" "#PWR020"
+			(at 40.64 27.94 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 40.64 26.67 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 40.64 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 40.64 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 40.64 21.59 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "c2d81b17-4275-4e71-a0d3-5a2a40d137d7")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR020")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 129.54 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "aeda582d-3350-4d59-a63d-9792932e3322")
+		(property "Reference" "#PWR024"
+			(at 33.02 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 130.81 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 33.02 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 129.54 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "226aae29-09d8-43a9-9142-4aa879c78a9e")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR024")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:AC")
+		(at 33.02 63.5 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "aef1db23-5316-4c75-9ea4-1ec996d38817")
+		(property "Reference" "#PWR05"
+			(at 35.56 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "AC"
+			(at 26.67 64.135 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 63.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "69c35ffd-06b1-4496-9650-f8a65cf78ce8")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR05")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:AC")
+		(at 33.02 160.02 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b236b819-1919-44de-9170-e10dd20ae94a")
+		(property "Reference" "#PWR017"
+			(at 35.56 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "AC"
+			(at 26.67 160.655 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0a32f160-05c6-404c-860e-445cdc6e2c9f")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR017")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:AC")
+		(at 33.02 185.42 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "c856116b-d282-4267-8506-226faf423133")
+		(property "Reference" "#PWR07"
+			(at 35.56 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "AC"
+			(at 26.67 186.055 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 185.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "7f1ea6a1-7e28-4a2e-ad04-07ac92875180")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR07")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:NetTie_2")
+		(at 59.69 45.72 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "c931b261-e9a6-451d-a198-f3f882ab3208")
+		(property "Reference" "NT1"
+			(at 59.69 49.53 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "NetTie_2"
+			(at 59.69 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 59.69 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 59.69 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 59.69 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "fcc1760b-fd4d-43df-bec9-daecdd5e618f")
+		)
+		(pin "2"
+			(uuid "44e7378d-3ee5-4477-a6eb-591f15c25cdc")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "NT1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:NetTie_2")
+		(at 59.69 165.1 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "cb0c5448-2588-4044-8fe5-b6638428add4")
+		(property "Reference" "NT6"
+			(at 59.69 168.91 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "NetTie_2"
+			(at 59.69 166.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 59.69 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 59.69 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 59.69 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "3892fcda-5b95-4f6e-a833-6619d4ea3cef")
+		)
+		(pin "2"
+			(uuid "4da516ec-1aa3-43d0-b7ea-19348f4a2fc5")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "NT6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 45.72 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e173b2a4-47bf-479d-9ee3-f5ba34e523f3")
+		(property "Reference" "#PWR03"
+			(at 33.02 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 46.99 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 45.72 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d9397c46-0002-4dca-93a6-a81845efceb4")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR03")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 180.34 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "e811af10-0b49-4235-a05a-82b71d7fe3f8")
+		(property "Reference" "#PWR04"
+			(at 33.02 186.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 181.61 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 33.02 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 180.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "cc6ad2a7-44da-4833-ae40-451b95232b6d")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR04")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:AC")
+		(at 33.02 109.22 90)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e9f0f1b2-d068-445a-a989-5ed589ca4b84")
+		(property "Reference" "#PWR011"
+			(at 35.56 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "AC"
+			(at 26.67 109.855 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 109.22 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "bd770a7f-ab98-4ea6-aae8-e4c17f09a530")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR011")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 104.14 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "ed63db60-50b3-48b6-9f89-e8ccabf92884")
+		(property "Reference" "#PWR023"
+			(at 33.02 110.49 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 104.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 33.02 104.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 104.14 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "1b05f9ba-a73c-49b1-8c57-904c2836dd29")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR023")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Switch:SW_SPST")
+		(at 132.08 71.12 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f841b235-8ec4-4490-a514-1f4968c11a12")
+		(property "Reference" "SW3"
+			(at 132.08 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SW_SPST"
+			(at 132.08 67.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 132.08 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 132.08 71.12 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "8f77949a-47fb-4777-ad91-def4de765a75")
+		)
+		(pin "2"
+			(uuid "7611285a-a06c-4b5a-bdc4-89bbdabd72a1")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "SW3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 63.5 165.1 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "f91ce78b-f8b7-44ec-85e8-db8dee84c9e5")
+		(property "Reference" "#PWR031"
+			(at 63.5 171.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 59.69 166.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 63.5 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 63.5 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 63.5 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b5099939-5d96-4135-adc8-1bd63479a87d")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR031")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Switch:SW_SPST")
+		(at 132.08 99.06 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "faa71de2-08f7-4353-a042-69ccd43f4aa2")
+		(property "Reference" "SW4"
+			(at 132.08 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "SW_SPST"
+			(at 132.08 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 132.08 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 132.08 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 132.08 99.06 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "16114248-61d4-462b-81c9-4f452b22c31d")
+		)
+		(pin "2"
+			(uuid "66c0ca20-53a3-4efa-8a73-4829fe5f05a4")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "SW4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:NetTie_2")
+		(at 59.69 190.5 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "fb18da63-000b-4a41-97dc-cdfc18e7914d")
+		(property "Reference" "NT7"
+			(at 59.69 194.31 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "NetTie_2"
+			(at 59.69 191.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 59.69 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 59.69 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 59.69 190.5 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "447e9e26-b885-4665-80c3-50678b25b30d")
+		)
+		(pin "2"
+			(uuid "3d7d9685-1c4d-4a84-a564-5d892f5f6f25")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "NT7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 58.42 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "fc8ee063-2051-4921-9c8f-df512f33eade")
+		(property "Reference" "#PWR019"
+			(at 33.02 64.77 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 33.02 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 58.42 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "d96d4855-1f61-4b16-bc17-ef4a32572860")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR019")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:NetTie_2")
+		(at 59.69 139.7 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "fd027a84-9cac-4527-ab62-ca1a6c80a1e2")
+		(property "Reference" "NT5"
+			(at 59.69 143.51 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "NetTie_2"
+			(at 59.69 140.97 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 59.69 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 59.69 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 59.69 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "77016fef-1b47-498b-a71f-ccdd0234a2be")
+		)
+		(pin "2"
+			(uuid "741b7f39-bb1b-4bbf-8a52-ae21947b5b68")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "NT5")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:GND")
+		(at 33.02 165.1 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "fd976f6e-6468-48ba-9703-d7af2708f497")
+		(property "Reference" "#PWR018"
+			(at 33.02 171.45 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "GND"
+			(at 29.21 166.37 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 33.02 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 33.02 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 33.02 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "b1531e1b-7695-4158-b4f9-d51c81f3a5ce")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "#PWR018")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:NetTie_2")
+		(at 59.69 91.44 0)
+		(mirror x)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(dnp no)
+		(uuid "febbe2c8-ba6e-49e1-a184-9be0c4947531")
+		(property "Reference" "NT3"
+			(at 59.69 95.25 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "NetTie_2"
+			(at 59.69 92.71 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Footprint" ""
+			(at 59.69 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 59.69 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 59.69 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "16f83d72-cf2f-4bef-85e4-801bc03856cc")
+		)
+		(pin "2"
+			(uuid "4004fb4d-71ea-4c6a-b0f7-193575a9a021")
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(reference "NT3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet
+		(at 88.9 93.98)
+		(size 27.94 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "0758f94d-174f-4c8e-9d8e-58d8bd9c552d")
+		(property "Sheetname" "Axis Y"
+			(at 88.9 93.345 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "axis_y.kicad_sch"
+			(at 88.9 114.8846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "Limit" output
+			(at 116.84 111.76 0)
+			(uuid "3072f3c6-ab39-4eb1-87e9-a77fe49fe845")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DOut{Ready Alert Error}" output
+			(at 116.84 104.14 0)
+			(uuid "367cb3a6-2711-472e-977d-0b1d9ea93b62")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "FB{A A{slash} B B{slash} N N{slash}}" output
+			(at 116.84 106.68 0)
+			(uuid "06abc567-cf69-4790-8d7b-85521e7ae79b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Velocity" input
+			(at 116.84 109.22 0)
+			(uuid "b4d9fa90-bd77-472f-a85b-f7ae6fda857f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Enable" input
+			(at 116.84 99.06 0)
+			(uuid "438825cf-9fad-42ad-9151-ef0c8f7b16bd")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Start" input
+			(at 116.84 96.52 0)
+			(uuid "ffb26d5d-bea4-4ad5-a228-d1083ff6b683")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Reset" input
+			(at 116.84 101.6 0)
+			(uuid "983fe7bc-63db-4ea9-97c5-74908279c90c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 88.9 121.92)
+		(size 27.94 17.78)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "0ea5d0d5-ad85-4dc0-9ea4-c06b178fa1a5")
+		(property "Sheetname" "Axis Z"
+			(at 88.9 121.285 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "axis_z.kicad_sch"
+			(at 88.9 140.2846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "FB{A A{slash} B B{slash} N N{slash}}" output
+			(at 116.84 134.62 0)
+			(uuid "d7b9b053-c53f-4845-9b91-a17aa6c0fac2")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DIn{Step Direction}" input
+			(at 116.84 129.54 0)
+			(uuid "cd656179-f4d9-4568-a8b1-5c44a32fc922")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Limit" output
+			(at 116.84 137.16 0)
+			(uuid "fab084d1-5c7e-4e4f-b85b-e438c1d40953")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DOut{Alert Error}" output
+			(at 116.84 132.08 0)
+			(uuid "68d9c111-842b-4aa8-8684-b7e0eb652f5f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Enable" input
+			(at 116.84 124.46 0)
+			(uuid "8b51b01e-46c3-4a9e-a84e-8f2f27f1743f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Reset" input
+			(at 116.84 127 0)
+			(uuid "24a5e53f-009b-416e-918e-dffc4ed2d463")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(page "5")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 88.9 38.1)
+		(size 27.94 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "4ca12cb4-ae2b-43c8-849c-c57b83695f05")
+		(property "Sheetname" "Axis X1"
+			(at 88.9 37.465 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "axis_x1.kicad_sch"
+			(at 88.9 59.0046 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "Limit" output
+			(at 116.84 55.88 0)
+			(uuid "54b3cac1-af33-4d69-9080-ad8598a7b0fb")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DOut{Ready Alert Error}" output
+			(at 116.84 48.26 0)
+			(uuid "e5eff761-2937-42c2-88c7-b6dcc0ae5fa9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Enable" input
+			(at 116.84 43.18 0)
+			(uuid "e8b952d2-3614-4a86-af94-06a037a7935a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "FB{A A{slash} B B{slash} N N{slash}}" output
+			(at 116.84 50.8 0)
+			(uuid "fab15874-14f0-4212-9c55-b36ce700a54c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Velocity" input
+			(at 116.84 53.34 0)
+			(uuid "3ae57f18-e14a-4adf-aa6f-30107e6ee31c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Start" input
+			(at 116.84 40.64 0)
+			(uuid "cba9c486-100b-4b60-9197-08d14ce1efb0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Reset" input
+			(at 116.84 45.72 0)
+			(uuid "97ee46a2-7642-4a7d-a61f-eea1596e1137")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 208.28 127)
+		(size 40.64 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "80da6d55-c2ff-431a-b6db-a6018183f5cc")
+		(property "Sheetname" "MESA 7i96S"
+			(at 208.28 126.365 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "mesa_7i96s.kicad_sch"
+			(at 208.28 147.9046 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "Limit_X1" input
+			(at 208.28 137.16 180)
+			(uuid "4dc88587-65c7-4c3c-a3fd-fd93fb6e2ff2")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "Limit_Y" input
+			(at 208.28 142.24 180)
+			(uuid "3f3f9da9-788f-4b07-9e43-83c16a846cc9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "Limit_Z" input
+			(at 208.28 144.78 180)
+			(uuid "b656b102-9928-46a2-a056-3c75a72a2171")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "Limit_X2" input
+			(at 208.28 139.7 180)
+			(uuid "80fb285e-2836-4051-a8c6-161c50929828")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "DOut_Z{Step Direction}" output
+			(at 208.28 129.54 180)
+			(uuid "712e7453-f02b-4ea1-a762-4954b34a88ad")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "DOut_ZR{Step Direction}" output
+			(at 208.28 132.08 180)
+			(uuid "fe618123-4d47-40b7-b781-49eb1a8c803e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(page "7")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 88.9 66.04)
+		(size 27.94 20.32)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "a927da98-22df-4b7b-8567-168a44d3632a")
+		(property "Sheetname" "Axis X2"
+			(at 88.9 65.405 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "axis_x2.kicad_sch"
+			(at 88.9 86.9446 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "DOut{Ready Alert Error}" output
+			(at 116.84 76.2 0)
+			(uuid "76833a8a-279a-43b2-b085-2204b870003e")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "FB{A A{slash} B B{slash} N N{slash}}" output
+			(at 116.84 78.74 0)
+			(uuid "44fe5b97-6f2b-4a73-823e-364537321b5c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Velocity" input
+			(at 116.84 81.28 0)
+			(uuid "eaf53981-38de-4940-a4d5-740a52384895")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Limit" output
+			(at 116.84 83.82 0)
+			(uuid "166e38b7-9b5e-4719-b451-2cd48fee007b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Enable" input
+			(at 116.84 71.12 0)
+			(uuid "b3f7ec24-6017-4590-9dbd-791d2a2a92a1")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Start" input
+			(at 116.84 68.58 0)
+			(uuid "2170b443-f42b-46d2-86c4-c7eb6ffea489")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Reset" input
+			(at 116.84 73.66 0)
+			(uuid "4aaae3eb-5ac1-437d-97ae-72af705a4e54")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 88.9 147.32)
+		(size 27.94 15.24)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "d1376b08-3148-4d36-89d9-6f3d35dc3062")
+		(property "Sheetname" "Axis Z Rotation"
+			(at 88.9 146.685 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "axis_zr.kicad_sch"
+			(at 88.9 163.1446 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "FB{A A{slash} B B{slash} N N{slash}}" output
+			(at 116.84 160.02 0)
+			(uuid "660dabf6-646e-40b9-a243-bcc55e95b278")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DIn{Step Direction}" input
+			(at 116.84 154.94 0)
+			(uuid "215a5b98-c889-41de-b10c-17e3429f1612")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DOut{Alert Error}" output
+			(at 116.84 157.48 0)
+			(uuid "46455c07-0dba-43f4-a9fb-f582ee59afac")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Enable" input
+			(at 116.84 149.86 0)
+			(uuid "e333f575-6041-408b-99e2-6f689a50b2d5")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "Reset" input
+			(at 116.84 152.4 0)
+			(uuid "d3c582fd-75c2-4511-bd00-2ad92d8bddae")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(page "6")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 208.28 33.02)
+		(size 40.64 68.58)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0000)
+		)
+		(uuid "dd03b0f6-c282-467d-8046-68348fdc7fa3")
+		(property "Sheetname" "MESA 7i77"
+			(at 208.28 32.385 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "mesa_7i77.kicad_sch"
+			(at 208.28 102.1846 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "FB_Y{A A{slash} B B{slash} N N{slash}}" input
+			(at 208.28 76.2 180)
+			(uuid "5c6baf7f-93ab-48fe-a940-49c016ed3b46")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "FB_Z{A A{slash} B B{slash} N N{slash}}" input
+			(at 208.28 88.9 180)
+			(uuid "08cee12f-862b-40ab-9236-8e600fa9dee7")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "FB_X2{A A{slash} B B{slash} N N{slash}}" input
+			(at 208.28 63.5 180)
+			(uuid "6dda581d-aade-4307-94a4-01db3f995497")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "FB_ZR{A A{slash} B B{slash} N N{slash}}" input
+			(at 208.28 99.06 180)
+			(uuid "304cf1e2-4012-4758-ae88-f2bd48563292")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "FB_X1{A A{slash} B B{slash} N N{slash}}" input
+			(at 208.28 50.8 180)
+			(uuid "6f52dd93-a518-4a3f-a780-25fb2cbd5b8b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "DIn_Y{Ready Alert Error}" input
+			(at 208.28 73.66 180)
+			(uuid "bc86f536-15ed-403e-ae2c-2e596e8811d6")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "DIn_X2{Ready Alert Error}" input
+			(at 208.28 60.96 180)
+			(uuid "d1c27115-1abe-4734-88ec-be2297c4e99f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "DIn_X1{Ready Alert Error}" input
+			(at 208.28 48.26 180)
+			(uuid "55c28c60-513f-4ab5-b651-c1d1cba4946c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "AOut_X1" output
+			(at 208.28 53.34 180)
+			(uuid "4f1aa113-98ba-4e32-8b1a-19dc5f35e481")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "AOut_X2" output
+			(at 208.28 66.04 180)
+			(uuid "278374cf-745e-4cf7-bb94-15f17c27df77")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "AOut_Y" output
+			(at 208.28 78.74 180)
+			(uuid "127d8585-6e44-4c1f-b10b-f6a24aa82879")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "Start" output
+			(at 208.28 35.56 180)
+			(uuid "376f44df-9384-49a0-a4cb-c6d5d8bb2419")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "Enable" output
+			(at 208.28 38.1 180)
+			(uuid "09e008ac-5743-4630-824d-add7b021d43f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "Estop" input
+			(at 208.28 40.64 180)
+			(uuid "876921cb-4dd9-46fc-afdb-3fb5ca598390")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "DIn_Z{Alert Error}" input
+			(at 208.28 86.36 180)
+			(uuid "12e0921b-c49c-4d9f-a36d-565be5a2aa19")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "DIn_ZR{Alert Error}" input
+			(at 208.28 96.52 180)
+			(uuid "e12ab5eb-afbe-47d4-994e-9bc8fa08cb9f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "Reset" output
+			(at 208.28 43.18 180)
+			(uuid "56f97dab-8f98-4035-b5e8-20b26aea805d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "gantry_robot"
+				(path "/d70af69b-26d7-4f79-9b4a-99b07ea5a006"
+					(page "8")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

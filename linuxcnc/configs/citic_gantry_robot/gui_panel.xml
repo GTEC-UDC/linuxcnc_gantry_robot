@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Panel for the CITIC gantry robot -->
+<pyvcp>
+    <labelframe text="LED indicators">
+        <label>
+            <!-- vertical space -->
+            <font>("DejaVu Sans",2)</font>
+        </label>
+        <table flexible_rows="[1]" flexible_columns="[1,3]">
+            <tablesticky sticky="ns"/>
+            <tablerow/>
+            <led>
+                <size>30</size>
+                <on_color>"green2"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-green"</halpin>
+            </led>
+            <led>
+                <size>30</size>
+                <on_color>"yellow"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-yellow"</halpin>
+            </led>
+            <led>
+                <size>30</size>
+                <on_color>"red"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-red"</halpin>
+            </led>
+        </table>
+        <label>
+            <!-- vertical space -->
+            <font>("DejaVu Sans",2)</font>
+        </label>
+    </labelframe>
+    <label>
+        <!-- vertical space -->
+        <font>("DejaVu Sans",2)</font>
+    </label>
+    <labelframe text="Motor RPM">
+        <relief>SUNKEN</relief>
+        <bd>2</bd>
+        <label>
+            <text>"X"</text>
+        </label>
+        <bar>
+            <halpin>"x-rpm"</halpin>
+            <min_>-3000</min_>
+            <max_>3000</max_>
+        </bar>
+        <label>
+            <text>"Y"</text>
+        </label>
+        <bar>
+            <halpin>"y-rpm"</halpin>
+            <min_>-3000</min_>
+            <max_>3000</max_>
+        </bar>
+        <label>
+            <text>"Z"</text>
+        </label>
+        <bar>
+            <halpin>"z-rpm"</halpin>
+            <min_>-300</min_>
+            <max_>300</max_>
+        </bar>
+    </labelframe>
+    <label>
+        <!-- vertical space -->
+        <font>("DejaVu Sans",2)</font>
+    </label>
+    <labelframe text="Motor controllers">
+        <relief>SUNKEN</relief>
+        <bd>2</bd>
+        <table flexible_rows="[1,2,3]" flexible_columns="[1,2,3,4,5]">
+            <tablesticky sticky="ns"/>
+            <tablerow/>
+            <label></label>
+            <label>
+                <text>"X1"</text>
+                <font>("DejaVu Sans",12)</font>
+            </label>
+            <label>
+                <text>"X2"</text>
+                <font>("DejaVu Sans",12)</font>
+            </label>
+            <label>
+                <text>"Y1"</text>
+                <font>("DejaVu Sans",12)</font>
+            </label>
+            <label>
+                <text>"Z"</text>
+                <font>("DejaVu Sans",12)</font>
+            </label>
+
+            <tablerow/>
+            <label>
+                <text>"Error"</text>
+                <font>("DejaVu Sans",12)</font>
+            </label>
+            <led>
+                <size>20</size>
+                <on_color>"red"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-x1-error"</halpin>
+            </led>
+            <led>
+                <size>20</size>
+                <on_color>"red"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-x2-error"</halpin>
+            </led>
+            <led>
+                <size>20</size>
+                <on_color>"red"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-y-error"</halpin>
+            </led>
+            <led>
+                <size>20</size>
+                <on_color>"red"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-z-error"</halpin>
+            </led>
+
+            <tablerow/>
+            <label>
+                <text>"Alert"</text>
+                <font>("DejaVu Sans",12)</font>
+            </label>
+            <led>
+                <size>20</size>
+                <on_color>"yellow"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-x1-alert"</halpin>
+            </led>
+            <led>
+                <size>20</size>
+                <on_color>"yellow"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-x2-alert"</halpin>
+            </led>
+            <led>
+                <size>20</size>
+                <on_color>"yellow"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-y-alert"</halpin>
+            </led>
+            <led>
+                <size>20</size>
+                <on_color>"yellow"</on_color>
+                <off_color>"gray50"</off_color>
+                <halpin>"led-z-alert"</halpin>
+            </led>
+        </table>
+        <label>
+            <!-- vertical space -->
+            <font>("DejaVu Sans",2)</font>
+        </label>
+        <button>
+            <halpin>"gui-controllers-reset-button"</halpin>
+            <disable_pin>True</disable_pin>
+            <text>"Reset"</text>
+        </button>
+    </labelframe>
+    <label>
+        <!-- vertical space -->
+        <font>("DejaVu Sans",5)</font>
+    </label>
+    <button>
+        <halpin>"gui-goto-zero-position-button"</halpin>
+        <disable_pin>True</disable_pin>
+        <text>"Go to zero"</text>
+    </button>
+    <label>
+        <!-- vertical space -->
+        <font>("DejaVu Sans",2)</font>
+    </label>
+    <button>
+        <halpin>"gui-goto-stop-position-button"</halpin>
+        <disable_pin>True</disable_pin>
+        <text>"Go to stop position"</text>
+    </button>
+</pyvcp>

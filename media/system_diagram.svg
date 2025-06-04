@@ -1,0 +1,1060 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="165.26459mm"
+   height="95.264954mm"
+   viewBox="0 0 165.26459 95.264954"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="system_diagram_english.svg"
+   inkscape:export-filename="system_diagram_english.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="1.4253648"
+     inkscape:cx="420.59408"
+     inkscape:cy="102.42992"
+     inkscape:window-width="1920"
+     inkscape:window-height="1008"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="true">
+    <inkscape:grid
+       id="grid9"
+       units="mm"
+       originx="-19.867709"
+       originy="-14.867336"
+       spacingx="0.99999998"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       enabled="true"
+       visible="true" />
+    <sodipodi:guide
+       position="120.26458,87.632291"
+       orientation="0,-1"
+       id="guide1"
+       inkscape:locked="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect85"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect83"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect81"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect79"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect77"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect75"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect73"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect71"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect69"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect67"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect65"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect63"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect61"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect58"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,2.1166667,0,1 @ F,0,0,1,0,0,0,1"
+       radius="8"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect53"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,1.0583333,0,1 @ F,0,0,1,0,0,0,1"
+       radius="4"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <marker
+       style="overflow:visible"
+       id="Dot"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Dot"
+       markerWidth="1"
+       markerHeight="1"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+         sodipodi:nodetypes="sssss"
+         id="path17" />
+    </marker>
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect22"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,1.3229166,0,1 @ F,0,0,1,0,0,0,1"
+       radius="5"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+    <marker
+       style="overflow:visible"
+       id="marker8"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1.5"
+       markerHeight="1.5"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path8" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline"
+     transform="translate(-19.867709,-14.867336)">
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect1"
+       width="30.000002"
+       height="14.999999"
+       x="20"
+       y="40"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="34.991531"
+       y="46.306202"
+       id="text1"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="34.991531"
+         y="46.306202"
+         id="tspan2">Limit</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="34.991531"
+         y="51.597862"
+         id="tspan3">switches</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect2"
+       width="20.000002"
+       height="14.999998"
+       x="25"
+       y="65"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="34.964016"
+       y="71.331596"
+       id="text4"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="34.964016"
+         y="71.331596"
+         id="tspan4">MESA</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="34.964016"
+         y="76.62326"
+         id="tspan5">7I96S</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="m 35.000001,54.999999 v 8.461452"
+       id="path5"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect5"
+       width="20.000002"
+       height="14.999998"
+       x="60"
+       y="65"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="69.851837"
+       y="71.357002"
+       id="text7"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="69.851837"
+         y="71.357002"
+         id="tspan6">MESA</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="69.851837"
+         y="76.648666"
+         id="tspan7">7I77</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;marker-start:url(#marker8);marker-end:url(#marker8)"
+       d="M 46.57508,69.999998 H 58.42492"
+       id="path7"
+       sodipodi:nodetypes="cc" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect8"
+       width="20.000002"
+       height="14.999998"
+       x="120"
+       y="65"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="129.91533"
+       y="70.93367"
+       id="text9"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="129.91533"
+         y="70.93367"
+         id="tspan9">IGUS</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="129.91533"
+         y="76.225334"
+         id="tspan10">Dryve D1</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="M 80.000002,69.148659 H 118.58535"
+       id="path10"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="87.175003"
+       y="68"
+       id="text11"><tspan
+         sodipodi:role="line"
+         id="tspan11"
+         style="text-align:start;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583"
+         x="87.175003"
+         y="68">Speed</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;marker-start:url(#marker8)"
+       d="M 81.534476,75.999998 H 120"
+       id="path11"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="87.175003"
+       y="75"
+       id="text12"><tspan
+         sodipodi:role="line"
+         id="tspan12"
+         style="text-align:start;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583"
+         x="87.175003"
+         y="75">Warning/Error</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect12"
+       width="20.000002"
+       height="14.999998"
+       x="120"
+       y="40"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="129.91533"
+       y="45.93367"
+       id="text14"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="129.91533"
+         y="45.93367"
+         id="tspan13">IGUS</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="129.91533"
+         y="51.225334"
+         id="tspan14">Dryve D1</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect14"
+       width="20.000002"
+       height="14.999998"
+       x="120"
+       y="15"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="129.91533"
+       y="20.93367"
+       id="text16"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="129.91533"
+         y="20.93367"
+         id="tspan15">IGUS</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="129.91533"
+         y="26.225332"
+         id="tspan16">Dryve D1</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect16"
+       width="20.000002"
+       height="14.999998"
+       x="120"
+       y="90"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="129.91533"
+       y="95.93367"
+       id="text18"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="129.91533"
+         y="95.93367"
+         id="tspan17">IGUS</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="129.91533"
+         y="101.22533"
+         id="tspan18">Dryve D1</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="M 72.000002,64.999998 V 46.116666 a 2.1166667,2.1166667 135 0 1 2.116667,-2.116667 h 44.544291"
+       id="path18"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect65"
+       inkscape:original-d="M 72.000002,64.999998 V 43.999999 h 46.660958" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="M 62.000001,64.999998 V 21.116666 a 2.1166667,2.1166667 135 0 1 2.116667,-2.116667 h 54.474002"
+       id="path19"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect58"
+       inkscape:original-d="M 62.000001,64.999998 V 18.999999 h 56.590669" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;marker-start:url(#marker8)"
+       d="M 75.000002,81.426582 V 91.88333 a 2.1166667,2.1166667 45 0 0 2.116667,2.116667 l 42.883331,0"
+       id="path20"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect73"
+       inkscape:original-d="M 75.000002,81.426582 V 93.999997 H 120" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-start:url(#marker8)"
+       d="M 75.000002,63.514998 V 53.116667 A 2.1166667,2.1166667 135 0 1 77.116669,51 H 120"
+       id="path21"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect67"
+       inkscape:original-d="M 75.000002,63.514998 75.000002,51 H 120" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;marker-start:url(#marker8)"
+       d="M 65.000001,63.559138 V 28.116666 a 2.1166667,2.1166667 135 0 1 2.116667,-2.116667 H 120"
+       id="path22"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect61"
+       inkscape:original-d="M 65.000001,63.559138 V 25.999999 H 120" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect22"
+       width="20.000004"
+       height="19.999998"
+       x="165"
+       y="15"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="175"
+       y="21"
+       id="text23"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="175"
+         y="21"
+         id="tspan23">X1</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="175"
+         y="26.291662"
+         id="tspan8">Motor</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="175"
+         y="31.583324"
+         id="tspan24" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="174.83914"
+       y="33.540932"
+       id="text26"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="174.83914"
+         y="33.540932"
+         id="tspan26">Encoder</tspan></text>
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       d="m 165,29 h 20"
+       id="path27" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect27"
+       width="20.000004"
+       height="19.999998"
+       x="165"
+       y="40"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="175"
+       y="46"
+       id="text28"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="175"
+         y="46"
+         id="tspan28">X2</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="175"
+         y="51.291664"
+         id="tspan19">Motor</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="174.83914"
+       y="58.540932"
+       id="text29"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="174.83914"
+         y="58.540932"
+         id="tspan29">Encoder</tspan></text>
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       d="m 165,53.999999 h 20"
+       id="path29" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect29"
+       width="20.000004"
+       height="19.999998"
+       x="165"
+       y="65"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="175"
+       y="71"
+       id="text31"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="175"
+         y="71"
+         id="tspan30">Y</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="175"
+         y="76.291664"
+         id="tspan31">Motor</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="174.83914"
+       y="83.540932"
+       id="text32"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="174.83914"
+         y="83.540932"
+         id="tspan32">Encoder</tspan></text>
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       d="m 165,78.999997 h 20"
+       id="path32" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect32"
+       width="20.000004"
+       height="19.999998"
+       x="165"
+       y="90"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="175"
+       y="96"
+       id="text34"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="175"
+         y="96"
+         id="tspan34">Z</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="175"
+         y="101.29166"
+         id="tspan21">Motor</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="174.83914"
+       y="108.54093"
+       id="text35"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="174.83914"
+         y="108.54093"
+         id="tspan35">Encoder</tspan></text>
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       d="m 165,103.99999 h 20"
+       id="path35" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="m 140,22.499999 h 23.58899"
+       id="path36"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       x="146.36929"
+       y="21.5"
+       id="text36"><tspan
+         sodipodi:role="line"
+         id="tspan36"
+         style="fill:#000000;stroke:none;stroke-width:0.264583"
+         x="146.36929"
+         y="21.5">Power</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="m 140,47.500001 h 23.58899"
+       id="path37"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       x="146.36929"
+       y="46.500004"
+       id="text37"><tspan
+         sodipodi:role="line"
+         id="tspan37"
+         style="fill:#000000;stroke:none;stroke-width:0.264583"
+         x="146.36929"
+         y="46.500004">Power</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="m 140,72.5 h 23.58899"
+       id="path38"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       x="146.36929"
+       y="71.5"
+       id="text38"><tspan
+         sodipodi:role="line"
+         id="tspan38"
+         style="fill:#000000;stroke:none;stroke-width:0.264583"
+         x="146.36929"
+         y="71.5">Power</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="m 140,97.499999 h 23.58899"
+       id="path39"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       x="146.36929"
+       y="96.5"
+       id="text39"><tspan
+         sodipodi:role="line"
+         id="tspan39"
+         style="fill:#000000;stroke:none;stroke-width:0.264583"
+         x="146.36929"
+         y="96.5">Power</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="M 165,31.999999 H 70.116669 a 2.1166667,2.1166667 135 0 0 -2.116667,2.116667 v 29.421535"
+       id="path40"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect63"
+       inkscape:original-d="M 165,31.999999 H 68.000002 v 31.538202" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-start:url(#Dot);marker-end:url(#marker8)"
+       d="M 145,31.999999 V 28.116667 A 2.1166667,2.1166667 45 0 0 142.88333,26 H 141.485"
+       id="path41"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect83"
+       inkscape:original-d="M 145,31.999999 V 26 h -3.515" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       x="147"
+       y="31"
+       id="text41"><tspan
+         sodipodi:role="line"
+         id="tspan41"
+         style="fill:#000000;stroke:none;stroke-width:0.264583"
+         x="147"
+         y="31">Position</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="M 165,56.999998 H 80.116669 a 2.1166667,2.1166667 135 0 0 -2.116667,2.116667 v 4.398333"
+       id="path42"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect69"
+       inkscape:original-d="M 165,56.999998 H 78.000002 v 6.515" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-start:url(#Dot);marker-end:url(#marker8)"
+       d="M 145,56.999998 V 53.116667 A 2.1166667,2.1166667 45 0 0 142.88333,51 H 141.485"
+       id="path43"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect81"
+       inkscape:original-d="M 145,56.999998 145,51 h -3.515" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="M 165,81.999998 H 84.116669 a 5.1100878,5.1100878 22.499991 0 1 -3.613377,-1.496709 l -0.03188,-0.03188"
+       id="path44"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect71"
+       inkscape:original-d="M 165,81.999998 H 82.000002 l -1.528593,-1.528592" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-start:url(#Dot);marker-end:url(#marker8)"
+       d="M 145,81.999998 V 78.116667 A 2.1166667,2.1166667 45 0 0 142.88333,76 H 141.485"
+       id="path45"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect77"
+       inkscape:original-d="M 145,81.999998 145,76 h -3.515" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="M 165,107 H 74.116669 a 2.1166667,2.1166667 45 0 1 -2.116667,-2.11667 l 0,-23.439508"
+       id="path46"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect75"
+       inkscape:original-d="M 165,107 H 72.000002 V 81.443822" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-start:url(#Dot);marker-end:url(#marker8)"
+       d="m 145,107 v -3.88333 A 2.1166667,2.1166667 45 0 0 142.88333,101 H 141.485"
+       id="path47"
+       sodipodi:nodetypes="ccc"
+       inkscape:path-effect="#path-effect79"
+       inkscape:original-d="m 145,107 0,-6 h -3.515" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       x="147"
+       y="56"
+       id="text47"><tspan
+         sodipodi:role="line"
+         id="tspan47"
+         style="fill:#000000;stroke:none;stroke-width:0.264583"
+         x="147"
+         y="56">Position</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       x="147"
+       y="81"
+       id="text48"><tspan
+         sodipodi:role="line"
+         id="tspan48"
+         style="fill:#000000;stroke:none;stroke-width:0.264583"
+         x="147"
+         y="81">Position</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none"
+       x="147"
+       y="106"
+       id="text49"><tspan
+         sodipodi:role="line"
+         id="tspan49"
+         style="fill:#000000;stroke:none;stroke-width:0.264583"
+         x="147"
+         y="106">Position</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="87.175003"
+       y="18"
+       id="text50"><tspan
+         sodipodi:role="line"
+         id="tspan50"
+         style="text-align:start;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583"
+         x="87.175003"
+         y="18">Speed</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="87.175003"
+       y="43"
+       id="text51"><tspan
+         sodipodi:role="line"
+         id="tspan51"
+         style="text-align:start;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583"
+         x="87.175003"
+         y="43">Speed</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="87.175003"
+       y="25"
+       id="text52"><tspan
+         sodipodi:role="line"
+         id="tspan52"
+         style="text-align:start;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583"
+         x="87.175003"
+         y="25">Warning/Error</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="87.175003"
+       y="50"
+       id="text53"><tspan
+         sodipodi:role="line"
+         id="tspan53"
+         style="text-align:start;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583"
+         x="87.175003"
+         y="50">Warning/Error</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="87.175003"
+       y="93"
+       id="text54"><tspan
+         sodipodi:role="line"
+         id="tspan54"
+         style="text-align:start;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583"
+         x="87.175003"
+         y="93">Warning/Error</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-linejoin:miter;stroke-dasharray:none;marker-end:url(#marker8)"
+       d="m 45.000001,74.999998 h 7.883333 a 2.1166667,2.1166667 45 0 1 2.116667,2.116667 V 98.883333 A 2.1166667,2.1166667 45 0 0 57.116668,101 h 61.468682"
+       id="path54"
+       sodipodi:nodetypes="cccc"
+       inkscape:path-effect="#path-effect85"
+       inkscape:original-d="m 45.000001,74.999998 h 10 V 101 h 63.585349" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="87.175003"
+       y="100"
+       id="text55"><tspan
+         sodipodi:role="line"
+         id="tspan55"
+         style="text-align:start;text-anchor:start;fill:#000000;stroke:none;stroke-width:0.264583"
+         x="87.175003"
+         y="100">Step/direction</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none"
+       id="rect55"
+       width="30.000002"
+       height="14.999996"
+       x="20"
+       y="90.132286"
+       rx="2"
+       ry="2" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333px;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#000000;stroke:none;stroke-width:0.264583;stroke-dasharray:none"
+       x="34.881466"
+       y="99.173218"
+       id="text57"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'IBM Plex Sans';-inkscape-font-specification:'IBM Plex Sans';fill:#000000;stroke:none;stroke-width:0.264583"
+         x="34.881466"
+         y="99.173218"
+         id="tspan57">LinuxCNC</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583;stroke-dasharray:none;marker-start:url(#marker8);marker-end:url(#marker8)"
+       d="m 35.000001,81.42845 v 7.165292"
+       id="path58"
+       sodipodi:nodetypes="cc" />
+  </g>
+</svg>

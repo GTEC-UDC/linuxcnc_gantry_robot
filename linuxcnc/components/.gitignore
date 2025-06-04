@@ -1,0 +1,6 @@
+# Compilation files
+*.o
+*.so
+*.ver
+*.tmp
+*.sym

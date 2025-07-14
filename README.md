@@ -29,14 +29,12 @@ The repository includes a **custom calibration solution** that leverages an exis
 
 ## Documentation
 
+> [!NOTE]
+> The technical documentation is currently under development and available only in Spanish. English translation is planned for future releases.
+
 The following documentation is provided in this repository:
 
-- **Technical Documentation**: Complete system documentation and setup guide in `docs/`
-
-  > [!NOTE]
-  > The documentation is currently under development and available only in Spanish. English translation is planned for future releases.
-
-  You can build the HTML version of the documentation with the following commands:
+- **Technical Documentation**: [Sphinx](https://www.sphinx-doc.org) sources of the system documentation and setup guide in [docs/](docs/). You can build the HTML version of the documentation with the following commands:
 
   ```bash
   cd docs
@@ -44,7 +42,7 @@ The following documentation is provided in this repository:
   make html
   ```
 
-- **Electrical Installation**: KiCAD electrical schematics in `electrical_installation/`
+- **Electrical Installation**: KiCAD electrical schematics in [electrical_installation/](electrical_installation/).
 
 ## Positioning calibration
 

@@ -1,0 +1,45 @@
+\addto\captionsspanish{\renewcommand{\listfigurename}{Lista de figuras}}
+\addto\captionsspanish{\renewcommand{\listtablename}{Lista de tablas}}
+\addto\captionsspanish{\renewcommand{\literalblockname}{Código}}
+
+% Change font size and color of fancyvrb line numbers
+\renewcommand{\theFancyVerbLine}{%
+    \scriptsize\color{black!80}\arabic{FancyVerbLine}%
+}
+
+% Use the light series of the font for Sphinx inline code fragments
+\protected\def\sphinxcode#1{\texttt{\fontseries{l}\selectfont#1}}
+
+% Fix for package fancyhdr Warning: \headheight is too small (12.0pt)
+\setlength{\headheight}{13.6pt}
+
+% Set code blocks and tables caption width
+\setlength{\LTcapwidth}{\textwidth}
+
+% New column types for longtables
+% Based on \X from sphinx source file sphinxlatextables.sty
+\makeatletter
+\newcolumntype{\L}[1]{>{\RaggedRight}p{\dimexpr
+      #1\dimexpr\linewidth-\spx@arrayrulewidth\relax-\tw@\tabcolsep-\spx@arrayrulewidth\relax}}
+\newcolumntype{\R}[1]{>{\RaggedLeft}p{\dimexpr
+      #1\dimexpr\linewidth-\spx@arrayrulewidth\relax-\tw@\tabcolsep-\spx@arrayrulewidth\relax}}
+\makeatother
+
+% Fix for bibliography cites inside of figure captions
+% See https://github.com/mcmtroffaes/sphinxcontrib-bibtex/issues/276
+\AtBeginEnvironment{figure}{\pretocmd{\hyperlink}{\protect}{}{}}
+
+% Renew \sphinxcode command to add color to inline code text
+\renewcommand{\sphinxcode}[1]{{\color{Navy}\texttt{{#1}}}}
+
+% Fix for missing character:
+% There is no ‣ (U+2023) in font [IBMPlexSans-Italic.otf]
+\newunicodechar{‣}{$\triangleright$}
+
+% Change fncychap fonts to fix missing character (for spanish language):
+% There is no í (U+00ED) in font phvr7t
+\newfontfamily\chapternamefont{TeX Gyre Termes}
+\newfontfamily\chaptertitlefont{TeX Gyre Termes}
+
+\ChNameVar{\Large\chapternamefont}
+\ChTitleVar{\Huge\chaptertitlefont}

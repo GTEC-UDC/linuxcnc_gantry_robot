@@ -1,0 +1,128 @@
+\begin{tikzpicture}[
+    auto,
+    piblock/.style = {
+        draw,
+        rectangle,
+        fill=white,
+        inner sep=0pt,
+        minimum height=0.6cm,
+        minimum width=1.1cm
+    },
+    op/.style = {
+        draw,
+        circle,
+        inner sep=0pt,
+        minimum size=15pt
+    },
+]
+    \def\piblocksep{15pt}
+
+    \matrix [
+        ampersand replacement=\&,
+        column sep=25pt,
+        row sep={15pt,between origins}
+    ] {
+        % First row
+        \coordinate (init);
+        \& \node [op] (pos_input_sum) {$+$};
+        \& \node [piblock] (pos_block_p) {$P(\kappa_p)$};
+        \& [-10pt] \node [op] (vel_input_sum) {$+$};
+        \& \coordinate (vel_input_1);
+        \& [-18pt] \coordinate (vel_input_2);
+        \& [-15pt] {
+                \node [piblock,yshift=\piblocksep] (vel_block_p) {$P(\lambda_p)$};
+                \node [piblock,yshift=-\piblocksep] (vel_block_i) {$I(\lambda_i)$};
+            }
+        \& [-22pt] \node [op] (vel_inner_sum) {$+$};
+        \& [-10pt] \node [op] (cur_input_sum) {$+$};
+        \& \coordinate (cur_input_1);
+        \& [-18pt] \coordinate (cur_input_2);
+        \& [-15pt] {
+                \node [piblock,yshift=\piblocksep] (cur_block_p) {$P(\mu_p)$};
+                \node [piblock,yshift=-\piblocksep] (cur_block_i) {$I(\mu_i)$};
+            }
+        \& [-22pt] \node [op] (cur_inner_sum) {$+$};
+        \& [-10pt] \node [draw, align=center] (power_mgmt) {Gestión de\\ potencia};
+        \& [-10pt] \node [draw, align=center] (motor) {Motor};
+        \\ [35pt]
+
+        % Second row
+        \& \&
+        \& \node [draw] (d_dt) {$\dfrac{d}{dt}$};
+        \& \& \& \& \& \& \& \& \&
+        \& \coordinate (power_mgmt_fb1);
+        \\ [15pt]
+
+        % Third row
+        \& \&
+        \& \coordinate (d_dt_pos);
+        \& \& \& \& \& \& \& \& \& \&
+        \& \coordinate (motor_fb1);
+        \\
+    };
+
+    \begin{scope}[
+        dot/.style = {radius=1.25pt}
+    ]
+        \draw [->] (init) -- node {$R(t)$} (pos_input_sum);
+        \draw [->] (pos_input_sum) -- node {$e_p(t)$} (pos_block_p);
+        \draw [->] (pos_block_p) -- (vel_input_sum);
+        
+        \draw [-]  (vel_input_sum) -- node {$e_v(t)$} (vel_input_1);
+        \draw [-]  (vel_input_1) -- (vel_input_2);
+        \fill (vel_input_2) circle [dot];
+        \draw [->] (vel_input_2) |- (vel_block_p);
+        \draw [->] (vel_input_2) |- (vel_block_i);
+        \draw [->] (vel_block_p) -| (vel_inner_sum);
+        \draw [->] (vel_block_i) -| (vel_inner_sum);
+
+        \draw [->] (vel_inner_sum) -- (cur_input_sum);
+        \draw [-]  (cur_input_sum) -- node {$e_c(t)$} (cur_input_1);
+
+        \draw [-]  (cur_input_1) -- (cur_input_2);
+        \fill (cur_input_2) circle [dot];
+        \draw [->] (cur_input_2) |- (cur_block_p);
+        \draw [->] (cur_input_2) |- (cur_block_i);
+        \draw [->] (cur_block_p) -| (cur_inner_sum);
+        \draw [->] (cur_block_i) -| (cur_inner_sum);
+        
+        \node [
+            draw,
+            fit={(vel_input_2) (vel_block_p) (vel_block_i) (vel_inner_sum)}
+        ] (vel_block) {};
+
+        \node [
+            draw,
+            fit={(cur_input_2) (cur_block_p) (cur_block_i) (cur_inner_sum)}
+        ] (cur_block) {};
+
+        \node [above=5pt of pos_block_p,align=center,font=\normalsize]
+            {Controlador de\\ posición};
+
+        \node [above=5pt of vel_block,align=center,font=\normalsize]
+            {Controlador de\\ velocidad};
+
+        \node [above=5pt of cur_block,align=center,font=\normalsize]
+            {Controlador de\\ corriente};
+
+        \draw [->] (cur_inner_sum) -- (power_mgmt);
+        \draw [->] (power_mgmt) -- (motor);
+
+        \draw [->] (power_mgmt) -- (power_mgmt_fb1) -| (cur_input_sum)
+            node [below left=5pt,xshift=3pt] {$-$};
+
+        \node [above]
+            at ($(cur_input_sum |- power_mgmt_fb1)!0.5!(power_mgmt_fb1)$])
+            {$c(t)$};
+
+        \draw [->] (motor) -- (motor_fb1) -| (pos_input_sum)
+            node [below left=5pt,xshift=3pt] {$-$};
+
+        \node [above] at ($(d_dt_pos)!0.5!(motor_fb1)$) {$p(t)$};
+        
+        \fill (d_dt_pos) circle [dot];
+        \draw [->] (d_dt_pos) -- (d_dt);
+        \draw [->] (d_dt) -- node [right] {$v(t)$} (vel_input_sum)
+            node [below left=5pt,xshift=3pt] {$-$};
+    \end{scope}
+\end{tikzpicture}

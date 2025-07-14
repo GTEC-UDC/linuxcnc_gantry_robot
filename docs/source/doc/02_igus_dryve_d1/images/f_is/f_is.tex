@@ -1,0 +1,44 @@
+\begin{tikzpicture}
+    \def\VMax{10}
+    \def\VDeadBand{3}
+    
+    \begin{axis}[
+        % height=6cm,
+        % width=10cm,
+        xlabel={Voltaje de entrada (\unit{\V})},
+        ylabel={Voltaje de salida (\unit{\V})},
+        xmin=-11,
+        xmax=11,
+        ymin=-11,
+        ymax=11,
+        xtick={-\VMax, -\VDeadBand, 0, \VDeadBand, \VMax},
+        xticklabels={
+            $-V_{\text{max}}$,
+            $-V_{\text{ISdb}}$,
+            0,
+            $V_{\text{ISdb}}$,
+            $V_{\text{max}}$
+        },
+        ytick={-\VMax, -\VDeadBand, 0, \VDeadBand, \VMax},
+        yticklabels={
+            $-V_{\text{max}}$,
+            $-V_{\text{ISdb}}$,
+            0,
+            $V_{\text{ISdb}}$,
+            $V_{\text{max}}$
+        },
+        grid=both,
+    ]
+    % Recta 1
+    \addplot [domain=-\VMax:-\VDeadBand, thick] {x};
+
+    % Recta 2
+    \addplot [thick,dashed] coordinates {(-\VDeadBand,-\VDeadBand) (-\VDeadBand,0)};
+    \addplot [domain=-\VDeadBand:\VDeadBand, thick] {0};
+    \addplot [thick,dashed] coordinates {(\VDeadBand,0) (\VDeadBand,\VDeadBand)};
+
+    % Recta 3
+    \addplot [domain=\VDeadBand:\VMax, thick] {x};
+    
+    \end{axis}
+\end{tikzpicture}

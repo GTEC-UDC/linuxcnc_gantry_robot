@@ -1,0 +1,4 @@
+__pycache__
+.mypy_cache
+build
+source/locales/es/LC_MESSAGES/sphinx.mo

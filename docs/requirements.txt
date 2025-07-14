@@ -1,0 +1,5 @@
+furo
+pygments-csv-lexer
+sphinx >= 7.0.0
+sphinx-copybutton
+sphinxcontrib-bibtex

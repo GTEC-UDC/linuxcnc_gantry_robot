@@ -1,0 +1,17 @@
+% Add lists of figures, tables, and listings
+% https://stackoverflow.com/questions/11849139/how-do-i-add-a-list-of-figures-tables-for-latex-pdf-output
+
+\if@openright\cleardoublepage\else\clearpage\fi
+\phantomsection
+\addcontentsline{toc}{chapter}{Lista de figuras}%
+\listoffigures
+
+\if@openright\cleardoublepage\else\clearpage\fi
+\phantomsection
+\addcontentsline{toc}{chapter}{Lista de tablas}%
+\listoftables
+
+\if@openright\cleardoublepage\else\clearpage\fi
+\phantomsection
+\addcontentsline{toc}{chapter}{Lista de códigos}%
+\listof{literalblock}{Lista de códigos}%

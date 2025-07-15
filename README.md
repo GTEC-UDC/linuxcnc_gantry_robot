@@ -2,7 +2,7 @@
 
 A large high-precision 3-axis gantry robot system using [LinuxCNC](https://www.linuxcnc.org), integrated with [Mesa Electronics](https://store.mesanet.com/) interface cards and [igus® dryve D1](https://www.igus.eu/product/D1) motor controllers.
 
-The system was developed from our [LinuxCNC motor control testbed](https://github.com/your-org/linuxcnc-testbed), which ensured the main components of the system were able to work reliably.
+The system was developed from our [LinuxCNC motor control testbed](https://github.com/GTEC-UDC/linuxcnc_testbed), which ensured the main components of the system were able to work reliably.
 
 The repository includes a **custom calibration solution** that leverages an existing [OptiTrack](https://optitrack.com/) motion capture system in the installation room to measure and compensate for errors in the gantry movement. Using this solution the gantry robot can achieve sub-centimeter precision across the entire work envelope.
 

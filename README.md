@@ -85,10 +85,10 @@ gantry-robot/
 │   └── components/              # Custom LinuxCNC components
 ├── calibration/                 # Calibration code and measurements
 │   ├── src/                     # Python analysis and calibration tools
-│   └── measurements/            # OptiTrack measurement data
+│   └── measurements/            # Gantry robot and OptiTrack measurements
 └── electrical_installation/     # Electrical documentation
     ├── schematics/              # KiCAD electrical diagrams
-    └── photos/                  # Installation photos
+    └── photos/                  # Electrical installation photos
 ```
 
 ## License

@@ -1,0 +1,63 @@
+# gui_panel.hal -- must be loaded as a postgui HAL file
+
+# Indicator LEDs
+net led-red => pyvcp.led-red
+net led-yellow => pyvcp.led-yellow
+net led-green => pyvcp.led-green
+
+
+# Motor controller LEDs
+net x1-error => pyvcp.led-x1-error
+net x2-error => pyvcp.led-x2-error
+net y-error => pyvcp.led-y-error
+net z-error => pyvcp.led-z-error
+
+net x1-alert => pyvcp.led-x1-alert
+net x2-alert => pyvcp.led-x2-alert
+net y-alert => pyvcp.led-y-alert
+net z-alert => pyvcp.led-z-alert
+
+# Motor controller reset button
+net not-fault => pyvcp.gui-controllers-reset-button.disable
+
+# Go to buttons
+net gui-goto-zero-button <= pyvcp.gui-goto-zero-position-button
+net gui-goto-zero-button => halui.mdi-command-00
+net gui-goto-disable => pyvcp.gui-goto-zero-position-button.disable
+
+net gui-goto-stop-button <= pyvcp.gui-goto-stop-position-button
+net gui-goto-stop-button => halui.mdi-command-01
+net gui-goto-disable => pyvcp.gui-goto-stop-position-button.disable
+
+
+# Scale to convert from velocity in mm/s to rpm
+# - For axes X and Y:
+#   The axes move 144 mm/rev and the motors have a gearbox with a
+#   gear rate of 0.1. Hence the scale is: 60/(0.1*144) = 4.166666666666667
+# - For axis Z:
+#   The axis moves 4 mm/rev. Hence the scale is 60/4 = 15
+setp scale.x.vel-rpm.gain 4.166666666666667
+setp scale.x.vel-rpm.offset 0
+
+setp scale.y.vel-rpm.gain 4.166666666666667
+setp scale.y.vel-rpm.offset 0
+
+setp scale.z.vel-rpm.gain 15
+setp scale.z.vel-rpm.offset 0
+
+
+# Connect axis velocities with scale components
+net x1-vel-cmd => scale.x.vel-rpm.in
+net y-vel-cmd => scale.y.vel-rpm.in
+net z-vel-cmd => scale.z.vel-rpm.in
+
+
+# Connect rpm with pyvcp display
+net axis-x-motor-rpm <= scale.x.vel-rpm.out
+net axis-x-motor-rpm => pyvcp.x-rpm
+
+net axis-y-motor-rpm <= scale.y.vel-rpm.out
+net axis-y-motor-rpm => pyvcp.y-rpm
+
+net axis-z-motor-rpm <= scale.z.vel-rpm.out
+net axis-z-motor-rpm => pyvcp.z-rpm

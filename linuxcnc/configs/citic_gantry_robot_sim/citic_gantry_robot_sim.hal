@@ -1,0 +1,211 @@
+# -----------------------------------------------------------------------------
+# Modules
+# -----------------------------------------------------------------------------
+
+# **********
+# Kinematics
+# **********
+
+loadrt [KINS]KINEMATICS
+
+
+# **************
+# Motion control
+# **************
+# Note that with the option "servo_period_nsec" the module will create a
+# thread called "servo-thread".
+loadrt [EMCMOT]EMCMOT servo_period_nsec=[EMCMOT]SERVO_PERIOD num_joints=[KINS]JOINTS
+
+# Add motion functions to the "servo-thread" thread
+addf motion-command-handler servo-thread
+addf motion-controller servo-thread
+
+
+# **************
+# Classic Ladder
+# **************
+loadrt classicladder_rt
+
+addf classicladder.0.refresh servo-thread
+
+# load classic ladder project
+loadusr classicladder myladder.clp --nogui
+
+
+# ***
+# ddt
+# ***
+
+# differentiators for velocity and acceleration signals
+loadrt ddt names=ddt_x1,ddt_x1v,ddt_x2,ddt_x2v,ddt_y,ddt_yv,ddt_z,ddt_zv
+
+addf ddt_x1 servo-thread
+addf ddt_x2 servo-thread
+addf ddt_y servo-thread
+addf ddt_z servo-thread
+
+addf ddt_x1v servo-thread
+addf ddt_x2v servo-thread
+addf ddt_yv servo-thread
+addf ddt_zv servo-thread
+
+
+# *****
+# hypot
+# *****
+loadrt hypot names=vel_xy,vel_xyz
+
+addf vel_xy servo-thread
+addf vel_xyz servo-thread
+
+
+# ***********
+# estop_latch
+# ***********
+loadrt estop_latch
+addf estop-latch.0 servo-thread
+
+
+# *****
+# logic
+# *****
+# Component providing configurable logic functions
+
+# We define the following functions:
+# - logic.error: OR gate with 4 inputs
+# - logic.alert: OR gate with 4 inputs
+# - logic.fault: OR and NOR gates with 3 inputs
+# - logic.analog-enable: AND gate with 3 inputs
+# - logic.analog-motors-start: AND gate with 3 inputs
+# - logic.gui-goto-disable: NAND gate with 3 inputs
+loadrt logic \
+    names=logic.error,logic.alert,logic.fault,logic.analog-enable,logic.analog-motors-start,logic.gui-goto-disable \
+    personality=0x204,0x204,0x1203,0x103,0x103,0x803
+
+addf logic.error servo-thread
+addf logic.alert servo-thread
+addf logic.fault servo-thread
+addf logic.analog-enable servo-thread
+addf logic.analog-motors-start servo-thread
+addf logic.gui-goto-disable servo-thread
+
+
+# *****
+# scale
+# *****
+loadrt scale names=scale.x.vel-rpm,scale.y.vel-rpm,scale.z.vel-rpm
+
+addf scale.x.vel-rpm servo-thread
+addf scale.y.vel-rpm servo-thread
+addf scale.z.vel-rpm servo-thread
+
+
+# ***
+# not
+# ***
+loadrt not names=not.fault
+addf not.fault servo-thread
+
+
+# -----------------------------------------------------------------------------
+# AXIS X --- JOINT 0
+# -----------------------------------------------------------------------------
+
+net X1pos joint.0.motor-pos-cmd => joint.0.motor-pos-fb ddt_x1.in
+
+
+# -----------------------------------------------------------------------------
+# AXIS X --- JOINT 1
+# -----------------------------------------------------------------------------
+
+net X2pos joint.1.motor-pos-cmd => joint.1.motor-pos-fb ddt_x2.in
+
+
+# -----------------------------------------------------------------------------
+# AXIS Y --- JOINT 2
+# -----------------------------------------------------------------------------
+
+net Ypos joint.2.motor-pos-cmd => joint.2.motor-pos-fb ddt_y.in
+
+
+# -----------------------------------------------------------------------------
+# AXIS Z --- JOINT 3
+# -----------------------------------------------------------------------------
+
+net Zpos joint.3.motor-pos-cmd => joint.3.motor-pos-fb ddt_z.in
+
+
+# -----------------------------------------------------------------------------
+# Miscellaneous signals
+# -----------------------------------------------------------------------------
+
+# Enable signal
+net machine-on <= halui.machine.is-on
+
+# Error signal
+net x1-error => logic.error.in-00
+net x2-error => logic.error.in-01
+net y-error => logic.error.in-02
+net z-error => logic.error.in-03
+
+net error <= logic.error.or
+
+# Alert signal
+net x1-alert => logic.alert.in-00
+net x2-alert => logic.alert.in-01
+net y-alert => logic.alert.in-02
+net z-alert => logic.alert.in-03
+
+net alert <= logic.alert.or
+
+# Fault signal
+# We set the fault signal if any controller signals an error or alert
+# or if the user press the emergency stop (estop) button
+net error => logic.fault.in-00
+net alert => logic.fault.in-01
+net remote-estop => logic.fault.in-02
+
+net fault <= logic.fault.or
+net not-fault <= logic.fault.nor
+
+# Emergency stop (ESTOP)
+net user-enable <= iocontrol.0.user-enable-out
+net user-enable => estop-latch.0.ok-in
+
+net user-request-enable <= iocontrol.0.user-request-enable
+net user-request-enable => estop-latch.0.reset
+
+net emc-enable <= estop-latch.0.ok-out
+net emc-enable => iocontrol.0.emc-enable-in
+
+net fault => estop-latch.0.fault-in
+
+# Classic Ladder program for controlling LEDS
+net estop <= halui.estop.is-activated
+
+net machine-on => classicladder.0.in-00
+net estop => classicladder.0.in-01
+net alert => classicladder.0.in-02
+net error => classicladder.0.in-03
+
+net led-red <= classicladder.0.out-00
+net led-yellow <= classicladder.0.out-01
+net led-green <= classicladder.0.out-02
+
+# Disable gui goto buttons
+# The goto buttons will be disabled except when robot on, idle, and in teleop
+# mode (i.e., not joint mode)
+net is-idle <= halui.program.is-idle
+net is-teleop <= halui.mode.is-teleop
+
+net is-idle => logic.gui-goto-disable.in-00
+net is-teleop => logic.gui-goto-disable.in-01
+net machine-on => logic.gui-goto-disable.in-02
+
+net gui-goto-disable <= logic.gui-goto-disable.nand
+
+# Velocities
+net x1-vel-cmd <= joint.0.vel-cmd
+net x2-vel-cmd <= joint.1.vel-cmd
+net y-vel-cmd <= joint.2.vel-cmd
+net z-vel-cmd <= joint.3.vel-cmd

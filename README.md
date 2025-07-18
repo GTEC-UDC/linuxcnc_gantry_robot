@@ -103,6 +103,17 @@ This project contains multiple components with different licenses.
 
 [LinuxCNC Gantry Robot System](https://github.com/GTEC-UDC/linuxcnc_gantry_robot) © 2025 by [Tomás Domínguez Bolaño](https://orcid.org/0000-0001-7470-0315), [Valentín Barral Vales](https://orcid.org/0000-0001-8750-7960), [Carlos José Escudero Cascón](https://orcid.org/0000-0002-3877-1332), and [José Antonio García Naya](https://orcid.org/0000-0002-1944-4678) (CITIC Research Center, University of A Coruña, Spain) is licensed under [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/) (CC BY-SA 4.0). To view a copy of this license, see the [LICENSE](LICENSE) file or visit <https://creativecommons.org/licenses/by-sa/4.0/>.
 
+### Documentation License ([docs/](docs/))
+
+Copyright © 2000-2022 LinuxCNC.org\
+Copyright © 2025 Tomás Domínguez Bolaño, Valentín Barral Vales, Carlos José Escudero Cascón, and José Antonio García Naya.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+A copy of the license is included in the section entitled "GNU Free Documentation License".
+
 ### Software Licenses
 
 - **LinuxCNC Components** (`linuxcnc/components/`): [GPL v2 or later](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)

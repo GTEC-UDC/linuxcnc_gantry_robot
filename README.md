@@ -110,7 +110,7 @@ This project contains multiple components with different licenses.
 
 ## Acknowledgments
 
-This work has been supported by project TED2021-130240B-I00 (IVRY) funded by MCIN/AEI/10.13039/501100011033 and the European Union NextGenerationEU/PRTR.
+This work has been supported by grant PID2022-137099NB-C42 (MADDIE) and by project TED2021-130240B-I00 (IVRY) funded by MCIN/AEI/10.13039/501100011033 and the European Union NextGenerationEU/PRTR.
 
 <div align="center">
   <img alt="Acknowledgements logos" src="assets/ack_logos.svg" width="600"/>

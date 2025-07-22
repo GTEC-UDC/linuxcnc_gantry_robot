@@ -36,6 +36,4 @@ abstract: >
   (MADDIE) and by project TED2021-130240B-I00 (IVRY) funded
   by MCIN/AEI/10.13039/501100011033 and the European Union
   NextGenerationEU/PRTR.
-license:
-  - CC-BY-SA-4.0
-  - GFDL-1.3
+license: CC-BY-SA-4.0

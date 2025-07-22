@@ -8,12 +8,12 @@ The repository includes a **custom calibration solution** that leverages an exis
 
 <div align="center">
 
-<img src="assets/gantry_robot.jpg" style="width:100%; max-width:700px;" alt="Gantry Robot System"/>
-
 [![LinuxCNC](https://img.shields.io/badge/Control-LinuxCNC-blue.svg)](https://linuxcnc.org/)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-limegreen.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 [![Documentation](https://img.shields.io/badge/docs-sphinx-blue.svg)](docs/)
 [![Python](https://img.shields.io/badge/python-3.x-blue.svg)](https://python.org)
+
+<img src="assets/gantry_robot.jpg" style="width:100%; max-width:700px;" alt="Gantry Robot System"/>
 
 </div>
 
@@ -30,7 +30,7 @@ The repository includes a **custom calibration solution** that leverages an exis
 ## Documentation
 
 > [!NOTE]
-> The technical documentation is currently under development and available only in Spanish. English translation is planned for future releases.
+> The technical documentation is under development.
 
 The following documentation is provided in this repository:
 

@@ -5,16 +5,16 @@
     % Mark voltage levels
     \draw[fill=white] (0,0.6) rectangle (3,3.6);
 
-    \node[right] at (3,6) {Voltaje en X2.11};
-    \node[right] at (3,3.6) {\qty{60}{\percent} de X2.11};
-    \node[right] at (3,0.6) {\qty{10}{\percent} de X2.11};
+    \node[right] at (3,6) {Voltage in X2.11};
+    \node[right] at (3,3.6) {\qty{60}{\percent} of X2.11};
+    \node[right] at (3,0.6) {\qty{10}{\percent} of X2.11};
     \node[right] at (3,0) {\qty{0}{\V}};
 
     % Add labels for logic states
-    \node[] at (1.5, 4.8) {Valor alto};
-    \node[] at (1.5, 2.1) {Valor indefinido};
-    \node[] at (1.5, 0.3) {Valor bajo};
+    \node[] at (1.5, 4.8) {High value};
+    \node[] at (1.5, 2.1) {Undefined value};
+    \node[] at (1.5, 0.3) {Low value};
 
     % Draw arrows for voltage levels
-    \draw[-{Stealth[length=3mm]}] (-1.5, 0) -- ++(0, 6.5) node[above,midway,rotate=90] {Voltaje};
+    \draw[-{Stealth[length=3mm]}] (-1.5, 0) -- ++(0, 6.5) node[above,midway,rotate=90] {Voltage};
 \end{tikzpicture}

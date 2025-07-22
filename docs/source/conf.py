@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import textwrap
+import sphinx.builders.latex.transforms
 from sphinx.highlighting import lexers
 
 # extend system path
@@ -25,7 +26,7 @@ lexers["hal"] = HALLexer()
 
 project = "LinuxCNC Gantry Robot System"
 author = "Tomás Domínguez Bolaño, Valentín Barral Vales, Carlos José Escudero Cascón, and José Antonio García Naya"
-copyright = "%Y, Tomás Domínguez Bolaño, Valentín Barral Vales, Carlos José Escudero Cascón, and José Antonio García Naya (CITIC Research Center, University of A Coruña, Spain)"
+copyright = "2000–2022 LinuxCNC.org; %Y Tomás Domínguez Bolaño, Valentín Barral Vales, Carlos José Escudero Cascón, and José Antonio García Naya (CITIC Research Center, University of A Coruña, Spain)"
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,6 +41,15 @@ extensions = [
 
 bibtex_bibfiles = ["bib/references.bib"]
 bibtex_default_style = "unsrtalpha"
+
+# Workaround to match bibliography format in HTML/Text and LaTeX Backends
+# https://sphinxcontrib-bibtex.readthedocs.io/en/latest/usage.html
+# https://github.com/sphinx-doc/sphinx/issues/4775
+class DummyTransform(sphinx.builders.latex.transforms.BibliographyTransform):
+    def run(self, **kwargs):
+        pass
+
+sphinx.builders.latex.transforms.BibliographyTransform = DummyTransform
 
 # pygments_style = "manni"
 # pygments_dark_style = "monokai"
@@ -56,59 +66,43 @@ myst_enable_extensions = [
     "substitution",
 ]
 
-myst_substitutions = {"project": project}
+myst_substitutions = {
+    "project": project,
+    "project_url": "https://github.com/GTEC-UDC/linuxcnc_gantry_robot",
+    "project_url_link": "[project repository](https://github.com/GTEC-UDC/linuxcnc_gantry_robot)",
+}
 
 numfig = True
 numfig_secnum_depth = 0
 math_numfig = True
 highlight_language = "none"
 
-numfig_format = {
-    "code-block": "Código %s",
-    # 'figure': 'Figura %s',
-    # 'section': 'Sección',
-    # 'table': 'Tabla %s',
-}
-
 # Define acronyms. These will be added to rst_prolog using the abbr directive
 acronyms = {
     "ACPI": "Advanced Configuration and Power Interface",
     "APM": "Advanced Power Management",
     "BIOS": "Basic Input/Output System",
-    "CNC": "control numérico computerizado",
-    "CPU": "central processing unit",
-    "DRO": "Digital Read Out",
-    "EE.UU.": "Estados Unidos de América",
+    "CNC": "Computer Numerical Control",
     "EIA": "Electronic Industries Alliance",
     "EMC": "Enhanced Machine Controller",
-    "EMC2": "Enhanced Machine Controller 2",
     "GPL": "GNU General Public License",
-    "GUI": "graphical user interface",
+    "GUI": "Graphical User Interface",
     "HAL": "Hardware Abstraction Layer",
     "LGPL": "GNU Lesser General Public License",
-    "MDI": "manual data input",
-    "NAMES": "North American Model Engineering Society",
+    "MDI": "Manual Data Input",
     "NIST": "National Institute of Standards and Technology",
-    "NML": "Neutral Message Language",
-    "P": "proporcional",
-    "PI": "proporcional e integral",
-    "PID": "proporcional, integral, y derivativo",
-    "PLC": "programmable logic controller",
-    "PMAC": "programmable multi-axis controller",
-    "PPR": "pulsos por revolución",
+    "P": "Proportional",
+    "I": "Integral",
+    "PI": "Proportional and Integral",
+    "PID": "Proportional, Integral, and Derivative",
+    "PLC": "Programmable Logic Controller",
+    "PPR": "Pulses per Revolution",
     "RCU": "Read-Copy-Update",
-    "SMI": "System Management Interrupt",
     "UEFI": "Unified Extensible Firmware Interface",
 }
 
 for acronym, text in acronyms.items():
     myst_substitutions[acronym] = f"{{abbr}}`{acronym} ({text})`"
-
-
-# -- Options for internationalization ----------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-internationalization
-
-language = "es"
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -159,7 +153,7 @@ latex_logo = "images/logos/logo_udc_gtec_citic.pdf"
 latex_documents = [
     (
         "index",
-        "linuxcncgantryrobot.tex",
+        "linuxcnc_gantry_robot.tex",
         project,
         "Tomás Domínguez Bolaño \\and Valentín Barral Vales \\and Carlos José Escudero Cascón \\and José Antonio García Naya",
         "manual",
@@ -197,14 +191,6 @@ latex_elements = {
         ]{plex-otf} %
         """
     ),
-    # "fontpkg": textwrap.dedent(
-    #     r"""
-    #     \usepackage{plex-serif}
-    #     \usepackage{plex-sans}
-    #     \usepackage{plex-mono}
-    #     \renewcommand*\familydefault{\sfdefault}
-    #     """
-    # ),
     "fvset": textwrap.dedent(
         r"""\fvset{
         fontsize=\footnotesize,

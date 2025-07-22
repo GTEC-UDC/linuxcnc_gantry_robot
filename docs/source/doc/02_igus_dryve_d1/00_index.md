@@ -1,38 +1,26 @@
-# Controladores Igus dryve D1
+# igus® dryve D1 Controllers
 
-:::{admonition} Nota importante
-:class: warning
-
-**Esta sección requiere revisión**: La documentación de esta sección está basada en testbed de LinuxCNC y necesita ser actualizada para reflejar la configuración específica del robot pórtico de alta precisión, incluyendo los 4 controladores igus® dryve D1 utilizados (3 para motores sin escobillas NEMA 34 y 1 para motor paso a paso NEMA 24).
+:::{note}
+This section was taken from our LinuxCNC testbed project (<https://github.com/GTEC-UDC/linuxcnc_testbed>). It needs to be updated to reflect the gantry robot configuration.
 :::
+
+:::{important}
+For the testbed development we used the igus® dryve D1 controllers with firmware version `dryve-D1-1-20220525` and their operating manual with version `3.0.1`.
+:::
+
+In this section, we will detail the configuration of the igus® dryve D1 controllers. To configure them, connect each controller to a PC via an Ethernet cable. If you do not know a controller's IP address, you can find it by powering on the device or reconnecting the Ethernet cable. In either case, the controller will sequentially display its IP address, digit by digit, on the seven-segment display located on its front panel.
+
+Once connected, open a web browser and enter the IP address of the controller you wish to configure. This will grant access to the controller's web-based configuration interface. The following sections describe the controller's configuration parameters and the values to be applied for both the brushless and stepper motors. For more comprehensive information, it is recommended to consult the official controller manual.
 
 :::{toctree}
 :maxdepth: 2
-:caption: Índice
+:caption: Table of Contents
 
-01_pagina_start.md
-02_pagina_motor.md
-03_pagina_axis.md
-04_pagina_communication.md
-05_pagina_inputs_ouputs.md
-06_pagina_drive_profile.md
-07_pagina_oscilloscope.md
+01_start_page.md
+02_motor_page.md
+03_axis_page.md
+04_communication_page.md
+05_inputs_ouputs_page.md
+06_drive_profile_page.md
+07_oscilloscope_page.md
 :::
-
-En esta sección, describiremos en detalle la configuración de los
-controladores Igus dryve D1. Para configurar los controladores es
-necesario conectarlos mediante Ethernet a un PC. Si no sabemos la
-dirección IP de un controlador podemos obtenerla al encenderlo o
-reconectar el cable Ethernet, en estos casos el controlador mostrará su
-dirección IP dígito a dígito en el visualizador de siete segmentos de su
-frontal.
-
-Una vez conectados los controladores, abriremos un navegador web y
-pondremos la dirección IP del controlador que queramos configurar, esto
-nos permitirá acceder a la interfaz web de configuración del
-controlador. En las siguientes secciones se describen los parámetros de
-configuración del controlador y los valores a aplicar en cada parámetro
-para el motor sin escobillas y el motor paso a paso. Para una
-información más detallada se recomienda consultar el manual de los
-controladores (ver archivo
-"`Operating Manual dryve D1 EN V3.0.1.pdf`").

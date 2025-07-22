@@ -2,7 +2,7 @@
 
 A large high-precision 3-axis gantry robot system using [LinuxCNC](https://www.linuxcnc.org), integrated with [Mesa Electronics](https://store.mesanet.com/) interface cards and [igus® dryve D1](https://www.igus.eu/product/D1) motor controllers.
 
-The system was developed from our [LinuxCNC motor control testbed](https://github.com/your-org/linuxcnc-testbed), which ensured the main components of the system were able to work reliably.
+The system was developed from our [LinuxCNC motor control testbed](https://github.com/GTEC-UDC/linuxcnc_testbed), which ensured the main components of the system were able to work reliably.
 
 The system includes a custom calibration solution that leverages an existing [OptiTrack](https://optitrack.com/) motion capture system in the installation room to measure and compensate for errors in the gantry movement. Using this solution the gantry robot can achieve sub-centimeter precision across the entire work envelope.
 
@@ -26,25 +26,30 @@ This work has been supported by grant PID2022-137099NB-C42 (MADDIE) and by proje
 :name: fig:ack_logos
 :::
 
+:::{only} html
+<!-- -->
 ---
-
-:::{note}
-This documentation is currently under development and available only in Spanish. English translation is planned for future releases.
+<!-- -->
 :::
 
 :::{toctree}
 :maxdepth: 2
 :numbered:
-:caption: Índice
+:caption: Table of Contents
 
-doc/01_introduccion/introduccion.md
+doc/01_introduction/introduction.md
 doc/02_igus_dryve_d1/00_index.md
 doc/03_linuxcnc/00_index.md
+:::
+
+:::{raw} latex
+% Do not show section numbers for the following sections in latex
+\setcounter{secnumdepth}{-1}
 :::
 
 :::{toctree}
 :maxdepth: 1
 
-bibliografia.md
 fdl-1.3.md
+bibliography.md
 :::

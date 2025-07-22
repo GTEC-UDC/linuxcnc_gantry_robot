@@ -4,6 +4,7 @@ message: >-
   If you use this project, please cite it using the metadata
   from this file.
 type: software
+doi: 10.5281/zenodo.15914350
 authors:
   - orcid: 'https://orcid.org/0000-0001-7470-0315'
     affiliation: 'CITIC Research Center, University of A Coruña'
@@ -21,19 +22,9 @@ authors:
     affiliation: 'CITIC Research Center, University of A Coruña'
     given-names: José A.
     family-names: García-Naya
-identifiers:
-  - type: doi
-    value: 10.5281/zenodo.15914350
-    description: >-
-      The DOI of the work.
 repository-code: 'https://github.com/GTEC-UDC/linuxcnc_gantry_robot'
-abstract: >
-  A large high-precision 3-axis gantry robot system using
-  LinuxCNC, integrated with Mesa Electronics interface cards
-  and igus® dryve D1 motor controllers.
+abstract: |
+  A large high-precision 3-axis gantry robot system using LinuxCNC, integrated with Mesa Electronics interface cards and igus® dryve D1 motor controllers.
 
-  This work has been supported by grant PID2022-137099NB-C42
-  (MADDIE) and by project TED2021-130240B-I00 (IVRY) funded
-  by MCIN/AEI/10.13039/501100011033 and the European Union
-  NextGenerationEU/PRTR.
+  This work has been supported by grant PID2022-137099NB-C42 (MADDIE) and by project TED2021-130240B-I00 (IVRY) funded by MCIN/AEI/10.13039/501100011033 and the European Union NextGenerationEU/PRTR.
 license: CC-BY-SA-4.0

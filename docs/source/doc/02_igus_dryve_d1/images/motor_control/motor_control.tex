@@ -42,7 +42,7 @@
                 \node [piblock,yshift=-\piblocksep] (cur_block_i) {$I(\mu_i)$};
             }
         \& [-22pt] \node [op] (cur_inner_sum) {$+$};
-        \& [-10pt] \node [draw, align=center] (power_mgmt) {Gestión de\\ potencia};
+        \& [-10pt] \node [draw, align=center] (power_mgmt) {Power\\ management};
         \& [-10pt] \node [draw, align=center] (motor) {Motor};
         \\ [35pt]
 
@@ -97,13 +97,13 @@
         ] (cur_block) {};
 
         \node [above=5pt of pos_block_p,align=center,font=\normalsize]
-            {Controlador de\\ posición};
+            {Position\\ controller};
 
         \node [above=5pt of vel_block,align=center,font=\normalsize]
-            {Controlador de\\ velocidad};
+            {Velocity\\ controller};
 
         \node [above=5pt of cur_block,align=center,font=\normalsize]
-            {Controlador de\\ corriente};
+            {Current\\ controller};
 
         \draw [->] (cur_inner_sum) -- (power_mgmt);
         \draw [->] (power_mgmt) -- (motor);

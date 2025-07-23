@@ -1,5 +1,6 @@
 (sec:page_input_outputs)=
-# "Inputs/Outputs" Page 
+
+# "Inputs/Outputs" Page
 
 The "Inputs/Outputs" configuration page, displayed in {numref}`fig:conf_stepper_5`, allows for configuring the controller's inputs and outputs.
 

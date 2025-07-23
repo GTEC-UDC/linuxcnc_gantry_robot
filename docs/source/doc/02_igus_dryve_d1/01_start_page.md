@@ -1,20 +1,17 @@
 (sec:conf_start)=
+
 # "Start" Page
 
 The "Start" configuration page, shown in {numref}`fig:conf_stepper_1`, contains various general settings. Specifically, we will configure the following options for all the controllers:
 
 - **Measuring system**: Metric, Millimeter
-- **Movement type**: Rotary
+- **Movement type**: Linear
 - **Time units**: Seconds
 
 :::{figure} images/config-stepper/01-start.png
 :name: fig:conf_stepper_1
 
 Initial configuration page of the stepper motor controller.
-:::
-
-:::{note}
-We have configured the Movement type option as "Rotary," despite the motor driving a linear axis. This is because we do not require the controller to control the axis position, LinuxCNC will handle this. Our only requirement is for the controller to respond to the movement signals we transmit.
 :::
 
 Additionally, this page includes the following sections:

@@ -1,5 +1,6 @@
 (sec:page_oscilloscope)=
-# "Oscilloscope" Page 
+
+# "Oscilloscope" Page
 
 The "Oscilloscope" page, shown in {numref}`fig:conf_brushless_7`, offers two essential functionalities for adjusting and monitoring motor performance: the internal oscilloscope and the configuration of the motor's closed-loop control parameters.
 
@@ -15,7 +16,7 @@ The oscilloscope allows for the simultaneous observation of four channels over a
 
 - Actual current (A)
 - Tracking error
-- Speed (rpm)
+- Speed (RPM)
 - Actual position
 - Desired position
 - Digital inputs
@@ -23,7 +24,8 @@ The oscilloscope allows for the simultaneous observation of four channels over a
 - Analog input 2 (AI 2)
 
 (sec:oscilloscope_parameters)=
-## Control Parameters 
+
+## Control Parameters
 
 :::{figure} images/motor_control/fig.*
 :name: fig:motor_control
@@ -63,16 +65,25 @@ The igus® dryve D1 controller manual does not explicitly describe the control s
 
 The "Oscilloscope" page provides access to the configuration of the {{PI}} controllers parameters. These parameters allow for optimizing motor performance to meet the specific requirements of each task. For igus® motors, by selecting the corresponding motor model in the motor configuration section (see {numref}`sec:motor_motor`), the control parameters will be set to the default values for the chosen motor. In applications involving high speeds, heavy loads, or when noise reduction is critical, fine adjustments to the control parameter configuration may be necessary.
 
-In our testbed setup, we have configured the following parameters for both motors, which have worked well:
+{numref}`tab:oscilloscope_config_summary` below summarizes the configuration parameters for the oscilloscope in our gantry robot:
 
-- **Current**
-  - **Amplification (P)**: 20
-  - **Time constant (I)**: 1000
-- **Velocity**
-  - **Amplification (P)**: 0.1
-  - **Time constant (I)**: 0
-- **Position**
-  - **Amplification (P)**: 1000
+:::{tabularcolumns} lrr
+:::
+
+:::{csv-table} Oscilloscope configuration summary for the gantry robot.
+:name: tab:oscilloscope_config_summary
+:widths: auto
+:header: Parameter,X1/X2/Y,Z
+
+**Current**,,
+Amplification (P),5,15
+Time constant (I),1000,8000
+**Velocity**,,
+Amplification (P),2.8,0.5
+Time constant (I),0.5,24
+**Position**,,
+Amplification (P),150,100
+:::
 
 :::{note}
 When configuring the motor control parameters in the "Oscilloscope" page, it is important to consider the following points:

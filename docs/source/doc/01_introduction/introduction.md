@@ -26,13 +26,15 @@ In our system, LinuxCNC communicates with the igus® dryve D1 controllers via th
 
 Detailed information on LinuxCNC's operation and configuration can be found in {numref}`sec:linuxcnc`.
 
+(sec:hardware)=
+
 ## System Hardware
 
 This system comprises the following key components:
 
 ### Main Components
 
-- **Control Computer**: PC running LinuxCNC for real-time motor coordination
+- **Control Computer**: PC running [LinuxCNC](https://www.linuxcnc.org) for real-time motor coordination
 
 - **4 Motor Controllers** [igus® dryve D1](https://www.igus.eu/product/D1): igus® dryve D1 can be used for controlling stepper, DC, and brushless motors in industrial and automation applications. The igus® dryve D1 supports the following communication methods with control systems:
 
@@ -58,36 +60,39 @@ This system comprises the following key components:
 
 ### Motors and Actuators
 
-- **X-axis Motors**: 2 x [igus® MOT-EC-86-C-I-A](https://www.igus.eu/product/MOT-EC-86-C-I-A) - NEMA 34 brushless with 1000 PPR encoder
+- **X-axis Motors**: 2 × [igus® MOT-EC-86-C-I-A](https://www.igus.eu/product/MOT-EC-86-C-I-A) - NEMA 34 brushless with integrated 1000 {{PPR}} encoder. A 10:1 reduction gear was installed on the motor shaft.
 
-- **Y-axis Motor**: 1 x [igus® MOT-EC-86-C-I-A](https://www.igus.eu/product/MOT-EC-86-C-I-A) - NEMA 34 brushless with 1000 PPR encoder
+- **Y-axis Motor**: 1 × [igus® MOT-EC-86-C-I-A](https://www.igus.eu/product/MOT-EC-86-C-I-A) - NEMA 34 brushless with integrated 1000 {{PPR}} encoder. A 10:1 reduction gear was installed on the motor shaft.
 
-- **Z-axis Motor**: 1 x [igus® MOT-AN-S-060-035-060-M-C-AAAC](https://www.igus.eu/product/motors-and-gears) - NEMA 24 stepper with 500 PPR encoder
+- **Z-axis Motor**: 1 × [igus® MOT-AN-S-060-035-060-M-C-AAAC](https://www.igus.eu/product/motors-and-gears) - NEMA 24 stepper with 500 {{PPR}} encoder.
 
 ### Safety Systems and Sensors
 
 - **Emergency Stop Switch**: This switch has both a normally closed and a normally open contact.
 
-- **Limit Sensors**: 4 x igus® inductive sensors for position limit detection
+- **Limit Sensors**: 4 × igus® inductive sensors for position limit detection.
 
 - **LED Indicators**: Custom indicators with red, yellow, and green LEDs, which provide a visual display of the system's status.
 
 ### Power Supply
 
-- **48V Power Supplies**: 3 x MEAN WELL SDR-960 for brushless motor power
-- **24V Power Supply**: 1 x MEAN WELL SDR-240 for stepper motor power
-- **Additional 24V Power Supply**: For igus® dryve D1 logic and MESA 7I77 field power
-- **5V Power Supply**: MEAN WELL MDR-20-5 for MESA 7I77 field I/O logic
+- **48V Power Supplies**: 3 × [MEAN WELL SDR-960-48](https://www.meanwell.com/webapp/product/search.aspx?prod=SDR-960) for brushless motor power.
+- **24V Power Supply**: 1 × [MEAN WELL SDR-240-24](https://www.meanwell.com/webapp/product/search.aspx?prod=SDR-240) for stepper motor power.
+- **Additional 24V Power Supply**: For igus® dryve D1 logic and MESA 7I77 field power.
+- **5V Power Supply**: [MEAN WELL MDR-20-5](https://www.meanwell.com/webapp/product/search.aspx?prod=MDR-20) for MESA 7I77 field I/O logic.
 
 ### Linear Units
 
-The system is built with igus® self-lubricating linear units that enable lifetime operation of moving parts without external lubrication.
+The system is built with igus® self-lubricating linear units that enable lifetime operation of moving parts without external lubrication. The linear units details are the following:
+
+- **X and Y axes**: Toothed belt drive with a feed rate of 144 mm/rev.
+- **Z axis**: Lead screw drive with a feed rate of 4 mm/rev.
 
 ## Calibration System
 
 This project includes the following calibration components:
 
-- **Custom LinuxCNC kinematic module `calibxyzkins`** in `linuxcnc/components/linuxcnc_calibrated_xyz_kins`: enables real-time positioning error compensation
-- **Calibration analysis software** in the `calibration/` folder: Python-based tools for processing OptiTrack data and generating calibration parameters
+- **Custom LinuxCNC kinematic module** `calibxyzkins` in `linuxcnc/components/linuxcnc_calibrated_xyz_kins`: enables real-time positioning error compensation.
+- **Calibration analysis software** in `calibration/`: Python-based tools for processing OptiTrack data and generating calibration parameters.
 
 This solution enables the gantry robot to achieve sub-centimeter precision throughout the entire working volume of 5.3m × 5.2m × 1m.

@@ -1,6 +1,7 @@
 # MESA 7I77 Board Configuration
 
 (sec:mesa7i77_power)=
+
 ## 5 V Main Power
 
 The MESA 7I77 board can draw its main 5V power either from the MESA 7I96S board or through its `TB1` connector. This power is needed for the encoders, analog outputs, and the RS-422 interface. The main power mode for the MESA 7I77 is selected using jumper `W5` as follows:
@@ -12,7 +13,7 @@ The MESA 7I77 board can draw its main 5V power either from the MESA 7I96S board 
 Supplying power to the MESA 7I77 board through the `TB1` connector with jumper `W5` in the left position can potentially damage the MESA 7I77 board, the MESA 7I96S board, the connection cable, and even the PC.
 :::
 
-In our testbed setup, we chose to power the MESA 7I77 board via the `TB1` connector; therefore:
+In our gantry robot system, we chose to power the MESA 7I77 board via the `TB1` connector; therefore:
 
 - Jumper `W6` on the MESA 7I96S board has been set to the down position, as shown in {numref}`fig:mesa_ip_selection`.
 - Jumper `W5` on the MESA 7I77 board has been set to the right position, as shown in {numref}`fig:mesa7i77_left`.
@@ -32,14 +33,14 @@ In addition to the 5V main power, the MESA 7I77 board also requires supplementar
 :widths: auto
 :header: Pin, Signal, Function
 
-  1 (bottom), `VFIELD`, `FIELD POWER`
-  2, `VFIELD`, `FIELD POWER`
-  3, `VFIELD`, `FIELD POWER`
-  4, `VFIELD`, `FIELD POWER`
-  5, `VIN`, `FIELD I/O LOGIC POWER`
-  6, Not connected, --
-  7, Not connected, --
-  8 (top), Ground, Reference of `VIN` & `VFIELD`
+1 (bottom), `VFIELD`, `FIELD POWER`
+2, `VFIELD`, `FIELD POWER`
+3, `VFIELD`, `FIELD POWER`
+4, `VFIELD`, `FIELD POWER`
+5, `VIN`, `FIELD I/O LOGIC POWER`
+6, Not connected, --
+7, Not connected, --
+8 (top), Ground, Reference of `VIN` & `VFIELD`
 :::
 
 As indicated in {numref}`tab:mesa7i77_tb2`, the board requires two power inputs in this configuration:
@@ -53,7 +54,7 @@ If `VFIELD` is between 8 V and 28 V, the same source can be used to power `VIN`.
 The voltage at `VFIELD` must have a maximum rise rate of 10 V/ms to prevent damage to the board. This is a limitation of MOSFET transistors {cite}`toshiba2018impacts, toshiba2018mosfets, nexperia2023power, bai2003analysis`. Therefore, `VFIELD` must be connected directly to the power supply without using switches in the circuit.
 :::
 
-As stated in {numref}`sec:page_input_outputs`, the MESA 7I96S board can only use 5 V logic for step and direction signals. Therefore, the logic for both the igus® dryve D1 controllers and the MESA 7I77 board must also be 5 V. Thus, in our testbed setup, jumper `W1` on the MESA 7I77 board has been set to the right position, the `VIN` input to 24 V, and the `VFIELD` input to 5 V, as shown in {numref}`fig:mesa7i77_right`.
+As stated in {numref}`sec:page_input_outputs`, the MESA 7I96S board can only use 5 V logic for step and direction signals. Therefore, the logic for both the igus® dryve D1 controllers and the MESA 7I77 board must also be 5 V. Thus, in our gantry robot system, jumper `W1` on the MESA 7I77 board has been set to the right position, the `VIN` input to 24 V, and the `VFIELD` input to 5 V, as shown in {numref}`fig:mesa7i77_right`.
 
 ::: {figure} images/mesa/mesa_7i77_right_labelled.*
 :name: fig:mesa7i77_right
@@ -79,9 +80,6 @@ The MESA 7I77 board has six encoder inputs, each with individual A, B, and Z inp
 | 5         | W9        | W7       | W3       |
 :::
 
-In our testbed setup, the following MESA 7I77 board encoder inputs and modes were used:
+In our gantry robot system, all motor use differential encoders, so all the MESA 7I77 board encoder inputs and modes were set to differential mode.
 
-- The stepper motor encoder was connected to input 0. This encoder uses differential signals, so jumpers `W21`, `W19`, and `W17` were left in their default right position.
-- The brushless motor encoder was connected to input 1. This encoder uses single-ended signals, so jumpers `W15`, `W13`, and `W10` were set to the left position.
-
-The configuration of the aforementioned jumpers for encoders 0 and 1 on the MESA 7I77 board in the testbed setup is shown in {numref}`fig:mesa7i77_left`.
+{numref}`fig:mesa7i77_left` shows the jumpers for encoders 0 and 1 on the MESA 7I77 board in the gantry robot system. Jumpers for the other encoders are located below the cable connectors and hidden from view.

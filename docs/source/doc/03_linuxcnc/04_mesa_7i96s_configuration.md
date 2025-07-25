@@ -26,6 +26,10 @@ Finally, to flash the firmware to the board, execute the following command:
 mesaflash -device 7i96s -addr 192.168.1.121 -write 7i96s_7i77d.bin
 ```
 
+## Network Configuration
+
+The Beelink EQR6 mini computer used in our gantry robot system has two Ethernet ports, which allows for a dedicated network connection to the MESA 7I96S board. One port is used to connect the PC to the local network, while the other port is used for a direct connection to the MESA card. This setup provides isolation and dedicated bandwidth for the real-time communication with the motion control system.
+
 ## IP Address
 
 The MESA 7I96S board has three options for setting the IP address: a default IP (`192.168.1.121`), an IP read from the EEPROM, and IP acquisition via the BOOTP network protocol. These options are selected using jumpers `W4` and `W5`, located on the bottom left of the board as shown in {numref}`fig:mesa_ip_selection`.
@@ -38,11 +42,13 @@ View of the bottom left side of the MESA 7I96S board.
 
 The available IP configuration options are detailed in {numref}`tab:mesa_ip_selection`. Specifically, note the following:
 
+- When jumpers `W4` and `W5` are in the (down, down) position, the IP address will be set to the default value of 192.168.1.121. This is the configuration used in our setup.
+
 - When jumpers `W4` and `W5` are in the (down, up) position, the IP address will be read from the EEPROM. The default IP address in the EEPROM is 10.10.10.10. This IP address can be changed using the `mesaflash` utility. For example, to set the IP in the EEPROM to 10.10.10.100, you would execute the following command:
 
-    ```sh
-    mesaflash -device 7i96s -addr 192.168.1.121 -set ip=10.10.10.100
-    ```
+  ```sh
+  mesaflash -device 7i96s -addr 192.168.1.121 -set ip=10.10.10.100
+  ```
 
 - When jumpers `W4` and `W5` are in the (up, up) position, the IP address will be set to 192.168.1.121, and the board will boot using the fallback configuration (see {numref}`sec:mesa7i96s_fallback`).
 
@@ -57,9 +63,10 @@ Up, Down, Obtained via BOOTP
 Up, Up, 192.168.1.121 and use fallback conf.
 :::
 
-In our testbed setup, jumpers `W4` and `W5` have been set to the (down, up) position, as shown in {numref}`fig:mesa_ip_selection`. This configuration allows the board to read the IP address stored in the EEPROM. For this setup, we have configured the board's IP address to 10.68.33.122.
+In our gantry robot system, jumpers `W4` and `W5` have been set to the (down, down) position, as shown in {numref}`fig:mesa_ip_selection`. This configuration sets the board's IP address to the default value of 192.168.1.121, which is suitable for the setup where the PC is connected directly to the MESA card via one of its LAN ports.
 
 (sec:mesa7i96s_fallback)=
+
 ## Fallback Configuration
 
 The MESA 7I96S board's flash memory contains two images: a main image and a fallback image. If the primary image becomes corrupted, the FPGA will load the fallback configuration, allowing a new main image to be written. Otherwise, the memory would have to be programmed via JTAG.
@@ -67,6 +74,7 @@ The MESA 7I96S board's flash memory contains two images: a main image and a fall
 It is possible to force the board to boot using the fallback configuration by setting the IP selection jumpers `W4` and `W5` to the (up, up) position. In this boot mode, the card's IP address will be set to 192.168.1.121.
 
 (sec:mesa7i96s_cable_power)=
+
 ## Expansion Connector 5 V Power Supply
 
 The MESA 7I96S board has the capability to supply 5V power to the board connected to its expansion connector (P1), which in our case is the MESA 7I77. This option is controlled by jumper `W6`, located on the bottom of the board to the left of the expansion connector, as shown in {numref}`fig:mesa_ip_selection`. The settings are as follows:
@@ -74,4 +82,4 @@ The MESA 7I96S board has the capability to supply 5V power to the board connecte
 - When jumper `W6` is in the up position, the MESA 7I96S board will provide power to the MESA 7I77 board through the expansion connector.
 - When jumper `W6` is in the down position, the MESA 7I96S board will not provide power through the expansion connector; in this case, external power must be supplied to the MESA 7I77 board.
 
-In our testbed setup, the latter option was chosen, with jumper `W6` configured in the down position, as seen in {numref}`fig:mesa_ip_selection`. The MESA 7I77 board must also be configured appropriately, as explained in {numref}`sec:mesa7i77_power`.
+In our gantry robot system, the latter option was chosen, with jumper `W6` configured in the down position, as seen in {numref}`fig:mesa_ip_selection`. The MESA 7I77 board must also be configured appropriately, as explained in {numref}`sec:mesa7i77_power`.

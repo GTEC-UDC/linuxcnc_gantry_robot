@@ -1,9 +1,11 @@
 (sec:linuxcnc_configuration)=
+
 # LinuxCNC Configuration
 
-As noted in {numref}`sec:linuxcnc_intro_config`, a LinuxCNC configuration comprises several files, requiring at least one INI file and one {{HAL}} file. The following sections detail the configuration of both file types, using the `mesa_7i96s_7i77_xy` configuration as an example.
+As noted in {numref}`sec:linuxcnc_intro_config`, a LinuxCNC configuration comprises several files, requiring at least one INI file and one {{HAL}} file. The following sections detail the configuration of both file types, using the `citic_gantry_robot` configuration as an example.
 
 (sec:linuxcnc_configuration_ini)=
+
 ## INI Configuration
 
 ### .ini Configuration File Format
@@ -12,158 +14,175 @@ An `.ini` file is a plain text file used for configuring applications and progra
 
 - **Sections**: Sections serve to organize keys and values. Each section begins with its name enclosed in square brackets, followed by zero or more key-value pairs belonging to that section. The syntax for a section is:
 
-    ```ini
-    [section_name]
-    ```
+  ```ini
+  [section_name]
+  ```
 
 - **Keys and Values**: Within each section, keys and their corresponding values can be defined. Keys are identifiers used to access associated values. The syntax for a key-value pair is:
 
-    ```ini
-    key = value
-    ```
+  ```ini
+  key = value
+  ```
 
-    Keys can contain letters and underscores (`_`). Values can be text strings, integers, or floating-point numbers.
+  Keys can contain letters and underscores (`_`). Values can be text strings, integers, or floating-point numbers.
 
 - **Comments**: Comments begin with a semicolon (`;`) or a hash symbol (`#`). For example:
 
-    ```ini
-    ; This is a comment
-    # This is also a comment
-    ```
+  ```ini
+  ; This is a comment
+  # This is also a comment
+  ```
 
-### Example: `mesa_7i96s_7i77_xy.ini` Configuration File
+(sec:linuxcnc_configuration_ini_file)=
 
-Below are the different sections of the `mesa_7i96s_7i77_xy.ini` configuration file, with comments explaining the purpose of each parameter. Note that not all available parameters are specified in some sections. For a complete list of parameters and their documentation, consult the LinuxCNC user manual {cite}`linuxcncdoc`.
+### `citic_gantry_robot.ini` Configuration File
+
+Below are the different sections of the `citic_gantry_robot.ini` configuration file, with comments explaining the purpose of each parameter.
+
+:::{note}
+Not all available parameters are specified in some sections. For a complete list of parameters and their documentation, consult the LinuxCNC user manual {cite}`linuxcncdoc`.
+:::
+
+:::{note}
+Some parameters in INI files are used directly by LinuxCNC, but others are custom parameters added to be used in HAL files, as explained in {numref}`sec:linuxcnc_configuration_hal_format`. Parameters from the INI file can be accessed in HAL files using the syntax `[<section>]<option>`, where `[<section>]` is the section name in square brackets and `<option>` is the corresponding option name within that section.
+:::
 
 - **EMC Section**: General configuration.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 1-12
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 1-12
+  :lineno-match:
+  :::
 
 - **DISPLAY Section**: User interface configuration. The available options may depend on the specific user interface used. In this case, we are using the AXIS user interface.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 14-64
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 14-71
+  :lineno-match:
+  :::
 
 - **TASK Section**: LinuxCNC task controller configuration. The task controller is responsible for communicating with the user interface, the motion planner, and the G-code interpreter. Currently, `milltask` is the only task controller available. For more information, consult the LinuxCNC user manual {cite}`linuxcncdoc` and the `milltask` man page, also available at <http://linuxcnc.org/docs/devel/html/man/man1/milltask.1.html>.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 67-74
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 74-81
+  :lineno-match:
+  :::
 
 - **RS274NGC Section**: RS274NGC (G-code) interpreter configuration.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 77-84
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 84-97
+  :lineno-match:
+  :::
 
 - **EMCMOT Section**: Motion controller configuration. The `EMCMOT` and `SERVO_PERIOD` parameters are not directly used by LinuxCNC but are used to configure the motion control module in the {{HAL}} file (see {numref}`sec:linuxcnc_configuration_hal`).
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 87-100
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 100-113
+  :lineno-match:
+  :::
 
 - **{{HAL}} Section**: {{HAL}} configuration.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 103-117
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 116-130
+  :lineno-match:
+  :::
 
-- **HALUI Section**: HALUI (HAL-based user interface) configuration. The only available option is `MDI_COMMAND`, which allows MDI commands to be executed via {{HAL}} signals. In our case, this section is left empty.
+- **HALUI Section**: HALUI (HAL-based user interface) configuration. The only available option is `MDI_COMMAND`, which allows MDI commands to be executed via {{HAL}} signals. In our case we configure two commands which will be able to be executed via the PyVCP panel (see {numref}`sec:linuxcnc_configuration_pyvcp`).
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 120-126
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 133-144
+  :lineno-match:
+  :::
 
 - **KINS Section**: Kinematics configuration.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 129-137
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 147-155
+  :lineno-match:
+  :::
+
+  For machines with Cartesian geometries, such as gantry robots, where the movement of a joint is directly proportional to the movement of the axis, LinuxCNC includes the `trivkins` kinematics module.
+
+  The `trivkins` module accepts the `coordinates` parameter to specify the association of axis coordinate letters with the joint number. For example, with the parameter `coordinates=XZ`, `JOINT_0` will be assigned to `X` and `JOINT_1` to `Z`. In this parameter, the same axis letter can be specified multiple times, allowing multiple joints to be assigned to the same axis. In this case, it is also necessary to use the `kinstype=B` parameter. For instance, with the parameters `coordinates=XX` and `kinstype=B`, both `JOINT_0` and `JOINT_1` will be assigned to `X`.
+
+  For our gantry robot system, we use the parameters `coordinates=XXYZ` and `kinstype=B`, which means that the axes-joints mapping is the following:
+
+  - `X` axis → `JOINT_0` and `JOINT_1`
+  - `Y` axis → `JOINT_2`
+  - `Z` axis → `JOINT_3`
+
+  For more information about the `trivkins` kinematics module, consult the `kins` man page, also available at <http://linuxcnc.org/docs/devel/html/man/man9/kins.9.html>.
 
 - **APPLICATIONS Section**: LinuxCNC allows applications to be launched at startup. These applications must be specified within the `APPLICATIONS` section using the `APP` option, which can be used multiple times. Applications will be launched either at the beginning, before the graphical interface starts, or after a delay specified by the `DELAY` option.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 140-144
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 158-161
+  :lineno-match:
+  :::
 
 - **TRAJ Section**: Trajectory planner configuration.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 147-164
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 164-181
+  :lineno-match:
+  :::
 
 - **EMCIO Section**: Input/output controller configuration. This controls input/output tasks such as coolant, tool changes, and emergency stops.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 167-174
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 184-191
+  :lineno-match:
+  :::
 
-- **AXIS\_\<i\> Section**: Configuration for axis *\<i\>*. Possible values for *\<i\>* include `X`, `Y`, `Z`, `A`, `B`, `C`, `U`, `V`, and `W`. An example of the X-axis configuration is provided below; the Y-axis configuration is similar.
+- **AXIS\_\<i\> Section**: Configuration for axis *\<i\>*. Possible values for *\<i\>* include `X`, `Y`, `Z`, `A`, `B`, `C`, `U`, `V`, and `W`. Below we show the configuration for the X-axis. The configuration for the other axes is similar.
 
-    :::{important}
-    When configuring the robot's limits (`MIN_LIMIT` and `MAX_LIMIT` parameters), it is advisable to leave some margin beyond the desired workspace. If the robot is commanded to position itself at one of the limits, it can easily exceed that limit slightly. For example, if you want your robot to operate on the X-axis between X = 0 and X = 200, you could configure `MIN_LIMIT = -5` and `MAX_LIMIT = 205`.
-    :::
+  :::{important}
+  When configuring the robot's limits (`MIN_LIMIT` and `MAX_LIMIT` parameters), it is advisable to leave some margin beyond the desired workspace. If the robot is commanded to position itself at one of the limits, it can easily exceed that limit slightly. For example, if you want your robot to operate on the X-axis between X = 0 and X = 200, you could configure `MIN_LIMIT = -5` and `MAX_LIMIT = 205`.
+  :::
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 177-190
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 194-211
+  :lineno-match:
+  :::
 
 - **JOINT\_\<n\> Section**: Configuration for joint (motor) *\<n\>*, where *\<n\>* is the joint number, ranging from 0 to (*\<num_joints\>* $-$ 1). The value of *\<num_joints\>* is set in the `JOINTS` option of the `KINS` section.
 
-    For machines with Cartesian geometries, such as gantry robots, LinuxCNC includes the `trivkins` kinematics module. With this module, by default, there is a 1:1 correspondence between the axis coordinate letter and the joint number, i.e., JOINT_0 = X, JOINT_1 = Y, ..., JOINT_8 = W.
+  :::{important}
+  Both the joint and axis configurations include `MAX_VELOCITY`, `MAX_ACCELERATION`, `MIN_LIMIT`, and `MAX_LIMIT` parameters. When the robot is not homed, LinuxCNC uses the parameters from the joint sections, however, once the robot is homed, it uses the parameters from the axis sections.
+  :::
 
-    The `trivkins` module accepts the `coordinates` parameter to specify the association of axis coordinate letters with the joint number. For example, with the parameter `coordinates=XZ`, JOINT_0 will be assigned to X and JOINT_1 to Z. In this parameter, the same axis letter can be specified multiple times, allowing multiple joints to be assigned to the same axis. In this case, it is also necessary to use the `kinstype=B` parameter. For instance, with the parameters `coordinates=XX` and `kinstype=B`, both JOINT_0 and JOINT_1 will be assigned to X.
+  The following code shows the configuration of joint 0, which corresponds to the X1 brushless motor. The parameters specified below the comments starting with "Custom configuration:" are not directly used by LinuxCNC, they are used to configure the motor parameters in the {{HAL}} file (see {numref}`sec:linuxcnc_configuration_hal`).
 
-    For more information about the `trivkins` kinematics module, consult the `kins` man page, also available at <http://linuxcnc.org/docs/devel/html/man/man9/kins.9.html>.
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 257-351
+  :lineno-match:
+  :::
 
-    :::{important}
-    Both the joint and axis configurations include `MAX_VELOCITY`, `MAX_ACCELERATION`, `MIN_LIMIT`, and `MAX_LIMIT` parameters. When the robot is not homed, LinuxCNC uses the parameters from the joint sections; however, once the robot is homed, it uses the parameters from the axis sections.
-    :::
+  The following code shows the configuration of joint 3, which corresponds to the Z stepper motor. As before, the parameters specified below the comments starting with "Custom configuration:" are not directly used by LinuxCNC, they are used to configure the motor parameters in the {{HAL}} file (see {numref}`sec:linuxcnc_configuration_hal`). These parameters differ from the previous ones because now a stepper motor is used.
 
-    The following code shows the configuration of joint 1 (X-axis), which corresponds to the stepper motor. The parameters specified below the comment "Custom configurations for the HAL file" are not directly used by LinuxCNC; they are used to configure the motor parameters in the {{HAL}} file (see {numref}`sec:linuxcnc_configuration_hal`).
-
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 193-299
-    :lineno-match:
-    :::
-
-    The following code shows the configuration of joint 2 (Y-axis), which corresponds to the brushless motor. As before, the parameters specified below the comment "Custom configurations for the HAL file" are not directly used by LinuxCNC; they are used to configure the motor parameters in the {{HAL}} file (see {numref}`sec:linuxcnc_configuration_hal`). These parameters differ from the previous ones because now a brushless motor is used.
-
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: ini
-    :lines: 318-409
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.ini
+  :language: ini
+  :lines: 546-663
+  :lineno-match:
+  :::
 
 (sec:linuxcnc_configuration_hal)=
+
 ## {{HAL}} Configuration
 
 {{HAL}} is a fundamental component of LinuxCNC, serving as an interface between the machine's software and hardware. It provides the infrastructure for communication among the system's numerous software and hardware components. The {{HAL}} layer is composed of components that:
@@ -184,13 +203,13 @@ The {{HAL}} components included with LinuxCNC are listed in the user manual {cit
   - Pins have a direction: input (IN), output (OUT), or input/output (I/O).
   - A signal identifies a connection between pins.
 
-    {numref}`fig:hal_circuit_concept` from the LinuxCNC documentation {cite}`linuxcncdoc` illustrates the concepts of components, pins, and signals in {{HAL}}. In the figure, pin `pin3-out` of `component.0` connects to pins `pin3-in` and `pin4-in` of `component.1` (via the `signal-red` signal), and pin `pin1-out` of `component.1` connects to pin `pin1-in` of `component.0` (via the `signal blue` signal).
+  {numref}`fig:hal_circuit_concept` from the LinuxCNC documentation {cite}`linuxcncdoc` illustrates the concepts of components, pins, and signals in {{HAL}}. In the figure, pin `pin3-out` of `component.0` connects to pins `pin3-in` and `pin4-in` of `component.1` (via the `signal-red` signal), and pin `pin1-out` of `component.1` connects to pin `pin1-in` of `component.0` (via the `signal blue` signal).
 
-    :::{figure} images/linuxcnc/hal_circuit_concept.png
-    :name: fig:hal_circuit_concept
+  :::{figure} images/linuxcnc/hal_circuit_concept.png
+  :name: fig:hal_circuit_concept
 
-    {{HAL}} Concept --- Connection as electrical circuits. Source: LinuxCNC documentation {cite}`linuxcncdoc`.
-    :::
+  {{HAL}} Concept --- Connection as electrical circuits. Source: LinuxCNC documentation {cite}`linuxcncdoc`.
+  :::
 
 - **Parameters**: {{HAL}} components can have parameters, which are input or output settings not connected to any other component. There are two types of parameters:
 
@@ -218,158 +237,178 @@ Generally, each command must be specified on a single line. If a command needs t
 
 - `loadrt`: Loads a {{HAL}} real-time component into the system. The basic syntax of the `loadrt` command is:
 
-    ```text
-    loadrt <component> <options>
-    ```
+  ```text
+  loadrt <component> <options>
+  ```
 
-    where `<component>` is the name of the component and `<options>` are the component options. For example:
+  where `<component>` is the name of the component and `<options>` are the component options. For example:
 
-    ```hal
-    loadrt mux4 count=1
-    ```
+  ```hal
+  loadrt mux4 count=1
+  ```
 
 - `addf`: Adds a function to a real-time thread. The syntax of the `addf` command is:
 
-    ```text
-    addf <function> <thread>
-    ```
+  ```text
+  addf <function> <thread>
+  ```
 
-    where `<function>` is the name of the function and `<thread>` is the thread to which it will be added. For example:
+  where `<function>` is the name of the function and `<thread>` is the thread to which it will be added. For example:
 
-    ```hal
-    addf mux4.0 servo-thread
-    ```
+  ```hal
+  addf mux4.0 servo-thread
+  ```
 
 - `loadusr`: Loads a non-real-time {{HAL}} component into the system. Non-real-time components are separate processes that can optionally communicate with other {{HAL}} components via pins and parameters. Real-time components cannot be loaded into non-real-time space. The syntax of the `loadusr` command is:
 
-    ```text
-    loadusr [<flags>] <command>
-    ```
+  ```text
+  loadusr [<flags>] <command>
+  ```
 
-    where `<command>` is the program command to be executed and `<flags>` can be one or more of the following options:
+  where `<command>` is the program command to be executed and `<flags>` can be one or more of the following options:
 
   - `-i`: Ignore the program's return value (with `-w`).
   - `-w`: Wait for the program to finish.
   - `-W`: Wait for the component to be ready. It is assumed that the component will have the same name as the first argument of the command.
-  - `-Wn``<name>`: Wait for the component to be ready and assign it the name `<name>`. This is only applicable if the component has the `-n` option to assign a name.
+  - `-Wn <name>`: Wait for the component to be ready and assign it the name `<name>`. This is only applicable if the component has the `-n` option to assign a name.
 
-    For example:
+  For example:
 
-    ```hal
-    loadusr -Wn spindle gs2_vfd -n spindle
-    ```
+  ```hal
+  loadusr -Wn spindle gs2_vfd -n spindle
+  ```
 
 - `net`: Creates a connection between a signal and one or more pins. The syntax is as follows:
 
-    ```text
-    net <signal> <pin>
-    ```
+  ```text
+  net <signal> <pin>
+  ```
 
-    where `<signal>` is the name of the signal and `<pin>` is the name of a pin. If the signal does not exist, a new signal is created. The command also allows the use of the words `<=`, `=>`, and `<=>`, separated by a space from the pin names, to indicate the direction of the signals between pins. These words are ignored by the command and merely serve to facilitate readability.
+  where `<signal>` is the name of the signal and `<pin>` is the name of a pin. If the signal does not exist, a new signal is created. The command also allows the use of the words `<=`, `=>`, and `<=>`, separated by a space from the pin names, to indicate the direction of the signals between pins. These words are ignored by the command and merely serve to facilitate readability.
 
-    The following rules must be met to connect a pin to a signal:
+  The following rules must be met to connect a pin to a signal:
 
   - An input (IN) pin can always be connected to a signal.
   - An input/output (I/O) pin can be connected unless there is an output (OUT) pin on the signal.
   - An output (OUT) pin can be connected only if there are no other output (OUT) or input/output (I/O) pins on the signal.
 
-    The same signal name can be used in multiple `net` commands to connect additional pins, provided the above rules are respected.
+  The same signal name can be used in multiple `net` commands to connect additional pins, provided the above rules are respected.
 
-    Examples:
+  Examples:
 
-    - ```hal
-       net home-x joint.0.home-sw-in <= parport.0.pin-11-in
-       ```
+  - ```hal
+     net home-x joint.0.home-sw-in <= parport.0.pin-11-in
+     ```
 
-       where `home-x` is the signal name, `joint.0.home-sw-in` is an input (IN) pin, `<=` is the optional direction arrow (ignored by the command), and `parport.0.pin-11-in` is an output (OUT) pin.
+     where `home-x` is the signal name, `joint.0.home-sw-in` is an input (IN) pin, `<=` is the optional direction arrow (ignored by the command), and `parport.0.pin-11-in` is an output (OUT) pin.
 
-       This example can also be equivalently defined in {{HAL}} by two `net` commands:
+     This example can also be equivalently defined in {{HAL}} by two `net` commands:
 
-       ```hal
-       net home-x <= parport.0.pin-11-in
-       net home-x => joint-0.home-sw-in
-       ```
+     ```hal
+     net home-x <= parport.0.pin-11-in
+     net home-x => joint-0.home-sw-in
+     ```
 
-       :::{note}
-       As seen in this example, although the second pin's name has the `-in` suffix, {{HAL}} treats it as an output pin. Therefore, when configuring pin connections in {{HAL}}, always refer to how the pin is configured in {{HAL}}, not just its name.
-       :::
+     :::{note}
+     As seen in this example, although the second pin's name has the `-in` suffix, {{HAL}} treats it as an output pin. Therefore, when configuring pin connections in {{HAL}}, always refer to how the pin is configured in {{HAL}}, not just its name.
+     :::
 
-    - ```hal
-      net xStep stepgen.0.out => parport.0.pin-02-out parport.0.pin-08-out
-      ```
+  - ```hal
+    net xStep stepgen.0.out => parport.0.pin-02-out parport.0.pin-08-out
+    ```
 
-      where `xStep` is the signal name, `stepgen.0.out` is an output pin, and `parport.0.pin-02-out` and `parport.0.pin-08-out` are input pins.
+    where `xStep` is the signal name, `stepgen.0.out` is an output pin, and `parport.0.pin-02-out` and `parport.0.pin-08-out` are input pins.
 
-      This example can also be defined in {{HAL}} by two `net` commands as follows:
+    This example can also be defined in {{HAL}} by two `net` commands as follows:
 
-      ```hal
-      net home-x <= stepgen.0.out
-      net home-x => parport.0.pin-02-out parport.0.pin-08-out
-      ```
+    ```hal
+    net xStep <= stepgen.0.out
+    net xStep => parport.0.pin-02-out parport.0.pin-08-out
+    ```
 
 - `setp`: Sets the value of a pin or parameter. Valid values depend on the pin or parameter's data type. The syntax of this command is:
 
-    ```text
-    setp <name> <value>
-    ```
+  ```text
+  setp <name> <value>
+  ```
 
-    where `<name>` is the name of the pin or parameter and `<value>` is the value to which it is to be set. The command will fail if `<name>` does not exist as a pin or parameter, if it is a read-only parameter, if it is an output (OUT) pin, if it is a pin that is already connected to a signal, or if `<value>` is not a valid value for the pin or parameter's data type.
+  where `<name>` is the name of the pin or parameter and `<value>` is the value to which it is to be set. The command will fail if `<name>` does not exist as a pin or parameter, if it is a read-only parameter, if it is an output (OUT) pin, if it is a pin that is already connected to a signal, or if `<value>` is not a valid value for the pin or parameter's data type.
 
 - `sets`: Sets the value of a signal. The syntax is:
 
-    ```text
-    sets <signal> <value>
-    ```
+  ```text
+  sets <signal> <value>
+  ```
 
-    where `<signal>` is the name of the signal and `<value>` is the value to which it is to be set. The command will fail if `<signal>` does not exist as a signal, if the signal is already connected to an output (OUT) pin, or if `<value>` is not a valid value for the signal's data type.
+  where `<signal>` is the name of the signal and `<value>` is the value to which it is to be set. The command will fail if `<signal>` does not exist as a signal, if the signal is already connected to an output (OUT) pin, or if `<value>` is not a valid value for the signal's data type.
 
 - `unlinkp`: Unlinks a pin from its connected signal. The syntax of the command is:
 
-    ```hal
-    unlinkp <name>
-    ```
+  ```hal
+  unlinkp <name>
+  ```
 
     where `<name>` is the name of the pin. If the pin does not have a connected signal, nothing happens. The command will fail if `<name>` does not exist as a pin.
+
+(sec:linuxcnc_configuration_hal_format)=
 
 ### .hal File Format
 
 A `.hal` file is a plain text file containing {{HAL}} commands. Comments can be included by starting lines with the hash symbol (`#`). Options from the `.ini` file can be accessed with the syntax `[<section>]<option>`, where `[<section>]` is the section name in square brackets and `<option>` is the corresponding option name within that section.
 
-### Example: `mesa_7i96s_7i77_xy.hal` Configuration File
+### `citic_gantry_robot.hal` Configuration File
 
-As noted in {numref}`sec:linuxcnc_intro_config`, a LinuxCNC configuration includes at least one `.ini` file and one `.hal` file. Below is the `mesa_7i96s_7i77_xy.hal` configuration file, corresponding to the `mesa_7i96s_7i77_xy.ini` file detailed in {numref}`sec:linuxcnc_configuration_ini`. Unlike the `.ini` format, the `.hal` format does not have a formal section syntax; however, for clarity, the file is presented below divided into different parts.
+As noted in {numref}`sec:linuxcnc_intro_config`, a LinuxCNC configuration includes at least one `.ini` file and one `.hal` file. Below we show several fragments of the `citic_gantry_robot.hal` configuration file, the main {{HAL}} file for the `citic_gantry_robot.ini` file as detailed in {numref}`sec:linuxcnc_configuration_ini`. Unlike the `.ini` format, the `.hal` format does not have a section syntax, however, for clarity, the file is presented below divided into different parts.
+
+:::{note}
+The documentation of the different {{HAL}} components and its pins can be found in the LinuxCNC man pages {cite}`linuxcncdoc`. The components and pins available in the running system can be also explored using the `halcmd` or `halshow` tools. See {numref}`sec:linuxcnc_configuration_hal_tools` for more details.
+:::
 
 - **Load modules, add functions to threads, and other initial configurations**:
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.hal
-    :language: hal
-    :lines: 1-54
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.hal
+  :language: hal
+  :lines: 1-139
+  :lineno-match:
+  :::
 
-- **X-axis configuration (joint 0, stepper motor)**:
+- **Brushless motor configuration:** The configuration for the brushless motor for the joint 0 (motor X1) is shown below. Configuration for the other brushless motors (joint 1 and joint 2) is similar.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.hal
-    :language: hal
-    :lines: 57-120
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.hal
+  :language: hal
+  :lines: 140-183
+  :lineno-match:
+  :::
 
-- **Y-axis configuration (joint 1, brushless motor)**:
+- **Stepper motor configuration:** The configuration for the stepper motor for the joint 3 (motor Z1) is shown below.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.ini
-    :language: hal
-    :lines: 123-179
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.hal
+  :language: hal
+  :lines: 278-326
+  :lineno-match:
+  :::
 
-- **Other configurations**:
+- **Other configurations**: Configuration for other functions such as:
+  - **Hazard light**: Turn on a safety light when the machine is in motion.
+  - **Analog enable**: Enable the MESA 7I77 +- 10 V analog outputs.
+  - **Step generator enable**: Enable the MESA 7I96S step / direction outputs.
+  - **igus® Dryve enable inputs**: Set the enable signal to high for all igus® Dryve controllers.
+  - **igus® Dryve status signals**: Read ready/alert/error states from all igus® Dryve controllers.
+  - **Analog rotation program start**: Generate a oneshot pulse when the igus® Dryve controllers of brushless motors are ready to start the "ADR (Analogue Rotation with Direction Definition)" program of the motor controllers.
+  - **External emergency stop**: Handle the external emergency stop input signal.
+  - **Fault signal**: Set a fault signal to high if any controller signals an error or alert or the external emergency stop signal is activated.
+  - **Emergency stop (ESTOP)**: Manage the fault / enable / reset signals.
+  - **LED control via Classic Ladder**: Link classic ladder pins to the MESA 7I96S pins of the red/yellow/green LEDs. See {numref}`sec:linuxcnc_configuration_classic_ladder`.
+  - **GUI disable buttons**: Set the disable signal of PyVCP buttons based on the machine state.
+  - **Velocity signals**: Read velocity signals for all axes, to display the motor RPM in the PyVCP panel. See {numref}`sec:linuxcnc_configuration_pyvcp`.
 
-    :::{literalinclude} codes/mesa_7i96s_7i77_xy.hal
-    :language: hal
-    :lines: 182-265
-    :lineno-match:
-    :::
+  :::{literalinclude} codes/citic_gantry_robot.hal
+  :language: hal
+  :lines: 329-456
+  :lineno-match:
+  :::
+
+(sec:linuxcnc_configuration_hal_tools)=
 
 ## {{HAL}} Tools
 
@@ -401,14 +440,14 @@ You can open the Halshow tool from the AXIS graphical interface by clicking on {
 
 :::{figure} images/linuxcnc/halshow_show.png
 :name: fig:halshow_show
-:width: 70%
+:width: 90%
 
 Halshow tool showing the "SHOW" tab.
 :::
 
 :::{figure} images/linuxcnc/halshow_watch.png
 :name: fig:halshow_watch
-:width: 70%
+:width: 90%
 
 Halshow tool showing the "WATCH" tab.
 :::
@@ -447,6 +486,103 @@ The generated report displays all signal connections and indicates potential iss
 - Functions not added to threads.
 - Warnings about components marked as obsolete.
 
+(sec:linuxcnc_configuration_pyvcp)=
+
+## PyVCP (Python Virtual Control Panel)
+
+PyVCP (Python Virtual Control Panel) is a LinuxCNC component that allows creating custom graphical user interface panels to complement the main LinuxCNC interface. These panels can be used to provide additional controls, indicators, and displays that can be tailored to specific machine requirements. The PyVCP GUI components can be connected to {{HAL}} pins for real-time interaction with the machine. Some of the PyVCP components are:
+
+- **LED indicators**: Visual status indicators that can show the state of a {{HAL}} pin.
+- **Buttons**: Interactive controls that can set the value of a {{HAL}} pin.
+- **Bar displays**: Graphical representations of float {{HAL}} pins.
+- **Labels**: Text displays for showing information.
+- **Tables**: Layout containers for organizing components in rows and columns.
+
+For the complete list of components and their configuration options, consult the PyVCP section of the LinuxCNC user manual {cite}`linuxcncdoc` (<https://linuxcnc.org/docs/html/gui/pyvcp.html>).
+
+For our gantry robot system, we configured a PyVCP panel with LED status indicators, motor RPM displays, motor controller status indicators, and some convenient control buttons. {numref}`fig:linuxcnc_gui_pyvcp` shows the LinuxCNC AXIS interface with the custom PyVCP panel integrated on the right side.
+
+:::{figure} images/linuxcnc/linuxcnc_gui_pyvcp.png
+:name: fig:linuxcnc_gui_pyvcp
+
+LinuxCNC AXIS interface showing the custom PyVCP panel with LED indicators, motor RPM displays, controller status, and control buttons.
+:::
+
+### PyVCP Configuration
+
+PyVCP is configured in the `DISPLAY` section of the INI file using the `PYVCP` parameter:
+
+```ini
+PYVCP = gui_panel.xml
+```
+
+This parameter specifies the XML file that defines the panel layout and components. The XML file must be located in the same directory as the configuration files.
+
+By default the panel appears at the right of the AXIS user interface. The panel can be also configured to appear at the bottom of the AXIS user interface by specifying the following in the [DISPLAY] section of the INI file:
+
+```ini
+PYVCP_POSITION = BOTTOM
+```
+
+### `gui_panel.xml` Configuration File
+
+The gantry robot configuration uses a PyVCP panel that provides some monitoring and control capabilities. The panel is defined in the `gui_panel.xml` file and includes several functional sections. Below are the different sections of the `gui_panel.xml` configuration file.
+
+**LED Indicators**: Displays the main system status with three colored LEDs.
+
+:::{literalinclude} codes/gui_panel.xml
+:language: xml
+:lines: 4-35
+:lineno-match:
+:::
+
+**Motor RPM**: Shows real-time motor RPM speeds using bar displays:
+
+:::{literalinclude} codes/gui_panel.xml
+:language: xml
+:lines: 40-67
+:lineno-match:
+:::
+
+**Motor Controllers**: Displays error and alert status for each motor controller, and allows sending a reset signal to the motor controllers.
+
+:::{literalinclude} codes/gui_panel.xml
+:language: xml
+:lines: 72-165
+:lineno-match:
+:::
+
+**Control Buttons**: Provides convenient buttons for common operations:
+
+:::{literalinclude} codes/gui_panel.xml
+:language: xml
+:lines: 170-183
+:lineno-match:
+:::
+
+### PyVCP Integration with {{HAL}}
+
+Each PyVCP component that needs to interact with the machine creates a corresponding {{HAL}} pin. These pins can be connected to other {{HAL}} components in a `.hal` configuration file to provide the desired functionality. This file has to be specified in the `POSTGUI_HALFILE` parameter of the `HAL` section of the INI file.
+
+Examples of PyVCP components and the corresponding {{HAL}} pins are:
+
+- LED components create input pins (e.g., `pyvcp.led-green`, `pyvcp.led-red`)
+- Button components create output pins (e.g., `pyvcp.gui-goto-zero-position-button`). Additionally, when the `disable_pin` parameter is set to `true`, a `disabled` pin is created (e.g., `pyvcp.gui-goto-zero-position-button.disabled`).
+- Bar displays create input pins for displaying values (e.g., `pyvcp.x-rpm`, `pyvcp.y-rpm`)
+
+In our case, the corresponding PyVCP panel `.hal` file is `gui_panel.hal`.
+
+### `gui_panel.hal` Configuration File
+
+The `.hal` file for our PyVCP panel is `gui_panel.hal` and is specified in the `POSTGUI_HALFILE` parameter of the `HAL` section of the INI file as shown in {numref}`sec:linuxcnc_configuration_ini_file`. This file is used to connect the PyVCP components to the {{HAL}} pins. The file is shown below.
+
+:::{literalinclude} codes/gui_panel.hal
+:language: hal
+:lineno-match:
+:::
+
+(sec:linuxcnc_configuration_classic_ladder)=
+
 ## Ladder Logic Programming
 
 LinuxCNC includes the ClassicLadder component, a free implementation of a ladder interpreter published under the [{{LGPL}}](https://gnu.org/licenses/lgpl.html).
@@ -467,10 +603,12 @@ Once this is done, you can open the ClassicLadder graphical interface with the s
 ClassicLadder graphical interface.
 :::
 
-In our testbed setup, ladder logic has been used to program the operation of the LED indicator panel. The program created with ClassicLadder has been saved in the `myladder.clp` file. To use it in LinuxCNC, it can be loaded with the following {{HAL}} command:
+In our gantry robot system, we use ClassicLadder to program the operation of the LED indicator panel. The program created with ClassicLadder has been saved in the `myladder.clp` file. To use it in LinuxCNC, we use the following commands in the `citic_gantry_robot.hal` file to load the `classicladder_rt` module and load the `myladder.clp` file:
 
-```hal
-loadusr classicladder myladder.clp -nogui
-```
+:::{literalinclude} codes/citic_gantry_robot.hal
+:language: hal
+:lines: 57-62
+:lineno-match:
+:::
 
-The LinuxCNC user manual {cite}`linuxcncdoc` includes a detailed guide to ClassicLadder. Another good introduction to ClassicLadder is "The Feral Engineer"'s "Classicladder tutorials" series on YouTube: <https://www.youtube.com/playlist?list=PLTYvfbjLClpfAfJSGhZUecgXFwVPY5e09>.
+The LinuxCNC user manual {cite}`linuxcncdoc` includes a detailed guide to ClassicLadder. Another good introduction to ClassicLadder is *The Feral Engineer*'s "Classicladder tutorials" series on YouTube: <https://www.youtube.com/playlist?list=PLTYvfbjLClpfAfJSGhZUecgXFwVPY5e09>.

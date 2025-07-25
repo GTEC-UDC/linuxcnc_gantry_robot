@@ -9,17 +9,24 @@ myst:
 ---
 
 (sec:linuxcnc_usage)=
+
 # Basic LinuxCNC Usage
 
-During the development of the testbed, three LinuxCNC configurations were created:
+During the development of the gantry robot system, we created several LinuxCNC configurations:
 
-- `mesa_7i96s_7i77_xy`: Simulates a robot with X and Y axes, where the brushless motor controls the X-axis and the stepper motor controls the Y-axis.
-- `mesa_7i96s_7i77_xx`: Simulates a robot with a single X-axis, where both the brushless and stepper motors control the axis simultaneously, moving synchronously at the same speed.
-- `mesa_7i96s_7i77_xc`: Simulates a robot with an X-axis and a C-axis (rotation around the Z-axis). The brushless motor controls the X-axis, and the stepper motor controls the C-axis.
+- Configurations for single-axis movement:
+  - `citic_gantry_robot_xx`: Configuration for moving the robot along the X-axis.
+  - `citic_gantry_robot_xx_no_homing`: Configuration for moving the robot along the X-axis without the need for executing the physical homing procedure.
+  - `citic_gantry_robot_y`: Configuration for moving the robot along the Y-axis.
+  - `citic_gantry_robot_z`: Configuration for moving the robot along the Z-axis.
+- Configurations for 3-axis movement:
+  - `citic_gantry_robot`: Main configuration for the gantry robot system.
+  - `citic_gantry_robot_sim`: Simulation configuration for the gantry robot system. Can be used to test the robot system configuration without the physical hardware.
 
-The following sections explain how to use LinuxCNC with these configurations.
+The following sections explain the basic usage of LinuxCNC with these configurations.
 
 (sec:linuxcnc_usage_gui_axis)=
+
 ## Control using the AXIS Graphical Interface
 
 When LinuxCNC is launched with one of the aforementioned configurations, the AXIS graphical interface will open, as shown in {numref}`fig:linuxcnc_gui_axis_estop`. The process for controlling the machine with this interface is detailed below.
@@ -44,7 +51,7 @@ LinuxCNC "AXIS" graphical interface in "ON" state.
 
 Once LinuxCNC is in the "ON" state, you can manually control the machine using the {guilabel}`-` and {guilabel}`+` controls on the "Manual Control" tab. However, to execute specific G-code positioning commands (e.g., moving the machine to X=1, Y=5), it is necessary to perform the homing process. The homing procedure involves establishing a precise reference point for all machine axes, providing LinuxCNC with exact knowledge of the machine's current position.
 
-To perform the homing process, you can click the {guilabel}`Home All` button on the "Manual Control" tab or select the menu entry {menuselection}`Machine --> Homing --> Home all axes`. In the testbed configurations, the homing process uses a single limit switch per motor. The procedure LinuxCNC follows for homing with limit switches is as follows:
+To perform the homing process, you can click the {guilabel}`Home All` button on the "Manual Control" tab or select the menu entry {menuselection}`Machine --> Homing --> Home all axes`. In the gantry robot system, the homing process uses a single limit switch per motor. The procedure LinuxCNC follows for homing with limit switches is as follows:
 
 1. Move the motor towards the limit switch until it is activated.
 2. Move the motor in the opposite direction until the limit switch is deactivated.
@@ -78,7 +85,7 @@ LinuxCNC can be controlled programmatically by including a sequence of instructi
 1. Using G-code programs stored in a file, as mentioned in the previous section.
 2. Using Python programs with the `linuxcnc` library, which is included with LinuxCNC and allows interaction with the running LinuxCNC process. For more information, consult the "Python Interface" section in the LinuxCNC user manual. {numref}`lst:linuxcnc_python` provides an example of robot control using Python by sending G-code commands in MDI mode.
 
-:::{code-block} python
+```{code-block} python
 :name: lst:linuxcnc_python
 :caption: Example of using Python to interact with LinuxCNC
 
@@ -145,4 +152,4 @@ if __name__ == "__main__":
         print("error: ", e)
         print("is LinuxCNC running?")
         sys.exit(1)
-:::
+```

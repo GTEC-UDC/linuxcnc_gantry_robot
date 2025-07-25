@@ -123,7 +123,7 @@ One of the most popular graphical interfaces is "AXIS," designed for control via
 LinuxCNC "AXIS" graphical interface.
 :::
 
-In our testbed setup, we have considered the AXIS graphical interface. The window of this interface, as shown in {numref}`fig:linuxcnc_gui_axis_estop`, contains the following elements:
+In our gantry robot system, we have considered the AXIS graphical interface. The window of this interface, as shown in {numref}`fig:linuxcnc_gui_axis_estop`, contains the following elements:
 
 - A display area with two tabs:
 

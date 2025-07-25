@@ -1,13 +1,10 @@
 (sec:linuxcnc)=
-# LinuxCNC
 
-:::{note}
-This section was taken from our LinuxCNC testbed project (<https://github.com/GTEC-UDC/linuxcnc_testbed>). It needs to be updated to reflect the gantry robot configuration.
-:::
+# LinuxCNC
 
 LinuxCNC (<https://linuxcnc.org/>), formerly known as the {{EMC}}, is a free and open-source Linux numerical control system for operating {{CNC}} machines using general-purpose computers.
 
-This section provides a brief guide to using and configuring LinuxCNC for the testbed system. For more in-depth information, consult the LinuxCNC user manual {cite}`linuxcncdoc`. Other valuable LinuxCNC resources are:
+This section provides a brief guide to using and configuring LinuxCNC for the gantry robot system. For more in-depth information, consult the LinuxCNC user manual {cite}`linuxcncdoc`. Other valuable LinuxCNC resources are:
 
 - LinuxCNC Forum: <https://forum.linuxcnc.org/>
 - "LinuxCNC for the Hobbyist" video series by "Joe Hildreth" on YouTube:

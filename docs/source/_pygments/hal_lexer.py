@@ -39,8 +39,7 @@ class HALLexer(RegexLexer):
             (r"[+-]?\d+", Number.Integer),  # Integers
             (r"[=|&<>]", Operator),  # Operators
             (r"-", Operator),  # Hyphens as operators or part of numbers
-            (r"[\[\](),]", Punctuation),  # Brackets, parentheses, commas
-            (r"\.", Punctuation),  # Dots
+            (r"[\\\.\[\](),]", Punctuation),  # Punctuation
             (r"\s+", Text),  # Whitespace
         ],
     }

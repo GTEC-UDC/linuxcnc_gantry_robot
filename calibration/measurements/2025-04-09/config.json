@@ -1,0 +1,29 @@
+{
+  "alignment": {
+    "init_params": [2500, 2500, -2500, 0, 0, -1.5707963267948966, 50],
+    "max_rotation": 0.098174770424681,
+    "rotation_center": [2500, 2500, -750],
+    "optimization": {
+      "method": "Powell",
+      "tolerance": 1e-9,
+      "display": true
+    }
+  },
+  "calibration": {
+    "enabled": true,
+    "optimization": {
+      "method": "Powell", 
+      "tolerance": 1e-9,
+      "display": true
+    }
+  },
+  "skip_frames": {
+    "enabled": true,
+    "ranges": [
+      [8800, 9200],
+      [28750, 29550],
+      [55900, 56050],
+      [57870, 58000]
+    ]
+  }
+} 

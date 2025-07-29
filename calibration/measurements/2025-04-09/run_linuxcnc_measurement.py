@@ -68,9 +68,9 @@ def program_robot(
     # start_xy = (800, 800)
     # end_xy = (4700, 4300)
     start_xy = (300, 300)
-    end_xy = (5300-300, 5200-300)
+    end_xy = (5300-300, 5100-300)
     turns = 4
-    z_coords = [-1000 + x for x in range(0, 601, 200)]
+    z_coords = [-1050 + x for x in range(0, 601, 200)]
     wait_timeout = 1/30
 
     # -------------------------

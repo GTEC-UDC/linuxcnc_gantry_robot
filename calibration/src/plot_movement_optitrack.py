@@ -49,7 +49,15 @@ def plot_movement_optitrack(
 
     # Create parameters for the MultiPointPlayer
     point_cols = [("RB.X", "RB.Y", "RB.Z")]
-    points_styles = [{"color": "k", "marker": "x", "markersize": 5}]
+    points_styles = [
+        {
+            "color": "k",
+            "linestyle": "None",
+            "marker": "x",
+            "markersize": 5,
+            "label": "Rigid body centroid",
+        }
+    ]
 
     marker_cols = [
         [(f"M.X{i}", f"M.Y{i}", f"M.Z{i}") for i in range(1, num_markers + 1)],
@@ -63,6 +71,7 @@ def plot_movement_optitrack(
             "marker": "o",
             "markeredgewidth": 0.75,
             "markersize": 5,
+            "label": "Raw markers",
         },
         {
             "color": "r",
@@ -70,11 +79,14 @@ def plot_movement_optitrack(
             "marker": ".",
             "markeredgewidth": 0.75,
             "markersize": 3,
+            "label": "Rigid body markers",
         },
     ]
 
     trail_cols = [("RB.X", "RB.Y", "RB.Z")]
-    trail_styles = [{"color": "b", "linestyle": "-", "alpha": 0.25}]
+    trail_styles = [
+        {"color": "b", "linestyle": "-", "alpha": 0.25, "label": "Rigid body trail"}
+    ]
 
     # Create animation
     anim = MultiPointPlayer(
@@ -92,6 +104,8 @@ def plot_movement_optitrack(
         cache_frame_data=True,
         save_count=1000,
     )
+
+    ax.legend(loc="lower right")
 
     # Print control instructions
     print(anim.get_help_text())

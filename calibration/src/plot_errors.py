@@ -1,54 +1,66 @@
 # Plot the errors between the rigid body markers and the raw markers
 
 import argparse
-from typing import Optional
 import logging
+import os
+from typing import Literal, Optional
 
+import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
-
 from argutils import parse_limit
-from data import get_processed_data, load_bad_frames
+from data import CalibrationConfig, CalibrationParams, get_processed_data
 
 
 def plot_errors(
     gantry_file: str = "take_gantry.csv",
     optitrack_file: str = "take_optitrack.csv",
-    alignment_file: str = "alignment_params.npy",
-    calibration_file: str = "calibration_params.npy",
-    calibrate: bool = True,
-    bad_frames_file: str = "bad_frames.json",
-    remove_bad_frames: bool = False,
+    config_file: str = "config.json",
+    calibration_file: str = "calibration.json",
+    correct: bool = True,
+    skip_frames: bool = True,
+    time_unit: Literal["s", "frames"] = "s",
     time_limit: Optional[tuple[float, float]] = None,
     position_limit: Optional[tuple[float, float]] = None,
     error_limit: Optional[tuple[float, float]] = None,
     abs_error_limit: Optional[tuple[float, float]] = None,
-) -> tuple[plt.Axes, plt.Axes, plt.Axes, plt.Axes, plt.Axes]:
+) -> tuple[mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes]:
     """Plot gantry and optitrack position and error data.
 
     Args:
         gantry_file: Path to gantry CSV file
-        optitrack_file: Path to Optitrack CSV file
+        optitrack_file: Path to OptiTrack CSV file
         alignment_file: Path to alignment parameters file
         calibration_file: Path to calibration parameters file
         remove_bad_frames: Whether to remove bad frames from the data
         bad_frames_file: Path to file with bad frames ranges
-        time_limit: Optional (min, max) tuple for x-axis time limits (seconds)
+        time_unit: Time unit for the x-axis (s, frames)
+        time_limit: Optional (min, max) tuple for x-axis time limits (seconds or frames)
         position_limit: Optional (min, max) tuple for position plot y-axis limits (mm)
         error_limit: Optional (min, max) tuple for error plots y-axis limits (mm)
     """
-    # Handle bad frames if needed
-    bad_frames = None
-    if remove_bad_frames:
-        bad_frames = load_bad_frames(bad_frames_file)
+
+    if os.path.exists(config_file):
+        with open(config_file, "r") as f:
+            config = CalibrationConfig.model_validate_json(f.read())
+            print("Loaded calibration configuration from", config_file)
+    else:
+        config = CalibrationConfig()
+        print("No calibration configuration file found. Using default configuration.")
+
+    with open(calibration_file, "r") as f:
+        calibration_params = CalibrationParams.model_validate_json(f.read())
+        print("Loaded calibration parameters from", calibration_file)
+
+    # Override the configuration with the provided arguments
+    config.correction.enabled = correct
+    config.skip_frames.enabled = skip_frames
 
     # Get the processed data
-    df, _ = get_processed_data(
+    df, _, _ = get_processed_data(
         gantry_file,
         optitrack_file,
-        alignment_file,
-        calibration_file,
-        bad_frames=bad_frames,
-        calibrate=calibrate,
+        config=config,
+        calibration_params=calibration_params,
     )
 
     # Create figure with subplots
@@ -66,23 +78,26 @@ def plot_errors(
         ax.grid(True)
 
     # String separator for the gantry coordinates
-    sep = ".CALIBRATED." if calibrate else "."
+    sep = ".CALIBRATED." if correct else "."
+
+    # Select the time column based on the time unit
+    time_data = df["time"] if time_unit == "s" else df["frame"]
 
     # Plot all positions in the same subplot
-    ax_pos.plot(df["time"], df[f"GAN{sep}X"], "b-", linewidth=0.5, label="Gantry X")
-    ax_pos.plot(df["time"], df[f"GAN{sep}Y"], "g-", linewidth=0.5, label="Gantry Y")
-    ax_pos.plot(df["time"], df[f"GAN{sep}Z"], "r-", linewidth=0.5, label="Gantry Z")
+    ax_pos.plot(time_data, df[f"GAN{sep}X"], "b-", linewidth=0.5, label="Gantry X")
+    ax_pos.plot(time_data, df[f"GAN{sep}Y"], "g-", linewidth=0.5, label="Gantry Y")
+    ax_pos.plot(time_data, df[f"GAN{sep}Z"], "r-", linewidth=0.5, label="Gantry Z")
 
     # Add labels for position plot
     ax_pos.set_ylabel("Position (mm)")
     ax_pos.legend()
 
     # Plot differences over time
-    ax_x_err.plot(df["time"], df[f"GAN.ERR{sep}X"], "b-", linewidth=0.5, label="X Error")
-    ax_y_err.plot(df["time"], df[f"GAN.ERR{sep}Y"], "g-", linewidth=0.5, label="Y Error")
-    ax_z_err.plot(df["time"], df[f"GAN.ERR{sep}Z"], "r-", linewidth=0.5, label="Z Error")
+    ax_x_err.plot(time_data, df[f"GAN.ERR{sep}X"], "b-", linewidth=0.5, label="X Error")
+    ax_y_err.plot(time_data, df[f"GAN.ERR{sep}Y"], "g-", linewidth=0.5, label="Y Error")
+    ax_z_err.plot(time_data, df[f"GAN.ERR{sep}Z"], "r-", linewidth=0.5, label="Z Error")
     ax_abs_err.plot(
-        df["time"], df[f"GAN.ERR{sep}Abs"], "k-", linewidth=0.5, label="Absolute Error"
+        time_data, df[f"GAN.ERR{sep}Abs"], "k-", linewidth=0.5, label="Absolute Error"
     )
 
     # Set labels
@@ -90,7 +105,7 @@ def plot_errors(
     ax_y_err.set_ylabel("Y Error (mm)")
     ax_z_err.set_ylabel("Z Error (mm)")
     ax_abs_err.set_ylabel("Absolute Error (mm)")
-    ax_abs_err.set_xlabel("Time (s)")
+    ax_abs_err.set_xlabel(f"Time ({time_unit})")
 
     # Set time limits
     if time_limit is not None:
@@ -127,7 +142,7 @@ def main():
         "--optitrack",
         type=str,
         default="take_optitrack.csv",
-        help="Path to the CSV file with the Optitrack movement data",
+        help="Path to the CSV file with the OptiTrack movement data",
     )
 
     parser.add_argument(
@@ -138,38 +153,39 @@ def main():
     )
 
     parser.add_argument(
-        "--alignment",
+        "--config",
         type=str,
-        default="alignment_params.npy",
-        help="Path to alignment parameters file",
-    )
-
-    parser.add_argument(
-        "--calibrate",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Calibrate the Gantry data",
+        default="config.json",
+        help="Path to the calibration configuration file",
     )
 
     parser.add_argument(
         "--calibration",
         type=str,
-        default="calibration_params.npy",
-        help="Path to calibration parameters file",
+        default="calibration.json",
+        help="Path to the calibration parameters file",
     )
 
     parser.add_argument(
-        "--remove-bad-frames",
+        "--correct",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Remove bad frames from the data",
+        help="Enable the non-linear coordinate correction step",
     )
 
     parser.add_argument(
-        "--bad-frames",
+        "--skip-frames",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable skipping the frames set in the configuration file",
+    )
+
+    parser.add_argument(
+        "--time-unit",
         type=str,
-        default="bad_frames.json",
-        help="Path to file of bad frames data",
+        choices=["s", "frames"],
+        default="s",
+        help="Time unit for the x-axis (s, frames)",
     )
 
     parser.add_argument(
@@ -196,7 +212,7 @@ def main():
     parser.add_argument(
         "--abserrlim",
         type=parse_limit,
-        default="0,15",
+        default="0,20",
         help="Y-axis limit for absolute error plot as 'min,max' (mm)",
     )
 
@@ -205,11 +221,11 @@ def main():
     plot_errors(
         gantry_file=args.gantry,
         optitrack_file=args.optitrack,
-        alignment_file=args.alignment,
+        config_file=args.config,
         calibration_file=args.calibration,
-        calibrate=args.calibrate,
-        remove_bad_frames=args.remove_bad_frames,
-        bad_frames_file=args.bad_frames,
+        correct=args.correct,
+        skip_frames=args.skip_frames,
+        time_unit=args.time_unit,
         time_limit=args.time_limit,
         position_limit=args.poslim,
         error_limit=args.errlim,

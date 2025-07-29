@@ -3,9 +3,8 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
+from data import CalibrationParams, get_calibration_matrices
 from matplotlib.widgets import Button, Slider
-
-from data import get_calibration_matrices
 
 
 def coord_transform(
@@ -105,15 +104,15 @@ class TransformationPlotter:
         self.update_plot()
 
     def update_plot(self):
-        coord1, coord2 = self.plot_coords
+        coord1, coord2 = self.plot_coords  # type: ignore
 
         # Get mesh grid
         mesh_ax1, mesh_ax2 = self.mesh_ax1, self.mesh_ax2
 
         # Create coordinate arrays
-        coords = np.zeros((mesh_ax1.size, 3))
-        coords[:, self.coord_indices[coord1]] = mesh_ax1.flatten()
-        coords[:, self.coord_indices[coord2]] = mesh_ax2.flatten()
+        coords = np.zeros((mesh_ax1.size, 3))  # type: ignore
+        coords[:, self.coord_indices[coord1]] = mesh_ax1.flatten()  # type: ignore
+        coords[:, self.coord_indices[coord2]] = mesh_ax2.flatten()  # type: ignore
         coords[:, self.coord_indices[self.current_coord]] = self.fixed_value
 
         # Apply transformation
@@ -126,27 +125,27 @@ class TransformationPlotter:
             coords_transformed[:, self.coord_indices[self.current_coord]]
             - coords[:, self.coord_indices[self.current_coord]]
         )
-        mesh_diff = diff.reshape(mesh_ax1.shape)
+        mesh_diff = diff.reshape(mesh_ax1.shape)  # type: ignore
 
         # Remove existing surface plot
         if self.surf is not None:
-            self.colorbar.remove()
+            self.colorbar.remove()  # type: ignore
             self.surf.remove()
 
         # Create new surface plot
-        self.surf = self.ax.plot_surface(mesh_ax1, mesh_ax2, mesh_diff, cmap="viridis")
+        self.surf = self.ax.plot_surface(mesh_ax1, mesh_ax2, mesh_diff, cmap="viridis")  # type: ignore
         self.colorbar = self.fig.colorbar(
             self.surf,
             label=f"Difference in {self.current_coord} (transformed - original)",
         )
 
         # Set z limits
-        self.ax.set_zlim(-10, 10)
+        self.ax.set_zlim(-10, 10)  # type: ignore
 
         # Set labels
         self.ax.set_xlabel(coord1.upper())
         self.ax.set_ylabel(coord2.upper())
-        self.ax.set_zlabel(f"{self.current_coord.upper()} Difference")
+        self.ax.set_zlabel(f"{self.current_coord.upper()} Difference")  # type: ignore
 
         # Update title
         self.ax.set_title(
@@ -165,13 +164,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--calibration",
         type=str,
-        default="calibration_params.npy",
+        default="calibration.json",
         help="Path to calibration parameters file",
     )
 
     args = parser.parse_args()
 
-    calibration_params = np.load(args.calibration)
-    matrix1, matrix2, array = get_calibration_matrices(calibration_params)
+    with open(args.calibration, "r") as f:
+        calibration_params = CalibrationParams.model_validate_json(f.read())
+
+    matrix1, matrix2, array = get_calibration_matrices(calibration_params.correction)
 
     plotter = TransformationPlotter(matrix1, matrix2, array)

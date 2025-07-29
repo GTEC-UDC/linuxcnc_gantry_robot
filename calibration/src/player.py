@@ -1,13 +1,13 @@
 import math
 import time
 from abc import ABC, abstractmethod
-from collections.abc import Iterator, Iterable
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from typing import Optional
 
-from matplotlib.figure import Figure
-from matplotlib.artist import Artist
 from matplotlib.animation import FuncAnimation
+from matplotlib.artist import Artist
+from matplotlib.figure import Figure
 
 
 @dataclass

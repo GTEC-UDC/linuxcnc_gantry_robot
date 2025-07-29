@@ -3,7 +3,7 @@ import logging
 import sys
 from typing import Optional
 
-from data import get_calibration_matrices
+from data import get_calibration_matrices, CalibrationParams
 
 import numpy as np
 import scipy as scp
@@ -81,7 +81,7 @@ def check_J_inv(
     print(f"Jacobian invertibility test: norm 1 = {norm_1} < 1 -> {norm_1 < 1}")
     print(f"Jacobian invertibility test: norm inf = {norm_inf} < 1 -> {norm_inf < 1}")
 
-    return norm_1 < 1 or norm_inf < 1
+    return bool(norm_1 < 1 or norm_inf < 1)
 
 
 def get_joint_bounds(
@@ -106,7 +106,6 @@ def get_joint_bounds(
                 fun=f_opt,
                 x0=axis_bounds[0] if opt_idx == 0 else axis_bounds[1],
                 bounds=[(axis_bounds[0][i], axis_bounds[1][i]) for i in range(3)],
-                options={"disp": True},
                 callback=lambda intermediate_result: logger.info(
                     "fval: %s", intermediate_result.fun
                 ),
@@ -133,8 +132,8 @@ def check_joint_bounds(
     min_joints, max_joints = get_joint_bounds(params, axis_bounds)
     print(f"Joint bounds: min = {min_joints}, max = {max_joints}")
 
-    return np.all(joint_bounds[0] <= min_joints) and np.all(
-        max_joints <= joint_bounds[1]
+    return bool(
+        np.all(joint_bounds[0] <= min_joints) and np.all(max_joints <= joint_bounds[1])
     )
 
 
@@ -147,47 +146,54 @@ def main():
     )
 
     parser.add_argument(
-        "--data",
-        help="Path to the npy file with the calibration data",
+        "--calibration",
+        help="Path to the calibration parameters file",
         type=str,
-        default="take_optitrack.csv",
+        default="calibration.json",
     )
 
     parser.add_argument(
         "--axis-min",
         nargs=3,
-        help="Minimum values for the XYZ axis positions",
+        metavar=("X", "Y", "Z"),
+        help="Minimum values for the X Y Z axis positions",
         type=float,
-        required=True,
+        default=[0.0, 0.0, -1000.0],
     )
 
     parser.add_argument(
         "--axis-max",
         nargs=3,
-        help="Maximum values for the XYZ axis positions",
+        metavar=("X", "Y", "Z"),
+        help="Maximum values for the X Y Z axis positions",
         type=float,
-        required=True,
+        default=[5300.0, 5200.0, 0.0],
     )
 
     parser.add_argument(
         "--joints-min",
         nargs=3,
-        help="Minimum values for the XYZ joint values",
+        metavar=("X", "Y", "Z"),
+        help="Minimum values for the X Y Z joint values",
         type=float,
-        required=True,
+        default=[-20.0, -20.0, -1020.0],
     )
 
     parser.add_argument(
         "--joints-max",
         nargs=3,
-        help="Maximum values for the XYZ joint values",
+        metavar=("X", "Y", "Z"),
+        help="Maximum values for the X Y Z joint values",
         type=float,
-        required=True,
+        default=[5320.0, 5220.0, 20.0],
     )
 
     args = parser.parse_args()
 
-    params = get_calibration_matrices(np.load(args.data))
+    with open(args.calibration, "r") as f:
+        calibration_params = CalibrationParams.model_validate_json(f.read())
+
+    params = get_calibration_matrices(calibration_params.correction)
 
     # Check J invertibility on the joint space
     if not check_J_inv(

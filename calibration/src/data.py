@@ -1,41 +1,22 @@
-import json
 import logging
-import os
 import re
-from collections.abc import Sequence
 from datetime import datetime
 from typing import Any, Optional, cast
 
 import numpy as np
 import pandas as pd
 import scipy as scp
-
 from coordinates_utils import (
-    TransformRotateCenter,
+    TransformRotate,
     TransformShiftT,
     TransformShiftXYZ,
     coord_matrix_transform2,
     coord_mse,
     coord_transform,
 )
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
-
-
-def load_bad_frames(filename: str) -> list[tuple[int, int]]:
-    """Load bad frame ranges from a JSON file.
-
-    Args:
-        filename (str): Path to the JSON file containing bad frame ranges.
-
-    Returns:
-        list[tuple[int, int]]: List of tuples where each tuple contains the start and end
-            frame numbers of a range of bad frames.
-    """
-    with open(filename, "r") as f:
-        data = json.load(f)
-
-    return [tuple(range) for range in data.get("ranges", [])]
 
 
 def load_gantry_data(filename: str) -> pd.DataFrame:
@@ -124,7 +105,7 @@ def load_optitrack_data(
         ValueError: If the number of rigid body markers doesn't match the number of
             raw markers, or if an unknown column type is encountered.
     """
-    df = pd.read_csv(filename, header=[1, 2, 4, 5])
+    df: pd.DataFrame = pd.read_csv(filename, header=[1, 2, 4, 5])
 
     # Get the columns we want to keep and create new names
     df_cols = list(df.columns[:2])
@@ -133,7 +114,7 @@ def load_optitrack_data(
     num_m = 0
 
     if rigid_body_name is None:
-        rigid_body_name = df.columns[2][1]
+        rigid_body_name = cast(str, df.columns[2][1])
         logger.info("Found rigid body name: %s", rigid_body_name)
 
     for col in df.columns[2:]:
@@ -163,7 +144,7 @@ def load_optitrack_data(
         )
 
     # Create a new dataframe with the columns we want to keep
-    df = df[df_cols]
+    df = df.loc[:, df_cols]
     df.columns = df_col_names
 
     # Calculate errors for the markers
@@ -232,41 +213,74 @@ def get_calibration_matrices(x) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     return matrix1, matrix2, array
 
 
+class OptimizationConfig(BaseModel):
+    method: str = "Powell"
+    tolerance: float = 1e-9
+    display: bool = True
+
+
+class CalibrationAlignmentConfig(BaseModel):
+    enabled: bool = True
+    init_params: Optional[list[float]] = None
+    max_rotation: Optional[float] = np.pi / 32
+    rotation_center: tuple[float, float, float] = (2500, 2500, -750)
+    optimization: OptimizationConfig = Field(default_factory=OptimizationConfig)
+
+
+class CalibrationCorrectionConfig(BaseModel):
+    enabled: bool = True
+    init_params: Optional[list[float]] = None
+    optimization: OptimizationConfig = Field(default_factory=OptimizationConfig)
+
+
+class SkipFramesConfig(BaseModel):
+    enabled: bool = True
+    ranges: list[tuple[int, int]] = Field(default_factory=list)
+
+
+class CalibrationConfig(BaseModel):
+    alignment: CalibrationAlignmentConfig = Field(
+        default_factory=CalibrationAlignmentConfig
+    )
+    correction: CalibrationCorrectionConfig = Field(
+        default_factory=CalibrationCorrectionConfig
+    )
+    skip_frames: SkipFramesConfig = Field(default_factory=SkipFramesConfig)
+
+
+class CalibrationParams(BaseModel):
+    alignment: Optional[list[float]] = None
+    correction: Optional[list[float]] = None
+
+
 def get_processed_data(
     gantry_filename: str,
     optitrack_filename: str,
-    alignment_params_filename: Optional[str] = None,
-    calibration_params_filename: Optional[str] = None,
-    bad_frames: Optional[list[tuple[int, int]]] = None,
-    alignment_init_params: Optional[Sequence[float]] = None,
-    calibrate: bool = False,
-) -> tuple[pd.DataFrame, int]:
-    """Process and align gantry and OptiTrack data.
+    config: CalibrationConfig = Field(default_factory=CalibrationConfig),
+    calibration_params: CalibrationParams = Field(default_factory=CalibrationParams),
+) -> tuple[pd.DataFrame, CalibrationParams, int]:
+    """Align and calibrate the gantry and OptiTrack data.
 
-    This function loads gantry and OptiTrack data, aligns them temporally and spatially,
-    handles bad frames, and optionally performs calibration, i.e., correct
-    misalignments between the gantry and the OptiTrack system.
+    This function loads gantry and OptiTrack data, aligns them temporally and
+    spatially, handles bad frames, and optionally performs calibration, i.e.,
+    corrects misalignments between the gantry and the OptiTrack system.
 
     Args:
         gantry_filename (str): Path to the gantry data CSV file.
         optitrack_filename (str): Path to the OptiTrack data CSV file.
-        alignment_params_filename (Optional[str], optional): Path to save/load alignment
-            parameters. Defaults to None.
-        calibration_params_filename (Optional[str], optional): Path to save/load
-            calibration parameters. Defaults to None.
-        bad_frames (Optional[list[tuple[int, int]]], optional): List of frame ranges to
-            exclude. Defaults to None.
-        alignment_init_params (Optional[Sequence[float]], optional): Initial alignment
-            parameters. Defaults to None.
-        calibrate (bool, optional): Whether to perform calibration. Defaults to False.
+        config (DataProcessingConfig, optional): Configuration for the data
+            processing. Defaults to an empty DataProcessingConfig object.
+        calibration_params (CalibrationParams, optional): Calibration parameters.
+            Defaults to an empty CalibrationParams object.
 
     Returns:
-        tuple[pd.DataFrame, int]: A tuple containing:
-            - DataFrame with processed and aligned data
+        tuple[pd.DataFrame, CalibrationParams, int]: A tuple containing:
+            - DataFrame with the processed and aligned data
+            - Calibration parameters
             - Number of markers detected
     """
     # -------------------------------------------------------------------------
-    # Load the Gantry and Optitrack data
+    # Load the Gantry and the OptiTrack data
     # -------------------------------------------------------------------------
 
     df_optitrack, num_markers = load_optitrack_data(optitrack_filename)
@@ -290,74 +304,77 @@ def get_processed_data(
 
     # -------------------------------------------------------------------------
     # Align the optitrack data with the gantry data
-    #
-    # The optitrack data is rotated and translated to align it with the gantry
-    # data. The alignment parameters are saved in the alignment_params_filename
-    # file. If the file exists, the alignment parameters are loaded from the file,
-    # otherwise, the alignment parameters are calculated using the Powell method.
     # -------------------------------------------------------------------------
 
-    # File for the alignment parameters
-    if alignment_params_filename and os.path.exists(alignment_params_filename):
-        alignment_params = np.load(alignment_params_filename)
-        logger.info("Alignment parameters loaded from file: %s", alignment_params)
-    else:
-        # Function to transform the data based on an array of parameters
-        def coord_transform_array(x, df: pd.DataFrame) -> pd.DataFrame:
-            return coord_transform(
-                df,
-                [
-                    TransformShiftXYZ(x[0], x[1], x[2]),
-                    TransformRotateCenter("x", x[3]),
-                    TransformRotateCenter("y", x[4]),
-                    TransformRotateCenter("z", x[5]),
-                    TransformShiftT(x[6]),
-                ],
-            )
+    # Function to align the optitrack coordinates with the gantry coordinates
+    def coord_align(
+        x,
+        df: pd.DataFrame,
+        rotation_center: tuple[float, float, float] = config.alignment.rotation_center,
+        time_col="time",
+        **kwargs,
+    ) -> pd.DataFrame:
+        return coord_transform(
+            df,
+            [
+                TransformShiftXYZ(x[0], x[1], x[2], **kwargs),
+                TransformRotate("x", x[3], rotation_center, **kwargs),
+                TransformRotate("y", x[4], rotation_center, **kwargs),
+                TransformRotate("z", x[5], rotation_center, **kwargs),
+                TransformShiftT(x[6], time_col, **kwargs),
+            ],
+        )
 
+    alignment_params_array: Optional[np.ndarray] = None
+    if config.alignment.enabled and calibration_params.alignment is not None:
+        alignment_params_array = np.array(calibration_params.alignment)
+    elif config.alignment.enabled:
         # Gantry data
-        df_gantry_tr = df[["time", "GAN.X", "GAN.Y", "GAN.Z"]]
+        df_gantry_tr: pd.DataFrame = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
         df_gantry_tr.columns = ["time", "x", "y", "z"]
 
-        # Optitrack data
-        df_optitrack_tr = df[["time", "RB.X", "RB.Y", "RB.Z"]]
+        # OptiTrack data
+        df_optitrack_tr: pd.DataFrame = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
         df_optitrack_tr.columns = ["time", "x", "y", "z"]
 
         # Initial alignment parameters
-        if alignment_init_params:
-            x0 = np.array(alignment_init_params)
+        if config.alignment.init_params:
+            x0 = np.array(config.alignment.init_params)
         else:
             x0 = np.zeros(7)
 
-        bounds: list[tuple[float | None, float | None]] = [(None, None)] * len(x0)
-        bounds[3] = (x0[3] - np.pi / 32, x0[3] + np.pi / 32)
-        bounds[4] = (x0[4] - np.pi / 32, x0[4] + np.pi / 32)
-        bounds[5] = (x0[5] - np.pi / 32, x0[5] + np.pi / 32)
+        bounds: Optional[list[tuple[float | None, float | None]]] = None
+
+        if max_rotation := config.alignment.max_rotation:
+            bounds = [(None, None) for _ in range(len(x0))]
+            bounds[3] = (x0[3] - max_rotation, x0[3] + max_rotation)
+            bounds[4] = (x0[4] - max_rotation, x0[4] + max_rotation)
+            bounds[5] = (x0[5] - max_rotation, x0[5] + max_rotation)
+
+        def opt_callback(intermediate_result):
+            if config.alignment.optimization.display:
+                fval = getattr(intermediate_result, "fun", intermediate_result)
+                print(f"fval: {fval}")
+
+        opt_options = {}
+        if config.alignment.optimization.display:
+            opt_options["disp"] = True
 
         logger.info("Aligning optitrack data with gantry data...")
         res = scp.optimize.minimize(
-            fun=lambda x: coord_mse(
-                df_gantry_tr, coord_transform_array(x, df_optitrack_tr)
-            ),
+            fun=lambda x: coord_mse(df_gantry_tr, coord_align(x, df_optitrack_tr)),
             x0=x0,
             bounds=bounds,
-            tol=1e-9,
-            options={"disp": True},
-            callback=lambda intermediate_result: print(
-                f"fval: {getattr(intermediate_result, 'fun', intermediate_result)}"
-            ),
-            method="Powell",
+            tol=config.alignment.optimization.tolerance,
+            options=opt_options,
+            callback=opt_callback,
+            method=config.alignment.optimization.method,
         )
 
-        alignment_params = res.x
-        logger.info("Alignment completed. Parameters: %s", alignment_params)
+        alignment_params_array = res.x
+        logger.info("Alignment completed. Parameters: %s", alignment_params_array)
 
-        # save the alignment parameters
-        if alignment_params_filename:
-            np.save(alignment_params_filename, alignment_params)
-
-    # Transform all the optitrack data in the dataframe
-    center_cols = ["RB.X", "RB.Y", "RB.Z"]
+    # Transform all the optitrack coordinates in the dataframe
     cols_params = {
         f"{axis.lower()}_cols": [
             col
@@ -367,49 +384,29 @@ def get_processed_data(
         for axis in ["X", "Y", "Z"]
     }
 
-    df = coord_transform(
-        df,
-        [
-            TransformShiftXYZ(
-                alignment_params[0],
-                alignment_params[1],
-                alignment_params[2],
-                **cols_params,
-            ),
-            TransformRotateCenter("x", alignment_params[3], center_cols, **cols_params),
-            TransformRotateCenter("y", alignment_params[4], center_cols, **cols_params),
-            TransformRotateCenter("z", alignment_params[5], center_cols, **cols_params),
-            TransformShiftT(alignment_params[6], "time", **cols_params),
-        ],
-    )
+    if alignment_params_array is not None:
+        df = coord_align(alignment_params_array, df, **cols_params)  # type: ignore
 
     # -------------------------------------------------------------------------
-    # Remove bad frames
+    # Skip frames
+    #
+    # This step is used to remove frames with poor tracking quality by setting
+    # their coordinate values to NaN. The frame ranges are specified as indices
+    # in the gantry data. This step is done after alignment to ensure we don't
+    # remove non-aligned data points.
     # -------------------------------------------------------------------------
 
-    # Note: We remove the bad frames after the alignment to avoid problems.
-    # Consider that the alignment parameters are calculated using the whole
-    # data, including the bad frames, then removing some bad frames before
-    # applying the alignment may yield invalid results. This is due to the fact
-    # that there are several TransformRotateCenter transformations whose results
-    # depend on the data.
-
-    if bad_frames:
+    if config.skip_frames.enabled:
         coord_cols = [col for col in df.columns if col not in ("time", "frame")]
-        for start, end in bad_frames:
+        for start, end in config.skip_frames.ranges:
+            logger.info("Skipping frames %d to %d", start, end)
             df.loc[start:end, coord_cols] = np.nan
 
     # -------------------------------------------------------------------------
-    # Calculate and apply calibration to the optitrack data
+    # Calculate and apply non-linear coordinate transformation to correct the
+    # misalignments between the gantry and the OptiTrack system.
     #
-    # The calibration is performed to correct the misalignments between the
-    # gantry and the OptiTrack system. The calibration parameters are saved in
-    # the calibration_params_filename file. If the file exists, the calibration
-    # parameters are loaded from the file, otherwise, the calibration parameters
-    # are calculated using the Powell method.
-    #
-    # To obtain the calibration parameters, we consider the following
-    # transformation:
+    # We consider the following transformation:
     #
     #   pos_optitrack = pos_gantry * A + pos_gantry ** 2 * B + C
     #
@@ -420,70 +417,65 @@ def get_processed_data(
     #   - B is a 3x3 matrix
     #   - C is a 3x1 vector
     #
-    # The calibration parameters are the elements of the matrices A, B, and C.
+    # The parameters are the elements of the matrices A, B, and C.
     # -------------------------------------------------------------------------
 
-    calibration_params: Optional[np.ndarray] = None
+    correction_params_array: Optional[np.ndarray] = None
 
-    if (
-        calibrate
-        and calibration_params_filename
-        and os.path.exists(calibration_params_filename)
-    ):
-        calibration_params = np.load(calibration_params_filename)
-        logger.info("Calibration parameters loaded from file: %s", calibration_params)
-    elif calibrate:
-        # Function to transform the data based on an array of parameters
-        def coord_transform_array(x, df: pd.DataFrame) -> pd.DataFrame:
+    if config.correction.enabled and calibration_params.correction is not None:
+        correction_params_array = np.array(calibration_params.correction)
+    elif config.correction.enabled:
+        # Function to calibrate the gantry data based on an array of parameters
+        def coord_calibrate(x, df: pd.DataFrame) -> pd.DataFrame:
             matrix1, matrix2, array = get_calibration_matrices(x)
             return coord_matrix_transform2(df, matrix1, matrix2, array)
 
         # Gantry data
-        df_gantry_tr = df[["time", "GAN.X", "GAN.Y", "GAN.Z"]]
+        df_gantry_tr = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
         df_gantry_tr.columns = ["time", "x", "y", "z"]
 
-        # Optitrack data
-        df_optitrack_tr = df[["time", "RB.X", "RB.Y", "RB.Z"]]
+        # OptiTrack data
+        df_optitrack_tr = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
         df_optitrack_tr.columns = ["time", "x", "y", "z"]
 
         x0 = np.zeros(18)
         x0[[0, 4, 8]] = 1
 
-        logger.info("Calibrating gantry data...")
+        def opt_callback(intermediate_result):
+            if config.correction.optimization.display:
+                fval = getattr(intermediate_result, "fun", intermediate_result)
+                print(f"fval: {fval}")
+
+        opt_options = {}
+        if config.correction.optimization.display:
+            opt_options["disp"] = True
+
+        logger.info("Correcting gantry data...")
         res = scp.optimize.minimize(
-            fun=lambda x: coord_mse(
-                df_optitrack_tr, coord_transform_array(x, df_gantry_tr)
-            ),
+            fun=lambda x: coord_mse(df_optitrack_tr, coord_calibrate(x, df_gantry_tr)),
             x0=x0,
-            tol=1e-9,
-            options={"disp": True},
-            callback=lambda intermediate_result: logger.info(
-                "fval: %s",
-                getattr(intermediate_result, "fun", intermediate_result),
-            ),
-            method="Powell",
+            tol=config.correction.optimization.tolerance,
+            options=opt_options,
+            callback=opt_callback,
+            method=config.correction.optimization.method,
         )
 
-        calibration_params = cast(np.ndarray, res.x)
-        logger.info("Calibration completed. Parameters: %s", calibration_params)
+        correction_params_array = res.x
+        logger.info("Correction completed. Parameters: %s", correction_params_array)
 
-        # save the calibration parameters
-        if calibration_params_filename:
-            np.save(calibration_params_filename, calibration_params)
-
-    if calibration_params is not None:
-        df_calib = df[["GAN.X", "GAN.Y", "GAN.Z"]]
+    if correction_params_array is not None:
+        df_calib: pd.DataFrame = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]]
         df_calib.columns = ["x", "y", "z"]
 
-        m1, m2, vec = get_calibration_matrices(calibration_params)
+        m1, m2, vec = get_calibration_matrices(correction_params_array)
         df_calib = coord_matrix_transform2(df_calib, m1, m2, vec)
 
-        # Add calibrated coordinates to the dataframe
+        # Add final calibrated coordinates to the dataframe
         df["GAN.CALIBRATED.X"] = df_calib["x"]
         df["GAN.CALIBRATED.Y"] = df_calib["y"]
         df["GAN.CALIBRATED.Z"] = df_calib["z"]
     else:
-        # Add calibrated coordinates with nan values
+        # Add final calibrated coordinates with nan values
         df["GAN.CALIBRATED.X"] = np.nan
         df["GAN.CALIBRATED.Y"] = np.nan
         df["GAN.CALIBRATED.Z"] = np.nan
@@ -504,7 +496,18 @@ def get_processed_data(
         )
 
     # -------------------------------------------------------------------------
+    # Create the CalibrationParams object to return
+    # -------------------------------------------------------------------------
+    def np_to_list(x: Optional[np.ndarray]) -> Optional[list[float]]:
+        return x.tolist() if x is not None else None
+
+    calibration_params = CalibrationParams(
+        alignment=np_to_list(alignment_params_array),
+        correction=np_to_list(correction_params_array),
+    )
+
+    # -------------------------------------------------------------------------
     # Return the processed data
     # -------------------------------------------------------------------------
 
-    return df, num_markers
+    return df, calibration_params, num_markers

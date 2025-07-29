@@ -1,51 +1,48 @@
 import argparse
 from typing import Any, Optional, cast
 
+import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-
 from argutils import parse_limit
-from data import get_processed_data, load_bad_frames
+from data import CalibrationConfig, CalibrationParams, get_processed_data
 
 
 def plot_errors_scatter(
     gantry_file: str = "take_gantry.csv",
     optitrack_file: str = "take_optitrack.csv",
-    alignment_params_file: str = "alignment_params.npy",
-    calibration_params_file: str = "calibration_params.npy",
-    calibrate: bool = True,
-    bad_frames_file: str = "bad_frames.json",
-    remove_bad_frames: bool = True,
+    config_file: str = "config.json",
+    calibration_file: str = "calibration.json",
+    correct: bool = True,
+    skip_frames: bool = True,
     ylim: Optional[tuple[float, float]] = None,
     plot_fit: bool = True,
     style: dict[str, Any] = {"alpha": 0.25, "s": 2, "lw": 0},
     fit_style: dict[str, Any] = {"color": "r", "linestyle": "--", "alpha": 0.8},
-    save_path: Optional[str] = None,
-) -> tuple[pd.DataFrame, list[plt.Axes]]:
+) -> tuple[pd.DataFrame, list[mpl_axes.Axes]]:
     """
     Plot pairwise scatter plots between gantry position and positioning errors.
-
-    Args:
-        df: DataFrame containing gantry and error data
-        save_path: Optional path to save the plots
     """
-    sep = ".CALIBRATED." if calibrate else "."
+    sep = ".CALIBRATED." if correct else "."
     errors = [f"GAN.ERR{sep}X", f"GAN.ERR{sep}Y", f"GAN.ERR{sep}Z"]
     positions = [f"GAN{sep}X", f"GAN{sep}Y", f"GAN{sep}Z"]
     axes = []
 
-    bad_frames = None
-    if remove_bad_frames:
-        bad_frames = load_bad_frames(bad_frames_file)
+    with open(config_file, "r") as f:
+        config = CalibrationConfig.model_validate_json(f.read())
 
-    df, _ = get_processed_data(
+    with open(calibration_file, "r") as f:
+        calibration_params = CalibrationParams.model_validate_json(f.read())
+
+    # Override the skip frames parameter
+    config.skip_frames.enabled = skip_frames
+
+    df, _, _ = get_processed_data(
         gantry_file,
         optitrack_file,
-        alignment_params_file,
-        calibration_params_file,
-        bad_frames=bad_frames,
-        calibrate=calibrate,
+        config=config,
+        calibration_params=calibration_params,
     )
 
     plt.figure(constrained_layout=True)
@@ -63,9 +60,10 @@ def plot_errors_scatter(
             ax.set_ylim(ylim)
 
             # Add fit line
-            if plot_fit and (mask := df[[pos, err]].notna().all(axis=1)).any():
+            if plot_fit and (mask := df.loc[:, [pos, err]].notna().all(axis=1)).any():
                 x = df.loc[mask, pos]
                 y = df.loc[mask, err]
+
                 if pos[-1] in ["X", "Y"]:
                     legend_str = "Quadratic fit"
                     z = np.polyfit(x, y, 2)
@@ -81,11 +79,7 @@ def plot_errors_scatter(
                 ax.plot(x, p(x), label=legend_str, **fit_style)
                 ax.legend()
 
-    # plt.tight_layout(pad=0.1)
-    if save_path:
-        plt.savefig(save_path)
     plt.show()
-
     return df, axes
 
 
@@ -110,45 +104,38 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--alignment",
+        "--config",
         type=str,
-        default="alignment_params.npy",
-        help="Path to alignment parameters file",
-    )
-
-    parser.add_argument(
-        "--calibrate",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Calibrate the Optitrack data",
+        default="config.json",
+        help="Path to the calibration configuration file",
     )
 
     parser.add_argument(
         "--calibration",
         type=str,
-        default="calibration_params.npy",
-        help="Path to calibration parameters file",
+        default="calibration.json",
+        help="Path to the calibration parameters file",
     )
 
     parser.add_argument(
-        "--remove-bad-frames",
+        "--correct",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Remove bad frames from the data",
+        help="Enable the non-linear coordinate correction step",
     )
 
     parser.add_argument(
-        "--bad-frames",
-        type=str,
-        default="bad_frames.json",
-        help="Path to bad frames data file",
+        "--skip-frames",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Enable skipping the frames set in the configuration file",
     )
 
     parser.add_argument(
         "--plot-fit",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Plot fit line",
+        help="Plot fitted lines",
     )
 
     parser.add_argument(
@@ -163,11 +150,10 @@ if __name__ == "__main__":
     df, _ = plot_errors_scatter(
         gantry_file=args.gantry,
         optitrack_file=args.optitrack,
-        alignment_params_file=args.alignment,
-        calibration_params_file=args.calibration,
-        calibrate=args.calibrate,
-        bad_frames_file=args.bad_frames,
-        remove_bad_frames=args.remove_bad_frames,
+        config_file=args.config,
+        calibration_file=args.calibration,
+        correct=args.correct,
+        skip_frames=args.skip_frames,
         ylim=args.ylim,
         plot_fit=args.plot_fit,
     )
@@ -182,8 +168,7 @@ if __name__ == "__main__":
     print("\nR-squared values for linear fits:")
     for pos in positions:
         for err in errors:
-            mask = df[[pos, err]].notna().all(axis=1)
-            if mask.any():
+            if (mask := df.loc[:, [pos, err]].notna().all(axis=1)).any():
                 correlation = cast(float, df.loc[mask, [pos, err]].corr().iloc[0, 1])
                 r_squared = correlation**2
                 print(f"{pos} vs {err}: {r_squared:.4f}")

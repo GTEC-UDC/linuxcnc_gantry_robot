@@ -8,7 +8,6 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from matplotlib.artist import Artist
-
 from player import Player, PlayerFrameData
 
 

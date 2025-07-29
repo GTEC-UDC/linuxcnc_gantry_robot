@@ -3,9 +3,8 @@ import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
+from data import CalibrationParams, get_calibration_matrices
 from matplotlib.widgets import Button, Slider
-
-from data import get_calibration_matrices
 
 
 def coord_transform(
@@ -183,13 +182,15 @@ if __name__ == "__main__":
     parser.add_argument(
         "--calibration",
         type=str,
-        default="calibration_params.npy",
+        default="calibration.json",
         help="Path to calibration parameters file",
     )
 
     args = parser.parse_args()
 
-    calibration_params = np.load(args.calibration)
-    matrix1, matrix2, array = get_calibration_matrices(calibration_params)
+    with open(args.calibration, "r") as f:
+        calibration_params = CalibrationParams.model_validate_json(f.read())
+
+    matrix1, matrix2, array = get_calibration_matrices(calibration_params.correction)
 
     plotter = TransformationPlotter(matrix1, matrix2, array)

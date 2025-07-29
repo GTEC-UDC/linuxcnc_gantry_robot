@@ -1,14 +1,12 @@
 import argparse
 from typing import Optional, cast
 
+import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d.axes3d as axes3d
-
-from data import load_optitrack_data
 from argutils import parse_limit
+from data import load_optitrack_data
 from multipoint_player import MultiPointPlayer
-
-from coordinates_utils import TransformRotateCenter
 
 
 def plot_movement_optitrack(
@@ -18,11 +16,11 @@ def plot_movement_optitrack(
     xlim: Optional[tuple[float, float]] = None,
     ylim: Optional[tuple[float, float]] = None,
     zlim: Optional[tuple[float, float]] = None,
-) -> plt.Axes:
-    """Plot Optitrack movement data in 3D.
+) -> mpl_axes.Axes:
+    """Plot OptiTrack movement data in 3D.
 
     Args:
-        filename: Path to the Optitrack CSV file
+        filename: Path to the OptiTrack CSV file
         trail_after_samples: Number of previous samples to show after the current frame
         trail_before_samples: Number of previous samples to show before the current frame
         xlim: Optional tuple of (min, max) for the x-axis
@@ -106,13 +104,13 @@ def plot_movement_optitrack(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Plot Optitrack movement",
+        description="Plot OptiTrack movement",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
     parser.add_argument(
         "--data",
-        help="Path to the CSV file with the optitrack movement data",
+        help="Path to the CSV file with the OptiTrack movement data",
         type=str,
         default="take_optitrack.csv",
     )

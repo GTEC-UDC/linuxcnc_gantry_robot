@@ -1,8 +1,6 @@
 import argparse
 
-import numpy as np
-
-from data import get_calibration_matrices
+from data import CalibrationParams, get_calibration_matrices
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -14,12 +12,15 @@ if __name__ == "__main__":
         "--calibration",
         help="Path to save the calibration parameters file",
         type=str,
-        default="calibration_params.npy",
+        default="calibration.json",
     )
 
     args = parser.parse_args()
 
-    params = get_calibration_matrices(np.load(args.calibration))
+    with open(args.calibration, "r") as f:
+        calibration_params = CalibrationParams.model_validate_json(f.read())
+
+    params = get_calibration_matrices(calibration_params.correction)
 
     # Note that we transpose the calibration matrices because the python code
     # uses row coordinate vectors, but the calibxyzkins module uses column

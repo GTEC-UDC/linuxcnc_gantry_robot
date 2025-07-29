@@ -1,7 +1,6 @@
 import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import cast
 
 import numpy as np
 import numpy.typing as npt
@@ -20,31 +19,33 @@ def coord_mse(
         len(df_cols) == len(df_other_cols) == 3
     ), "df_cols and df_other_cols must have 3 elements"
 
-    df_time, df_x, df_y, df_z = (
-        df[time_col],
-        df[df_cols[0]],
-        df[df_cols[1]],
-        df[df_cols[2]],
-    )
+    df_time = df[time_col]
+    df_x = df[df_cols[0]]
+    df_y = df[df_cols[1]]
+    df_z = df[df_cols[2]]
 
-    df_o_time, df_o_x, df_o_y, df_o_z = (
-        df_other[time_col],
-        df_other[df_other_cols[0]],
-        df_other[df_other_cols[1]],
-        df_other[df_other_cols[2]],
-    )
+    df_o_time = df_other[time_col]
+    df_o_x = df_other[df_other_cols[0]]
+    df_o_y = df_other[df_other_cols[1]]
+    df_o_z = df_other[df_other_cols[2]]
 
     df_o_interp_x = np.interp(df_time, df_o_time, df_o_x, left=np.nan, right=np.nan)
     df_o_interp_y = np.interp(df_time, df_o_time, df_o_y, left=np.nan, right=np.nan)
     df_o_interp_z = np.interp(df_time, df_o_time, df_o_z, left=np.nan, right=np.nan)
 
-    sq = (
+    err = (
         (df_x - df_o_interp_x) ** 2
         + (df_y - df_o_interp_y) ** 2
         + (df_z - df_o_interp_z) ** 2
     )
 
-    return cast(float, np.nanmean(np.sqrt(sq)))
+    result = np.nanmean(np.sqrt(err))
+
+    if np.isnan(result):
+        print(f"Warning: Invalid MSE result: {result}. Returning inf.")
+        return np.inf
+    else:
+        return result
 
 
 def coord_shift_xyz(
@@ -90,14 +91,11 @@ def coord_rotate(
     df_rotated = df.copy()
     cos_a = np.cos(angle)
     sin_a = np.sin(angle)
-
     xc, yc, zc = center
 
-    x, y, z = (
-        (df[x_cols] - xc).to_numpy(),
-        (df[y_cols] - yc).to_numpy(),
-        (df[z_cols] - zc).to_numpy(),
-    )
+    x = (df[x_cols] - xc).to_numpy()
+    y = (df[y_cols] - yc).to_numpy()
+    z = (df[z_cols] - zc).to_numpy()
 
     if axis == "x":
         df_rotated[y_cols] = y * cos_a - z * sin_a + yc
@@ -296,7 +294,7 @@ class TransformRotateCenter(Transform):
     z_cols: list[str] = field(default_factory=lambda: ["z"])
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
-        center = tuple(df[self.center_cols].mean())
+        center = tuple(df[self.center_cols].mean())  # type: ignore
         return coord_rotate(
             df, self.axis, self.angle, center, self.x_cols, self.y_cols, self.z_cols
         )

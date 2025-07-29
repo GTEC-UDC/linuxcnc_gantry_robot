@@ -1,61 +1,63 @@
 import argparse
 from typing import Optional, cast
 
+import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
 import mpl_toolkits.mplot3d.axes3d as axes3d
 import numpy as np
-
 from argutils import parse_limit
-from data import get_processed_data, load_bad_frames
+from data import CalibrationConfig, CalibrationParams, get_processed_data
 from multipoint_player import MultiPointPlayer
 
 
 def plot_movement(
     gantry_file: str,
     optitrack_file: str,
-    alignment_params_file: str,
-    calibration_params_file: str,
+    config_file: str,
+    calibration_file: str,
     trail_after_samples: int = 0,
     trail_before_samples: int = 2000,
     error_after_samples: int = 2000,
     error_before_samples: int = 2000,
-    remove_bad_frames: bool = False,
-    bad_frames_file: str = "bad_frames.json",
-    show_calibrated: bool = True,
+    skip_frames: bool = True,
+    correct: bool = True,
     xlim: Optional[tuple[float, float]] = None,
     ylim: Optional[tuple[float, float]] = None,
     zlim: Optional[tuple[float, float]] = None,
-) -> plt.Axes:
-    """Plot gantry and Optitrack movement data in 3D.
+) -> mpl_axes.Axes:
+    """Plot gantry and OptiTrack movement data in 3D.
 
     Args:
         gantry_file: Path to the gantry CSV file
-        optitrack_file: Path to the Optitrack CSV file
-        alignment_params_file: Path to the alignment parameters file
-        calibration_params_file: Path to the calibration parameters file
+        optitrack_file: Path to the OptiTrack CSV file
+        config_file: Path to the calibration configuration file
+        calibration_file: Path to the calibration parameters file
         trail_after_samples: Number of previous samples to show for the trails
         trail_before_samples: Number of previous samples to show for the trails
         error_after_samples: Number of previous samples to show for the errors
         error_before_samples: Number of previous samples to show for the errors
-        remove_bad_frames: Whether to remove bad frames from the data
-        bad_frames_file: Path to the bad frames file
-        show_calibrated: Whether to show the gantry position after calibration
+        skip_frames: Whether to skip the frames set in the configuration file
+        correct: Whether to correct the gantry position
         xlim: Optional tuple of (min, max) for the x-axis
         ylim: Optional tuple of (min, max) for the y-axis
         zlim: Optional tuple of (min, max) for the z-axis
     """
-    bad_frames = None
-    if remove_bad_frames:
-        bad_frames = load_bad_frames(bad_frames_file)
+
+    with open(config_file, "r") as f:
+        config = CalibrationConfig.model_validate_json(f.read())
+
+    with open(calibration_file, "r") as f:
+        calibration_params = CalibrationParams.model_validate_json(f.read())
+
+    # Override the skip frames parameter
+    config.skip_frames.enabled = skip_frames
 
     # Load and process the data
-    df, num_markers = get_processed_data(
+    df, _, num_markers = get_processed_data(
         gantry_file,
         optitrack_file,
-        alignment_params_file,
-        calibration_params_file,
-        bad_frames=bad_frames,
-        calibrate=True,
+        config=config,
+        calibration_params=calibration_params,
     )
 
     # Set the time relative to the start time
@@ -113,7 +115,7 @@ def plot_movement(
     ax.set_zlim(zlim)
 
     # Create parameters for the MultiPointPlayer
-    sep = ".CALIBRATED." if show_calibrated else "."
+    sep = ".CALIBRATED." if correct else "."
     point_cols = [
         (f"GAN{sep}X", f"GAN{sep}Y", f"GAN{sep}Z"),  # Gantry position
         ("RB.X", "RB.Y", "RB.Z"),  # Rigid body center
@@ -267,7 +269,7 @@ def plot_movement(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Plot gantry and Optitrack movement comparison",
+        description="Plot gantry and OptiTrack movement comparison",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 
@@ -280,30 +282,30 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--optitrack",
-        help="Path to the CSV file with the Optitrack movement data",
+        help="Path to the CSV file with the OptiTrack movement data",
         type=str,
         default="take_optitrack.csv",
     )
 
     parser.add_argument(
-        "--alignment",
-        help="Path to the alignment parameters file",
+        "--config",
         type=str,
-        default="alignment_params.npy",
-    )
-
-    parser.add_argument(
-        "--show-calibrated",
-        action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Show the gantry position after calibration",
+        default="config.json",
+        help="Path to the calibration configuration file",
     )
 
     parser.add_argument(
         "--calibration",
         help="Path to the calibration parameters file",
         type=str,
-        default="calibration_params.npy",
+        default="calibration.json",
+    )
+
+    parser.add_argument(
+        "--correct",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Show the gantry position after correction",
     )
 
     parser.add_argument(
@@ -321,22 +323,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--remove-bad-frames",
+        "--skip-frames",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Remove bad frames from the data",
-    )
-
-    parser.add_argument(
-        "--bad-frames",
-        type=str,
-        default="bad_frames.json",
-        help="Path to bad frames data file",
+        help="Enable skipping the frames set in the configuration file",
     )
 
     default_axis_limits = {
-        "x": (0, 5000),
-        "y": (0, 5000),
+        "x": (-500, 5500),
+        "y": (-500, 5500),
         "z": (-1100, -500),
     }
 
@@ -353,13 +348,12 @@ if __name__ == "__main__":
     plot_movement(
         gantry_file=args.gantry,
         optitrack_file=args.optitrack,
-        alignment_params_file=args.alignment,
-        calibration_params_file=args.calibration,
+        config_file=args.config,
+        calibration_file=args.calibration,
         trail_after_samples=args.trail_after,
         trail_before_samples=args.trail_before,
-        remove_bad_frames=args.remove_bad_frames,
-        bad_frames_file=args.bad_frames,
-        show_calibrated=args.show_calibrated,
+        skip_frames=args.skip_frames,
+        correct=args.correct,
         xlim=args.xlim,
         ylim=args.ylim,
         zlim=args.zlim,

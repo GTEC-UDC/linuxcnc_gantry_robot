@@ -45,7 +45,10 @@ def plot_errors_scatter(
         calibration_params=calibration_params,
     )
 
-    plt.figure(constrained_layout=True)
+    plt.figure(
+        constrained_layout=True,
+        figsize=(10, 6),
+    )
 
     for i, pos in enumerate(positions):
         for j, err in enumerate(errors):
@@ -54,9 +57,9 @@ def plot_errors_scatter(
 
             ax.scatter(df[pos], df[err], **style)
             ax.grid(True)
-            ax.set_xlabel(pos)
-            ax.set_ylabel(err)
-            ax.set_title(f"{err} vs {pos}")
+            ax.set_xlabel(pos[-1])
+            ax.set_ylabel(f"Error {err[-1]}")
+            ax.set_title(f"Error {err[-1]} over {pos[-1]}")
             ax.set_ylim(ylim)
 
             # Add fit line
@@ -72,8 +75,8 @@ def plot_errors_scatter(
                 else:
                     legend_str = "Linear fit"
                     z = np.polyfit(x, y, 1)
-                    x = np.linspace(-1050, 0, 100)
-                    ax.set_xlim(-1050, 0)
+                    x = np.linspace(-1100, 0, 100)
+                    ax.set_xlim(-1100, 0)
 
                 p = np.poly1d(z)
                 ax.plot(x, p(x), label=legend_str, **fit_style)

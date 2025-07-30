@@ -68,9 +68,9 @@ HAL parameters (defaults in parentheses):
     calibxyzkins.calib-b.zz (0)
 
   * Calibration vector C:
-    calibxyzkins.calib-c.xx (0)
-    calibxyzkins.calib-c.xy (0)
-    calibxyzkins.calib-c.xz (0)
+    calibxyzkins.calib-c.x (0)
+    calibxyzkins.calib-c.y (0)
+    calibxyzkins.calib-c.z (0)
 
   * Max/min joints limits for the XYZ axes:
     calibxyzkins.min-limit.x (-inf)

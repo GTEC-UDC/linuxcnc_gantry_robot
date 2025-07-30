@@ -182,20 +182,20 @@ int init_hal_params(int comp_id, haldata_t *haldata) {
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
       if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_m_A[i][j],
-                                      comp_id, "calibxzkins.calib-a.%c%c",
+                                      comp_id, "calibxyzkins.calib-a.%c%c",
                                       coord_letter[i], coord_letter[j])) < 0) {
         return res;
       }
 
       if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_m_B[i][j],
-                                      comp_id, "calibxzkins.calib-b.%c%c",
+                                      comp_id, "calibxyzkins.calib-b.%c%c",
                                       coord_letter[i], coord_letter[j])) < 0) {
         return res;
       }
     }
 
     if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_v_C[i], comp_id,
-                                    "calibxzkins.calib-c.%c",
+                                    "calibxyzkins.calib-c.%c",
                                     coord_letter[i])) < 0) {
       return res;
     }
@@ -204,13 +204,13 @@ int init_hal_params(int comp_id, haldata_t *haldata) {
   // Joints limits
   for (int i = 0; i < 3; ++i) {
     if ((res = hal_param_float_newf(HAL_RW, &(haldata->joints_min[i]), comp_id,
-                                    "calibxzkins.min-limit.%c",
+                                    "calibxyzkins.min-limit.%c",
                                     coord_letter[i])) < 0) {
       return res;
     }
 
     if ((res = hal_param_float_newf(HAL_RW, &(haldata->joints_max[i]), comp_id,
-                                    "calibxzkins.max-limit.%c",
+                                    "calibxyzkins.max-limit.%c",
                                     coord_letter[i])) < 0) {
       return res;
     }
@@ -242,12 +242,12 @@ int init_hal_pins(int comp_id, haldata_t *haldata) {
   }
 
   if ((res = hal_pin_u32_newf(HAL_IO, &haldata->max_iter, comp_id,
-                              "calibxzkins.max-iter")) < 0) {
+                              "calibxyzkins.max-iter")) < 0) {
     return res;
   }
 
   if ((res = hal_pin_float_newf(HAL_IO, &haldata->tol, comp_id,
-                                "calibxzkins.tol")) < 0) {
+                                "calibxyzkins.tol")) < 0) {
     return res;
   }
 

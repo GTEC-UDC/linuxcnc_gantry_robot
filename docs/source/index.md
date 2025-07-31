@@ -41,6 +41,7 @@ doc/01_introduction/introduction.md
 doc/02_igus_dryve_d1/00_index.md
 doc/03_linuxcnc/00_index.md
 doc/04_error_analysis_calibration/00_index.md
+doc/05_calibxyzkins_module/00_index.md
 :::
 
 :::{raw} latex

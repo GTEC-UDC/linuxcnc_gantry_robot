@@ -8,10 +8,10 @@ The repository includes a **custom calibration solution** that leverages an exis
 
 <div align="center">
 
-[![LinuxCNC](https://img.shields.io/badge/Control-LinuxCNC-blue.svg)](https://linuxcnc.org/)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-limegreen.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
+[![License: GNU FDL 1.3](https://img.shields.io/badge/License-GNU%20FDL%201.3-limegreen.svg)](https://www.gnu.org/licenses/fdl-1.3.en.html)
+[![DOI](https://zenodo.org/badge/996340720.svg)](https://zenodo.org/badge/latestdoi/996340720)
 [![Documentation](https://img.shields.io/badge/docs-sphinx-blue.svg)](docs/)
-[![Python](https://img.shields.io/badge/python-3.x-blue.svg)](https://python.org)
 
 <img src="assets/gantry_robot.jpg" style="width:100%; max-width:700px;" alt="Gantry Robot System"/>
 
@@ -29,27 +29,35 @@ The repository includes a **custom calibration solution** that leverages an exis
 
 ## Documentation
 
-> [!NOTE]
-> The technical documentation is under development.
-
 The following documentation is provided in this repository:
 
-- **Technical Documentation**: [Sphinx](https://www.sphinx-doc.org) sources of the system documentation and setup guide in [docs/](docs/). You can build the HTML version of the documentation with the following commands:
+- **Technical Documentation**: [Sphinx](https://www.sphinx-doc.org) documentation sources of the system documentation in [docs/](docs/). The documentation has been prepared to be built in HTML and PDF formats. To build the documentation follow the instructions below:
 
-  ```bash
-  cd docs
-  uv venv && uv sync && source .venv/bin/activate
-  make html
-  ```
+  1. **Prepare the environment**:
 
-- **Electrical Installation**: KiCAD electrical schematics in [electrical_installation/](electrical_installation/).
+     ```bash
+     cd docs
+     uv venv && uv sync && source .venv/bin/activate
+     ```
+
+  2. **Build the documentation**:
+
+     - HTML: `make html`
+
+       The HTML documentation index file will be saved in `docs/build/html/index.html`.
+
+     - PDF (requires a LaTeX installation with LuaLaTeX): `make latexpdf`
+
+       The PDF file will be saved in `docs/build/latex/linuxcnc_gantry_robot.pdf`.
+
+- **Electrical Installation**: KiCAD electrical schematics in [electrical_installation/schematics/](electrical_installation/schematics/).
 
 ## Positioning calibration
 
 The gantry robot can be calibrated to compensate for positioning errors using an existing OptiTrack motion capture system in the installation room. For this, the repository provides the following software:
 
 - **Custom `calibxyzkins` LinuxCNC Kinematics Module** in [linuxcnc/components/linuxcnc_calibrated_xyz_kins/](linuxcnc/components/linuxcnc_calibrated_xyz_kins/): compensates for the positioning errors in real-time
-- **Calibration Analysis Software** in [calibration/](calibration/): Python-based tools for processing the OptiTrack data and generating the calibration parameters
+- **Calibration Analysis Software** in [calibration/](calibration/): Python scripts for processing the OptiTrack data and generating the calibration parameters
 
 ## Hardware Components
 
@@ -80,6 +88,7 @@ gantry-robot/
 ├── README.md                    # This file
 ├── assets/                      # Pictures and videos
 ├── docs/                        # Technical documentation
+├── igus-dryve/                  # igus® dryve D1 configuration files
 ├── linuxcnc/                    # LinuxCNC configuration files
 │   ├── configs/                 # Machine configurations
 │   └── components/              # Custom LinuxCNC components

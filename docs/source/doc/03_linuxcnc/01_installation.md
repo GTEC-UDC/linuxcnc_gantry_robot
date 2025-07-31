@@ -9,7 +9,8 @@ Once the operating system is installed, follow these steps to install LinuxCNC:
 1. Update the system's package index by running the following commands:
 
    ```sh
-   sudo apt-get update sudo apt-get dist-upgrade
+   sudo apt-get update
+   sudo apt-get dist-upgrade
    ```
 
 2. Install LinuxCNC using the following command:

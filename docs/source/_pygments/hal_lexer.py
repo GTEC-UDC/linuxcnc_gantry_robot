@@ -35,7 +35,7 @@ class HALLexer(RegexLexer):
             ),  # Signal or variable names with dots and dashes
             (r'"[^"]*"', String),  # Strings enclosed in double quotes
             (r"0x[0-9a-fA-F]+", Number.Hex),  # Hexadecimal numbers (e.g., 0x205)
-            (r"[+-]?\d+\.\d+", Number.Float),  # Floating-point numbers
+            (r"[+-]?\d+\.\d+([eE][+-]?\d+)?", Number.Float),  # Floating-point numbers
             (r"[+-]?\d+", Number.Integer),  # Integers
             (r"[=|&<>]", Operator),  # Operators
             (r"-", Operator),  # Hyphens as operators or part of numbers

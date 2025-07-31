@@ -23,7 +23,7 @@ Once connected, open a web browser and enter the IP address of the controller yo
 02_motor_page.md
 03_axis_page.md
 04_communication_page.md
-05_inputs_ouputs_page.md
+05_inputs_outputs_page.md
 06_drive_profile_page.md
 07_oscilloscope_page.md
 :::

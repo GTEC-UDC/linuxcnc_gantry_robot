@@ -40,6 +40,7 @@ This work has been supported by grant PID2022-137099NB-C42 (MADDIE) and by proje
 doc/01_introduction/introduction.md
 doc/02_igus_dryve_d1/00_index.md
 doc/03_linuxcnc/00_index.md
+doc/04_error_analysis_calibration/00_index.md
 :::
 
 :::{raw} latex

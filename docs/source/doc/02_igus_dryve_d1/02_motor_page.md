@@ -1,16 +1,16 @@
 # "Motor" Page
 
-The "Motor" configuration page is shown in {numref}`fig:conf_stepper_2`. Below, we describe the various available options and their appropriate settings for our gantry robot.
+The "Motor" configuration page is shown below in {numref}`fig:conf_x1_motor`. The following sections describe the various available options and their appropriate settings for our gantry robot.
 
-:::{figure} images/config-stepper/02-motor.png
-:name: fig:conf_stepper_2
+:::{figure} images/config-x1/02-motor.png
+:name: fig:conf_x1_motor
 
-"Motor" configuration page of the stepper motor controller.
+"Motor" configuration page of the X1 motor controller.
 :::
 
 ## Motor Configuration Summary
 
-The following table summarizes the configuration parameters for the motors in our gantry robot setup:
+{numref}`tab:motor_config_summary` below summarizes the configuration parameters for the motors in our gantry robot setup:
 
 :::{tabularcolumns} l\R{0.35}\R{0.35}
 :::
@@ -18,15 +18,16 @@ The following table summarizes the configuration parameters for the motors in ou
 :::{csv-table} Motor configuration summary for the gantry robot.
 :name: tab:motor_config_summary
 :widths: auto
-:header: Parameter,X1/X2/Y,Z
+:header: Parameter,Value (X1/X2/Y),Value (Z)
+:class: longtable align-col2-r align-col3-r
 
 **Motor**,,
-Motor Type,EC/BLDC (Brush-Less DC Motor),ST (Stepper Motor)
+Motor Type,EC/BLDC,ST
 Article Number,MOT-EC-86-C-I-A,MOT-AN-S-060-035-060-M-C-AAAC
 Motor Current (A),7,3.2
 Boost Current (A),21,3.2
 Pole Pairs,4,N/A
-Step Mode,N/A,1/64
+Step Mode,N/A,1/32
 Step Angle (°),N/A,1.8
 **Gear**,,
 Gear Ratio,10:1,N/A
@@ -83,7 +84,10 @@ Braking Voltage (V),51,N/A
 
   The igus® dryve D1 documentation specifies a minimum step pulse period of 40 μs. However, the actual minimum period is smaller. Using a signal generator and an oscilloscope, we have verified that the actual minimum step pulse period supported by the igus® dryve D1 is 4 μs. {numref}`tab:step_modes` shows the steps per revolution and theoretical maximum speeds in RPM for each step mode, considering a 1.8° step angle and a 4 μs minimum step pulse period. Note that the speeds presented in the table are theoretical values calculated from the formula $\theta/(6NT)$. In practice, stepper motors are not designed to reach high speeds. The maximum speed of a stepper motor depends on the motor model, but typically these motors do not exceed 1000 RPM.
 
-  In our gantry robot setup, we have set the step mode to 1/64 for the Z axis stepper motor.
+  In our gantry robot setup, we have set the step mode to 1/32 for the Z axis stepper motor.
+
+  :::{tabularcolumns} rrr
+  :::
 
   :::{csv-table} Step modes, steps per revolution, and theoretical maximum speeds in rpm, considering a step angle of 1.8° and a minimum step pulse period of 4 µs.
   :class: align-col1-r, align-col2-r, align-col3-r
@@ -135,7 +139,7 @@ In our gantry robot setup, the following values were set by default based on the
   - **Impulses**: 500
 
 :::{important}
-The "Impulse Check" button prompts the controller to automatically verify the number of encoder impulses. To do this, it rotates the motor by one revolution, even if the "enable" signal is not activated. Therefore, do not to click this button if the motor cannot rotate freely.
+The "Impulse Check" button prompts the controller to automatically verify the number of encoder impulses. To do this, it rotates the motor by one revolution, even if the "enable" signal is not activated. Therefore, do not click this button if the motor cannot rotate freely.
 :::
 
 ## Closed Loop

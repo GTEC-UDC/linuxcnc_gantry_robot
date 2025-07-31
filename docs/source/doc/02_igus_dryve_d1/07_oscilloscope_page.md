@@ -2,12 +2,12 @@
 
 # "Oscilloscope" Page
 
-The "Oscilloscope" page, shown in {numref}`fig:conf_brushless_7`, offers two essential functionalities for adjusting and monitoring motor performance: the internal oscilloscope and the configuration of the motor's closed-loop control parameters.
+The "Oscilloscope" page, shown below in {numref}`fig:conf_x1_oscilloscope`, offers two essential functionalities for adjusting and monitoring motor performance: the internal oscilloscope and the configuration of the motor's closed-loop control parameters.
 
-:::{figure} images/config-stepper/07-oscilloscope.png
-:name: fig:conf_brushless_7
+:::{figure} images/config-x1/07-oscilloscope.png
+:name: fig:conf_x1_oscilloscope
 
-"Oscilloscope" configuration page of the stepper motor controller.
+"Oscilloscope" configuration page of the X1 motor controller.
 :::
 
 ## Oscilloscope
@@ -73,7 +73,7 @@ The "Oscilloscope" page provides access to the configuration of the {{PI}} contr
 :::{csv-table} Oscilloscope configuration summary for the gantry robot.
 :name: tab:oscilloscope_config_summary
 :widths: auto
-:header: Parameter,X1/X2/Y,Z
+:header: Parameter,Value (X1/X2/Y),Value (Z)
 
 **Current**,,
 Amplification (P),5,15

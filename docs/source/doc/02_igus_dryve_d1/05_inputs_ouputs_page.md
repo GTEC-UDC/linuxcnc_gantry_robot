@@ -2,12 +2,12 @@
 
 # "Inputs/Outputs" Page
 
-The "Inputs/Outputs" configuration page, displayed in {numref}`fig:conf_stepper_5`, allows for configuring the controller's inputs and outputs.
+The "Inputs/Outputs" configuration page, displayed below in {numref}`fig:conf_x1_inputs_outputs`, allows for configuring the controller's inputs and outputs.
 
-:::{figure} images/config-stepper/05-inputs_outputs.png
-:name: fig:conf_stepper_5
+:::{figure} images/config-x1/05-inputs_outputs.png
+:name: fig:conf_x1_inputs_outputs
 
-"Inputs/Outputs" configuration page of the stepper motor controller.
+"Inputs/Outputs" configuration page of the X1 motor controller.
 :::
 
 The digital logic level used by the controller is set by supplying input X2.11 with a voltage between 5 V and 24 V. The controller's digital logic operates as follows:
@@ -26,7 +26,7 @@ Controller digital logic levels.
 To interact with the controller's digital inputs and outputs, we use the MESA 7I96S and 7I77 boards:
 
 - The MESA 7I96S board transmits step and direction signals to the stepper motor controller; these signals operate on 5 V logic.
-- The MESA 7I77 board sends "start" and "enable" signals, and reads the "ready," "alert," and "error" outputs from the controllers (refer to the wiring diagram in the {{project_url_link}}. The logic voltage for the MESA 7I77 board can be adjusted by supplying input TB2.1 ("field power") with the desired voltage, ranging from 5 V to 28 V.
+- The MESA 7I77 board sends "start" and "enable" signals, and reads the "ready," "alert," and "error" outputs from the controllers (refer to the wiring diagram in the {{project_url_link}}). The logic voltage for the MESA 7I77 board can be adjusted by supplying input TB2.1 ("field power") with the desired voltage, ranging from 5 V to 28 V.
 
 Because the MESA 7I96S board can only use 5 V logic for step and direction signals, we have set the logic voltage for both the igus® dryve D1 controllers (X2.11 input) and the MESA 7I77 board (TB2.1 input) to 5 V.
 
@@ -35,12 +35,12 @@ The sections available on this page are:
 - **Digital Inputs**: This section shows the digital inputs and allows you to select between normally open (H) or normally closed (L) for each. Normally open (H) inputs will activate upon receiving a high signal. Conversely, normally closed (L) inputs will activate upon receiving a low signal. We will keep all inputs set to their default value (H).
 
     :::{note}
-    The labels for the digital inputs shown on this page will vary depending on the motor control mode selected on the "Drive Profile" page (see {numref}`sec:page_drive_profile`). {numref}`fig:conf_stepper_5` shows the configuration for the stepper motor, which includes inputs for the "step/direction" control mode.
+    The labels for the digital inputs shown on this page will vary depending on the motor control mode selected on the "Drive Profile" page (see {numref}`sec:page_drive_profile`). {numref}`fig:conf_x1_inputs_outputs` shows the configuration for the X1 motor. For the Z motor, which is a stepper motor and uses the "step/direction" control mode, the inputs/outputs page will show the inputs for the "step" and "direction" signals.
     :::
 
 - **Digital Outputs**: This section shows the digital outputs and allows you to select between normally open (H) or normally closed (L) for each. We will keep all outputs set to their default value (H).
 
-- **Analog Inputs**: This section shows the analog inputs and allows you to set the supported value range from 0 V to 10 V or from -10 V to 10 V. In our case, we will use analog input AI 1 with -10 V to 10 V signals to control the speed of the brushless motor, as mentioned in {numref}`sec:axis_absolute_feedback`. Therefore, on the brushless motor controller, we will set the AI 1 option to ± 10 VDC. We will leave the AI 2 option unchanged, as we will not be using that input.
+- **Analog Inputs**: This section shows the analog inputs and allows you to set the supported value range from 0 V to 10 V or from -10 V to 10 V. In our case, we will use analog input AI 1 with -10 V to 10 V signals to control the speed of the brushless motors (X1, X2, Y), as mentioned in {numref}`sec:axis_absolute_feedback`. Therefore, on the brushless motor controllers, we will set the AI 1 option to ± 10 VDC. We will leave the AI 2 option unchanged, as we will not be using that input.
 
 - **Digital Input Switching**: This parameter determines how the system interprets digital input signals. The available options are PNP and NPN:
 

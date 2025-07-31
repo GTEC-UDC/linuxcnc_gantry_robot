@@ -1,7 +1,7 @@
 # igus® dryve D1 Controllers
 
 :::{important}
-For the gantry robot development we used the igus® dryve D1 controllers with firmware version `dryve-D1-1-20240927` and their operating manual with version `3.0.1`.
+For the gantry robot development we used the igus® dryve D1 controllers with firmware version `dryve-D1-1-20240927` and their operating manual with version `3.1`.
 :::
 
 In this section, we will detail the configuration of the igus® dryve D1 controllers for our gantry robot. The robot uses 4 motors, each with its own controller:

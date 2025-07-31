@@ -2,17 +2,17 @@
 
 # "Axis" Page
 
-The "Axis" configuration page is shown in {numref}`fig:conf_stepper_3`. As shown, the parameters use the units established on the initial configuration page (see {numref}`sec:conf_start`); thus, position parameters are in millimeters (mm), speed parameters in millimeters per second (mm/s), and acceleration parameters in millimeters per second squared (mm/s^2^). The various options available on this page and their recommended settings for our gantry robot configuration are described below.
+The "Axis" configuration page is shown below in {numref}`fig:conf_x1_axis`. The parameters use the units established on the initial configuration page (see {numref}`sec:conf_start`); thus, position parameters are in millimeters (mm), speed parameters in millimeters per second (mm/s), and acceleration parameters in millimeters per second squared (mm/s{sup}`2`). The various options available on this page and their settings for our gantry robot configuration are described in the following sections.
 
-:::{figure} images/config-stepper/03-axis.png
-:name: fig:conf_stepper_3
+:::{figure} images/config-x1/03-axis.png
+:name: fig:conf_x1_axis
 
-"Axis" configuration page of the stepper motor controller.
+"Axis" configuration page of the X1 motor controller.
 :::
 
 ## Axis Configuration Summary
 
-{numref}`tab:axis_config_summary` below summarizes the configuration parameters for the axes in our gantry robot:
+{numref}`tab:axis_config_summary` below summarizes the configuration parameters for the axes:
 
 :::{tabularcolumns} l\R{0.24}\R{0.24}
 :::
@@ -20,18 +20,20 @@ The "Axis" configuration page is shown in {numref}`fig:conf_stepper_3`. As shown
 :::{csv-table} Axis configuration summary for the gantry robot.
 :name: tab:axis_config_summary
 :widths: auto
-:header: Parameter,X1/X2/Y,Z
+:header: Parameter,Value (X1/X2/Y),Value (Z)
+:class: longtable align-col2-r align-col3-r
 
 **Axis**,,
-Available Stroke (mm),Any,Any
-Feed Rate (mm/s),Any,Any
+Minimal Stroke (mm),0,0
+Maximal Stroke (mm),0,0
+Feed Rate (mm/s),144,4
 **Motion Limits**,,
-Max. Velocity (mm/s),720,500
-Jog Velocity (mm/s),100,100
+Max. Velocity (mm/s),720,50
+Jog Velocity (mm/s),100,20
 Max. Acceleration (mm/s{sup}`2`),300,3200
 S-Curve (%),0,0
 Quick-Stop (mm/s{sup}`2`),500,200
-Following Error (mm),10,10
+Following Error (mm),10,1
 Positioning Window (mm),0,0
 Positioning Time (ms),0,0
 **Limit Switch**,,
@@ -53,8 +55,12 @@ AI 2 Absolute Value Max (V),N/A,N/A
 
 This section contains the following parameters:
 
-- **Available Stroke**: Defines the movement range for the "ABS" (Absolute Positioning) mode. Since we will not be using this mode, this parameter is not relevant to our application.
-- **Feed Rate**: For linear axes, this parameter indicates the axis displacement per motor rotation. As we are considering a rotary axis, we must set this parameter to 360°, as specified in Section 5.5.1 of the controller manual.
+- **Minimal Stroke** and **Maximal Stroke**: These parameters specify the movement window for "ABS" mode (Absolute Positioning). Since we will not be using this mode, these parameters are not relevant to our application and they are both set to 0.
+
+- **Feed Rate**: For linear axes, this parameter indicates the axis displacement per motor rotation. In our gantry robot setup the motors have the following feed rates:
+
+  - **Brushless motors (X1, X2, Y)**: 144 mm/rev
+  - **Stepper motor (Z)**: 4 mm/rev
 
 (sec:axis_motion_limits)=
 
@@ -62,14 +68,14 @@ This section contains the following parameters:
 
 This section includes the following parameters:
 
-- **Max. Velocity (mm/s)**: This sets the maximum motor speed. It functions as a limit for the movement programming modes available on the "Drive Profile" page (see {numref}`sec:page_drive_profile`). For the stepper motor, speed will be controlled by the step signal received by the controller. For the brushless motor, the maximum speed will be set on the "Drive Profile" page, with a value not exceeding that set here. In our gantry robot setup, we have configured the following values:
+- **Max. Velocity (mm/s)**: This sets the maximum motor speed. It functions as a limit for the movement programming modes available on the "Drive Profile" page (see {numref}`sec:page_drive_profile`). For the stepper motor (Z), speed will be controlled by the step signal received by the controller. For the brushless motors (X1, X2, Y), the maximum speed will be set on the "Drive Profile" page, with a value not exceeding that set here. In our gantry robot setup, we have configured the following values:
 
   - **Brushless motors (X1, X2, Y)**: 720 mm/s
-  - **Stepper motor (Z)**: 500 mm/s
+  - **Stepper motor (Z)**: 50 mm/s
 
-- **Jog Velocity (mm/s)**: This parameter defines the motor speed for manual positioning, accessible on the "Drive Profile" page (see {numref}`sec:page_drive_profile`). It is primarily useful for testing purposes via the controller's web interface; in our case, we have set it to 100 mm/s. For the final system, this parameter is irrelevant.
+- **Jog Velocity (mm/s)**: This parameter defines the motor speed for manual positioning, accessible on the "Drive Profile" page (see {numref}`sec:page_drive_profile`). It is primarily useful for testing purposes via the controller's web interface. For the final system, this parameter is irrelevant.
 
-- **Max. Acceleration (mm/s{sup}`2`)**: This sets the maximum motor acceleration, used in manual positioning on the "Drive Profile" page (see {numref}`sec:page_drive_profile`). It also serves as a limit in the movement programming modes available on the "Drive Profile" page. Similar to speed, for the stepper motor, acceleration will be controlled by the step signal received by the controller. For the brushless motor, the maximum acceleration will also be set on the "Drive Profile" page, with a value not exceeding that set here.
+- **Max. Acceleration (mm/s{sup}`2`)**: This sets the maximum motor acceleration, used in manual positioning on the "Drive Profile" page (see {numref}`sec:page_drive_profile`). It also serves as a limit in the movement programming modes available on the "Drive Profile" page. Similar to speed, for the stepper motor (Z), acceleration will be controlled by the step signal received by the controller. For the brushless motors (X1, X2, Y), the maximum acceleration will also be set on the "Drive Profile" page, with a value not exceeding that set here.
   
   :::{important}
   We have experimentally found that for the step/direction drive mode, the maximum acceleration also controls the jerk, i.e, the maximum rate of change of the acceleration over time, thus for the stepper motor (Z) we have set the maximum acceleration to a relatively high value.
@@ -77,8 +83,8 @@ This section includes the following parameters:
   
   In our gantry robot setup, we have configured the following values:
 
-  - **Brushless motors (X1, X2, Y)**: 300 mm/s^2^
-  - **Stepper motor (Z)**: 3200 mm/s^2^
+  - **Brushless motors (X1, X2, Y)**: 300 mm/s{sup}`2`
+  - **Stepper motor (Z)**: 3200 mm/s{sup}`2`
 
 - **S-Curve (%)**: This parameter allows control over the rate of change of acceleration, known as "jerk" {cite}`enwiki:1178778094`. It can be adjusted between 0% and 100% to control the smoothness of acceleration and deceleration transitions in motor movement. Lower values will result in abrupt changes in acceleration, leading to higher "jerk" levels and, consequently, less smooth movements that can induce unwanted vibrations and stress on the system. Conversely, higher values will reduce "jerk," resulting in smoother acceleration and deceleration transitions, thereby minimizing vibrations and wear on both the motor and machinery.
 
@@ -96,15 +102,15 @@ This section includes the following parameters:
 
   In our gantry robot setup, we have configured the following values:
 
-  - **Brushless motors (X1, X2, Y)**: 500 mm/s^2^
-  - **Stepper motor (Z)**: 200 mm/s^2^
+  - **Brushless motors (X1, X2, Y)**: 500 mm/s{sup}`2`
+  - **Stepper motor (Z)**: 200 mm/s{sup}`2`
 
 - **Following Error (mm)**: This defines the permissible deviation of the actual position from the desired position. A warning is issued if 50% of the allowed tracking error is reached. If the allowed tracking error is exceeded, the movement stops, and an error is reported.
 
   In our gantry robot setup, we have configured the following values:
   
   - **Brushless motors (X1, X2, Y)**: 10 mm
-  - **Stepper motor (Z)**: 10 mm
+  - **Stepper motor (Z)**: 1 mm
 
 - **Positioning Window (mm)**: This parameter defines a position range around a target point, extending in both positive and negative directions. For example, if the goal is to reach 100 mm and a positioning window of 10 mm is set, the system will consider the position to be within the target range if it falls anywhere between 90 mm and 110 mm. If the motor's actual position is within this window, the movement is considered complete, even if the motor is mechanically blocked. This prevents the system from continuously attempting to reach an exact position in case of an obstruction. If the positioning window is set to 0, this function is deactivated, and the system will not consider a range around the target point.
 
@@ -135,11 +141,11 @@ Similar to robot movement limits (see {numref}`sec:limit_switch`), the "homing" 
 
 ## Absolute Feedback
 
-The igus® dryve D1 controller has two analog inputs, AI 1 (Analog Input 1, input X4.1) and AI 2 (Analog Input 2, input X4.2). These are used to configure and control the target position or speed and the current position of the system, respectively. In our system, we will use analog input AI 1 to control the brushless motor's speed. Analog input AI 2 will not be used. For the stepper motor, these inputs are not applicable, making this section relevant only for the brushless motors. Below are the parameters related to the analog inputs available in this section.
+The igus® dryve D1 controller has two analog inputs, AI 1 (Analog Input 1, input X4.1) and AI 2 (Analog Input 2, input X4.2). These are used to configure and control the target position or speed and the current position of the system, respectively. In our system, we will use analog input AI 1 to control the speed of the brushless motors (X1, X2, Y). Analog input AI 2 will not be used. For the stepper motor (Z), these inputs are not applicable, making this section relevant only for the brushless motors. Below are the parameters related to the analog inputs available in this section.
 
 - **Parameters related to AI 1 (input X4.1)**:
 
-  The AI 1 input will be used to control the brushless motor's speed (see {numref}`sec:page_drive_profile`). The analog input control voltage will be ± 10 V, which must be configured on the "Inputs/Outputs" page (see {numref}`sec:page_input_outputs`). This voltage range must be considered when setting the AI 1 related parameters detailed below.
+  The AI 1 input will be used to control the speed of the brushless motors (X1, X2, Y) (see {numref}`sec:page_drive_profile`). The analog input control voltage will be ± 10 V, which must be configured on the "Inputs/Outputs" page (see {numref}`sec:page_input_outputs`). This voltage range must be considered when setting the AI 1 related parameters detailed below.
 
   - **AI 1 Target Value Min. (V)**: The minimum voltage value at analog input AI 1. We set its value to -10 V.
   - **AI 1 Target Value Max. (V)**: The maximum voltage value at analog input AI 1. We set its value to 10 V.

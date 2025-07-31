@@ -14,22 +14,22 @@ Next, we will describe the configurations to apply to the motors in our gantry r
 
 ## Stepper motor (Z axis)
 
-For the stepper motor, we select the "step/direction" control mode. {numref}`fig:conf_stepper_6` shows the "Drive Profile" configuration page for the stepper motor controller when using the "step/direction" control mode. This control mode does not require any additional configuration; the page will simply show usage information for the step and direction signals.
+For the stepper motor, we select the "step/direction" control mode. {numref}`fig:conf_z_drive_profile` below shows the "Drive Profile" configuration page for the stepper motor controller when using the "step/direction" control mode. This control mode does not require any additional configuration; the page will simply show usage information for the step and direction signals.
 
-:::{figure} images/config-stepper/06-drive_profile.png
-:name: fig:conf_stepper_6
+:::{figure} images/config-z/06-drive_profile.png
+:name: fig:conf_z_drive_profile
 
-"Drive Profile" configuration page of the stepper motor controller, using the "step/direction" control mode.
+"Drive Profile" configuration page of the Z motor controller, using the "step/direction" control mode.
 :::
 
 ## Brushless motors (X1, X2, Y axes)
 
-For the brushless motors, we select the "binary" control mode. {numref}`fig:conf_brushless_6` shows the "Drive Profile" configuration page for the brushless motor controller, using the "binary" control mode. This mode provides a movement table (see {numref}`fig:conf_brushless_6`) that allows for programming up to 32 parameterized movements, specifying the movement mode, target, maximum acceleration, speed, and the number of the next movement to execute. For the brushless motors, we will enter a single movement at position 1 using ADR (Analogue Rotation with Direction Definition) mode. ADR mode enables rotary movements by setting their speed via analog input AI 1.
+For the brushless motors, we select the "binary" control mode. {numref}`fig:conf_x1_drive_profile` below shows the "Drive Profile" configuration page for the X1 motor controller, using the "binary" control mode. This mode provides a movement table (see {numref}`fig:conf_x1_drive_profile`) that allows for programming up to 32 parameterized movements, specifying the movement mode, target, maximum acceleration, speed, and the number of the next movement to execute. For the brushless motors, we will enter a single movement at position 1 using the ADR (Analogue Rotation with Direction Definition) mode. This mode enables rotary movements by setting their speed via the analog input AI 1.
 
-:::{figure} images/config-brushless/06-drive_profile.png
-:name: fig:conf_brushless_6
+:::{figure} images/config-x1/06-drive_profile.png
+:name: fig:conf_x1_drive_profile
 
-"Drive Profile" configuration page of the brushless motor controller, using the "binary" control mode.
+"Drive Profile" configuration page of the X1 motor controller, using the "binary" control mode.
 :::
 
 In our gantry robot setup, we have configured the following parameters for the movement at position 1 for all brushless motors (X1, X2, Y):

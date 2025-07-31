@@ -2,16 +2,16 @@
 
 # "Start" Page
 
-The "Start" configuration page, shown in {numref}`fig:conf_stepper_1`, contains various general settings. Specifically, we will configure the following options for all the controllers:
+The "Start" configuration page, shown below in {numref}`fig:conf_x1_start`, contains various general settings. Specifically, we will configure the following options for all the controllers:
 
 - **Measuring system**: Metric, Millimeter
 - **Movement type**: Linear
 - **Time units**: Seconds
 
-:::{figure} images/config-stepper/01-start.png
-:name: fig:conf_stepper_1
+:::{figure} images/config-x1/01-start.png
+:name: fig:conf_x1_start
 
-Initial configuration page of the stepper motor controller.
+Initial configuration page of the X1 motor controller.
 :::
 
 Additionally, this page includes the following sections:

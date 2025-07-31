@@ -30,7 +30,14 @@ Detailed information on LinuxCNC's operation and configuration can be found in {
 
 ## System Hardware
 
-This system comprises the following key components:
+The following section describe the different hardware components of the system, such as the motor controllers, interface boards, motors, and safety systems. {numref}`fig:electrical_overview` belowshows the electrical cabinet and rack that house the interface boards, motor controllers, and power supplies.
+
+:::{ext-figure} images/electrical_cabinet_and_rack.*
+:width-html: 75%
+:name: fig:electrical_overview
+
+Electrical cabinet (left) containing the MESA interface boards and rack (right) containing the motor controllers and power supplies.
+:::
 
 ### Main Components
 
@@ -43,6 +50,15 @@ This system comprises the following key components:
   - **Analog and Digital Signals**: In addition to network communication options, the igus® dryve D1 can receive analog and digital signals for direct control.
 
     In this system, we communicate with the igus® dryve D1 controllers using MESA 7I96S and 7I77 boards using digital and analog signals. This setup enables LinuxCNC to have precise, real-time control over the motors' operation.
+
+{numref}`fig:rack_interior` below shows the interior of the rack containing the four igus® dryve D1 motor controllers and the power supplies.
+
+:::{ext-figure} images/rack.*
+:width-html: 75%
+:name: fig:rack_interior
+
+Interior view of the rack showing the igus® dryve D1 motor controllers and power supplies.
+:::
 
 ### Interface Boards
 
@@ -57,6 +73,15 @@ This system comprises the following key components:
   - Receiving position feedback signals from motor encoders.
   - Receiving warning and error signals from the controllers.
   - Receiving the emergency stop signal when the emergency stop switch is activated.
+
+{numref}`fig:electrical_cabinet` below shows the MESA 7I96S and 7I77 boards installed in the electrical cabinet.
+
+:::{ext-figure} images/electrical_cabinet.*
+:width-html: 75%
+:name: fig:electrical_cabinet
+
+Interior view of the electrical cabinet showing the MESA 7I96S and 7I77 interface boards.
+:::
 
 ### Motors and Actuators
 

@@ -2,14 +2,17 @@
 
 This directory contains Python scripts and utilities for analyzing and calibrating the gantry robot system. The system integrates OptiTrack motion capture data with gantry robot position data to perform error analysis and calibration.
 
+**important**: It is assumed that the gantry data is the commanded position of the gantry robot and the OptiTrack data is the actual position of the gantry robot. After the calibration is complete it can be evaluated with several scripts, which correct the OptiTrack data with the calibration parameters and compare the obtained positions with the reference gantry data.
+
 ## System Overview
 
 The system consists of several scripts to process and analyze the data:
 
 1. **Raw Data Visualization**: `plot_movement_gantry.py` and `plot_movement_optitrack.py` scripts to visualize the raw gantry and OptiTrack data before calibration.
-2. **Calibration**: The `run_calibration.py` script is the core calibration process that processes the raw data, it performs the following steps:
+2. **Calibration**: `run_calibration.py` is the script that processes the raw data, performing the following steps:
    - **Alignment**: Temporal and spatial alignment of OptiTrack and gantry robot coordinate systems using translation, rotation, and time shift transformations.
-   - **Correction**: Non-orthogonal and non-linear transformation of the gantry robot data to correct errors intrinsic to the gantry robot. This step assumes that the Optitrack data is the actual position of the gantry robot.
+   - **Correction**: Non-orthogonal and non-linear transformation of the OptiTrack data to correct errors intrinsic to the gantry robot.
+
 3. **Analysis**: Various scripts for plotting and analyzing the gantry and OptiTrack data, which can be executed after the calibration is complete:
    - `check_params.py`: Check the calibration parameters.
    - `print_calibxyzkins_config.py`: Print the HAL configuration for the `calibxyzkins` module.
@@ -18,9 +21,11 @@ The system consists of several scripts to process and analyze the data:
    - `plot_errors_scatter.py`: Plot positioning errors scatter plots.
    - `plot_errors_probability.py`: Plot positioning errors probability distributions.
 
+After the calibration is performed, the calibration parameters can be used to correct the gantry position data with the `calibxyzkins` module of LinuxCNC included in this repository.
+
 ## Calibration Process
 
-The calibration process addresses systematic positioning errors in the gantry robot system through a two-step approach: **alignment** and **correction**.
+The calibration process performs two steps: **alignment** and **correction**.
 
 ### Step 1: Alignment
 
@@ -83,7 +88,7 @@ The correction parameters are found using numerical optimization, with the Powel
 
 ## Parameters Validation
 
-The `calibxyzkins` module in LinuxCNC uses the Newton-Raphson algorithm to solve the inverse kinematics problem: given desired axis positions $x', y', z'$, it finds the corresponding joint positions $x, y, z$ that satisfy the transformation equation:
+The `calibxyzkins` module of LinuxCNC included in this repository uses the Newton-Raphson algorithm to solve the inverse kinematics problem: given desired axes positions $x', y', z'$, it finds the corresponding joint positions $x, y, z$ that satisfy the transformation equation:
 
 $$\mathbf{f}(x, y, z) = A \begin{bmatrix} x \\ y \\ z \end{bmatrix} + B \begin{bmatrix} x^2 \\ y^2 \\ z^2 \end{bmatrix} + C = \begin{bmatrix} x' \\ y' \\ z' \end{bmatrix}$$
 
@@ -112,9 +117,9 @@ This condition is checked in the `check_params.py` script using both the 1-norm 
 
 ### 2. Bounds Test
 
-The coordinate transformation must respect the physical limits of the robot, i.e., the desired axis positions $(x', y', z')$ must be within the robot's axis limits, and the corresponding joint positions $(x, y, z)$ computed by the inverse kinematics must be within the robot's joint limits.
+The coordinate transformation must respect the physical limits of the robot, i.e., the desired axes positions $(x', y', z')$ must be within the robot's axes limits, and the corresponding joint positions $(x, y, z)$ computed by the inverse kinematics must be within the robot's joint limits.
 
-This condition is checked in the `check_params.py` by finding the minimum and maximum values that each joint can reach when the axis positions are constrained to their limits. These values must fall within the specified joint limits of the robot for the parameters to be valid.
+This condition is checked in the `check_params.py` script by finding the minimum and maximum values that each joint can reach when the axes positions are constrained to their limits. These values must fall within the specified joint limits of the robot for the parameters to be valid.
 
 ## Installation and Usage
 
@@ -178,7 +183,7 @@ cd ../measurements/2025-04-09/
 
 This way the scripts will be able to find the data files without needing to specify them by command line arguments.
 
-### Raw Gantry and OptiTrack Path Visualization
+### Gantry and OptiTrack Path Visualization
 
 The raw gantry and OptiTrack data can be visualized using the `plot_movement_gantry.py` and `plot_movement_optitrack.py` scripts, respectively. For example, to visualize the OptiTrack data, run:
 
@@ -367,9 +372,9 @@ setp calibxyzkins.calib-c.y 0.8905471887
 setp calibxyzkins.calib-c.z 4.55518685
 ```
 
-### Calibrated Gantry and OptiTrack Path Visualization
+### Gantry and Calibrated OptiTrack Path Visualization
 
-The calibrated gantry and OptiTrack path can be visualized using the `plot_movement.py` script:
+The gantry and calibrated OptiTrack path can be visualized using the `plot_movement.py` script:
 
 ```bash
 python ../../src/plot_movement.py
@@ -377,9 +382,9 @@ python ../../src/plot_movement.py
 
 Note that the script accepts the `--no-correct` flag to show the OptiTrack position without applying the correction transformation.
 
-The image below shows the gantry and OptiTrack path visualization.
+The image below shows the gantry and calibrated OptiTrack path visualization.
 
-![Calibrated gantry and OptiTrack path visualization](assets/plot_movement.png)
+![Gantry and calibrated OptiTrack path visualization](assets/plot_movement.png)
 
 As in the case of the raw data visualization scripts, you can use the keyboard to control the playback of the data. The available controls are shown when the script is executed:
 

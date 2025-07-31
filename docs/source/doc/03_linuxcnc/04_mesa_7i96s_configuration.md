@@ -10,7 +10,7 @@ The MESA 7I96S board can be used standalone with its standard configuration. How
 
 To use the MESA 7I96S board with the MESA 7I77 board, we will use the `7i96s_7i77d.bin` firmware. First, power the board with 5 V via its P4 connector and connect it to the PC using an Ethernet cable. By default, the board's IP address is `192.168.1.121`. To verify connectivity, execute the following command:
 
-```sh
+```text
 mesaflash -device 7i96s -addr 192.168.1.121
 ```
 
@@ -22,7 +22,7 @@ ETH device 7I96S at ip=192.168.1.121
 
 Finally, to flash the firmware to the board, execute the following command:
 
-```sh
+```text
 mesaflash -device 7i96s -addr 192.168.1.121 -write 7i96s_7i77d.bin
 ```
 
@@ -34,19 +34,18 @@ The Beelink EQR6 mini computer used in our gantry robot system has two Ethernet 
 
 The MESA 7I96S board has three options for setting the IP address: a default IP (`192.168.1.121`), an IP read from the EEPROM, and IP acquisition via the BOOTP network protocol. These options are selected using jumpers `W4` and `W5`, located on the bottom left of the board as shown in {numref}`fig:mesa_ip_selection`.
 
-:::{figure} images/mesa/mesa_7i96s_bottom_left_labelled.*
+:::{figure} images/mesa/mesa_7i96s_left.*
 :name: fig:mesa_ip_selection
+:width: 80%
 
-View of the bottom left side of the MESA 7I96S board.
+View of the left side of the MESA 7I96S board installed in the gantry robot system.
 :::
 
 The available IP configuration options are detailed in {numref}`tab:mesa_ip_selection`. Specifically, note the following:
 
-- When jumpers `W4` and `W5` are in the (down, down) position, the IP address will be set to the default value of 192.168.1.121. This is the configuration used in our setup.
-
 - When jumpers `W4` and `W5` are in the (down, up) position, the IP address will be read from the EEPROM. The default IP address in the EEPROM is 10.10.10.10. This IP address can be changed using the `mesaflash` utility. For example, to set the IP in the EEPROM to 10.10.10.100, you would execute the following command:
 
-  ```sh
+  ```text
   mesaflash -device 7i96s -addr 192.168.1.121 -set ip=10.10.10.100
   ```
 
@@ -63,7 +62,7 @@ Up, Down, Obtained via BOOTP
 Up, Up, 192.168.1.121 and use fallback conf.
 :::
 
-In our gantry robot system, jumpers `W4` and `W5` have been set to the (down, down) position, as shown in {numref}`fig:mesa_ip_selection`. This configuration sets the board's IP address to the default value of 192.168.1.121, which is suitable for the setup where the PC is connected directly to the MESA card via one of its LAN ports.
+In our gantry robot system, jumpers `W4` and `W5` have been set to the (down, down) position, as shown in {numref}`fig:mesa_ip_selection`.
 
 (sec:mesa7i96s_fallback)=
 

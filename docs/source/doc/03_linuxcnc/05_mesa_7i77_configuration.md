@@ -18,10 +18,10 @@ In our gantry robot system, we chose to power the MESA 7I77 board via the `TB1` 
 - Jumper `W6` on the MESA 7I96S board has been set to the down position, as shown in {numref}`fig:mesa_ip_selection`.
 - Jumper `W5` on the MESA 7I77 board has been set to the right position, as shown in {numref}`fig:mesa7i77_left`.
 
-:::{figure} images/mesa/mesa_7i77_left_labelled.*
+:::{figure} images/mesa/mesa_7i77_left.*
 :name: fig:mesa7i77_left
 
-View of the left side of the MESA 7I77 board.
+View of the left side of the MESA 7I77 board installed in the gantry robot system.
 :::
 
 ## Digital Inputs and Outputs Power
@@ -56,10 +56,10 @@ The voltage at `VFIELD` must have a maximum rise rate of 10 V/ms to prevent dama
 
 As stated in {numref}`sec:page_input_outputs`, the MESA 7I96S board can only use 5 V logic for step and direction signals. Therefore, the logic for both the igus® dryve D1 controllers and the MESA 7I77 board must also be 5 V. Thus, in our gantry robot system, jumper `W1` on the MESA 7I77 board has been set to the right position, the `VIN` input to 24 V, and the `VFIELD` input to 5 V, as shown in {numref}`fig:mesa7i77_right`.
 
-::: {figure} images/mesa/mesa_7i77_right_labelled.*
+::: {figure} images/mesa/mesa_7i77_right.*
 :name: fig:mesa7i77_right
 
-View of the right side of the MESA 7I77 board.
+View of the right side of the MESA 7I77 board installed in the gantry robot system.
 :::
 
 ## Encoder Input Modes
@@ -80,6 +80,4 @@ The MESA 7I77 board has six encoder inputs, each with individual A, B, and Z inp
 | 5         | W9        | W7       | W3       |
 :::
 
-In our gantry robot system, all motor use differential encoders, so all the MESA 7I77 board encoder inputs and modes were set to differential mode.
-
-{numref}`fig:mesa7i77_left` shows the jumpers for encoders 0 and 1 on the MESA 7I77 board in the gantry robot system. Jumpers for the other encoders are located below the cable connectors and hidden from view.
+In our gantry robot system each of the 4 motors has a differential encoder. Therefore, we set encoders 0 to 3 on the MESA 7I77 board to differential mode. {numref}`fig:mesa7i77_left` shows the location of the jumpers for encoders 0 to 3 on the MESA 7I77 board.

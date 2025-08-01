@@ -11,7 +11,7 @@ The repository includes a **custom calibration solution** that leverages an exis
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-limegreen.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 [![License: GNU FDL 1.3](https://img.shields.io/badge/License-GNU%20FDL%201.3-limegreen.svg)](https://www.gnu.org/licenses/fdl-1.3.en.html)
 [![DOI](https://zenodo.org/badge/996340720.svg)](https://zenodo.org/badge/latestdoi/996340720)
-[![Documentation](https://img.shields.io/badge/docs-sphinx-blue.svg)](docs/)
+[![Documentation](https://img.shields.io/badge/docs-sphinx-blue.svg)](https://gtec-udc.github.io/linuxcnc_gantry_robot/)
 
 <img src="assets/gantry_robot.jpg" style="width:100%; max-width:700px;" alt="Gantry Robot System"/>
 

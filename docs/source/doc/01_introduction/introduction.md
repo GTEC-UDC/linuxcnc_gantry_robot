@@ -110,8 +110,8 @@ Interior view of the electrical cabinet showing the MESA 7I96S and 7I77 interfac
 
 The system is built with igus® self-lubricating linear units that enable lifetime operation of moving parts without external lubrication. The linear units details are the following:
 
-- **X and Y axes**: Toothed belt drive with a feed rate of 144 mm/rev.
-- **Z axis**: Lead screw drive with a feed rate of 4 mm/rev.
+- **X and Y axes**: [igus® ZLW-20120/20200](https://www.igus.eu/drive-technology/linear-axes-with-toothed-belts/technical-data) linear axes with toothed belts. The feed rate is 144 mm/rev.
+- **Z axis**: [igus® SAW-1660](https://www.igus.eu/product/20908?artNr=SLW-1660-xxx) linear axis with lead screws. The feed rate is 4 mm/rev.
 
 ## Calibration System
 

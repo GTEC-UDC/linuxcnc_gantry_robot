@@ -1,0 +1,74 @@
+# Coordinate Transformation
+
+The module implements a coordinate transformation that corrects the relationship between joint positions and actual machine coordinates using both linear and quadratic terms.
+
+## Mathematical Model
+
+The coordinate transformation is defined by the following equation:
+
+$$[x', y', z']^T = A [x, y, z]^T + B [x^2, y^2, z^2]^T + C$$
+
+Where:
+
+- $(\cdot)^T$: Transpose operator
+- $A$: 3×3 linear transformation matrix (scaling, rotation, shear, etc.)
+- $B$: 3×3 quadratic transformation matrix (corrects non-linear distortions)
+- $C$: 3×1 offset vector (constant position offset)
+- $x, y, z$: joint positions
+- $x', y', z'$: axes coordinates
+
+## Transformation Components
+
+### Linear Transformation Matrix (A)
+
+The 3×3 matrix $A$ handles linear transformations including:
+
+- **Scaling**: Compensates for different scaling factors in different axes
+- **Rotation**: Corrects for non-perpendicular axes alignment  
+- **Shear**: Addresses skewed coordinate systems
+- **Cross-coupling**: Corrects interactions between axes
+
+$$A = \begin{bmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33}
+\end{bmatrix}$$
+
+### Quadratic Transformation Matrix (B)
+
+The 3×3 matrix $B$ handles non-linear corrections:
+
+- **Position-dependent errors**: Corrections that vary based on position
+- **Structural deformations**: Compensation for load-induced deflections
+- **Non-linear mechanical effects**: Higher-order positioning errors
+
+$$B = \begin{bmatrix}
+b_{11} & b_{12} & b_{13} \\
+b_{21} & b_{22} & b_{23} \\
+b_{31} & b_{32} & b_{33}
+\end{bmatrix}$$
+
+### Offset Vector (C)
+
+The 3×1 vector $C$ provides constant position offsets:
+
+- **Zero-point corrections**: Adjusts coordinate system origin
+- **Systematic offsets**: Compensates for consistent positioning biases
+
+$$C = \begin{bmatrix}
+c_1 \\ c_2 \\ c_3
+\end{bmatrix}$$
+
+## Default Values
+
+When no calibration is applied, the module defaults to identity transformation:
+
+- $A$: 3×3 identity matrix
+- $B$: all zeros
+- $C$: all zeros
+
+This makes the module functionally equivalent to `trivkins` when calibration parameters are not set.
+
+## Transformation Direction
+
+The transformation equation shown above represents the **forward kinematics** (joint positions → axis coordinates). For machine control, LinuxCNC requires the **inverse kinematics** (axis coordinates → joint positions), which is solved numerically using the Newton-Raphson method as described in the Inverse Kinematics section.

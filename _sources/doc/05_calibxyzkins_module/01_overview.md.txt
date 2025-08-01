@@ -1,0 +1,34 @@
+# Overview
+
+The `calibxyzkins` module is a LinuxCNC kinematics component that provides coordinate transformations for cartesian machines to correct minor structural deviations and positioning errors. This module extends the standard trivial kinematics by applying mathematical corrections to compensate for systematic positioning errors in gantry robots and similar cartesian machines.
+
+## Key Features
+
+The `calibxyzkins` module is particularly useful for correcting:
+
+- **Mechanical inaccuracies** in manufacturing or assembly
+- **Structural deformations** under load
+- **Non-perpendicular axes alignment**
+- **Position-dependent errors**
+
+## How It Works
+
+The module works by applying a mathematical transformation that maps the desired axes positions (where you want the machine to go) to the actual joint positions (where the machine needs to go to achieve the desired position). This compensation happens transparently during machine operation.
+
+## Integration with Error Analysis System
+
+The `calibxyzkins` module is designed to work seamlessly with the error analysis and calibration system described in {ref}`sec:error_analysis_calibration`. The calibration system:
+
+1. Measures actual positioning errors using OptiTrack motion capture
+2. Computes optimal transformation parameters
+3. Generates the HAL configuration for the `calibxyzkins` module
+4. Enables real-time error correction during machine operation
+
+## Compatibility
+
+The module maintains compatibility with standard LinuxCNC configurations:
+
+- **Drop-in replacement** for `trivkins` in many cases
+- **Same parameter interface** as `trivkins` for basic functionality
+- **Additional calibration parameters** for error correction
+- **Support for various machine configurations** (3-axis, gantry with dual motors, etc.)

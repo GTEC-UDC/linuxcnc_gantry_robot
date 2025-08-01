@@ -1,0 +1,77 @@
+# Module Parameters
+
+The `calibxyzkins` module accepts several parameters at load time to configure its behavior. These parameters are similar to those used by the standard `trivkins` module.
+
+## coordinates
+
+Specifies the axis-to-joint mapping, as in `trivkins`.
+
+**Syntax**: `coordinates=<string>`
+
+**Examples**:
+
+- `coordinates=xyz`: Standard 3-axis mapping (X→joint0, Y→joint1, Z→joint2)
+- `coordinates=xyyz`: Gantry with dual Y motors (X→joint0, Y→joint1&joint2, Z→joint3)
+- `coordinates=xyzabc`: 6-axis machine (X→joint0, Y→joint1, Z→joint2, A→joint3, B→joint4, C→joint5)
+
+**Notes**:
+- Calibration is only applied to the X, Y, and Z axes
+- Additional axes (A, B, C) pass through without calibration
+- Default is `xyz` if not specified
+
+
+## kinstype
+
+Specifies the kinematics type, as in `trivkins`.
+
+**Syntax**: `kinstype=<value>`
+
+**Values**:
+
+- `kinstype=1` or `kinstype=I`: KINEMATICS_IDENTITY (default)
+- `kinstype=B`: KINEMATICS_BOTH  
+- `kinstype=F`: KINEMATICS_FORWARD_ONLY
+- `kinstype=I`: KINEMATICS_INVERSE_ONLY
+
+**Usage**:
+- Use `kinstype=B` for most gantry configurations
+- Use `kinstype=F` if only forward kinematics is needed
+- Use `kinstype=I` if only inverse kinematics is needed
+
+
+## Configuration Examples
+
+### Standard 3-Axis Machine
+
+```hal
+loadrt calibxyzkins coordinates=xyz kinstype=1
+```
+
+### Dual-Y Gantry Robot
+
+```hal
+loadrt calibxyzkins coordinates=xyyz kinstype=B
+```
+
+### 6-Axis Machine with Calibrated Linear Axes
+
+```hal
+loadrt calibxyzkins coordinates=xyzabc kinstype=B
+```
+
+## Parameter Validation
+
+The module validates parameters at load time:
+
+- **coordinates**: Must contain valid axis letters (x, y, z, a, b, c)
+- **kinstype**: Must be a recognized kinematics type
+- **Duplicate axes**: Only Y-axis duplication is supported for gantry configurations
+
+Invalid parameters will cause the module to fail to load with an appropriate error message.
+
+## Compatibility Notes
+
+- The module is designed as a drop-in replacement for `trivkins`
+- All `trivkins` parameter combinations should work with `calibxyzkins` 
+- When calibration parameters are not set, behavior is identical to `trivkins`
+- The module supports the same joint and axis numbering conventions as `trivkins`

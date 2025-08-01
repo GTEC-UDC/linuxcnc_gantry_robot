@@ -1,0 +1,34 @@
+/* Custom CSS for the furo theme */
+
+:root {
+    --content-width: 43em;
+}
+
+html {
+    font-size: 100%;
+}
+
+.content {
+    width: var(--content-width);
+}
+
+.sidebar-drawer {
+    width: calc(50% - (var(--content-width) + 6em)/2);
+}
+
+.code-block-caption {
+    text-align: left;
+}
+
+.code-block-caption>.caption-number {
+    flex: 1;
+}
+
+.code-block-caption>.caption-text {
+    flex: 8;
+}
+
+article .figure,
+article figure {
+    margin: 1rem;
+}

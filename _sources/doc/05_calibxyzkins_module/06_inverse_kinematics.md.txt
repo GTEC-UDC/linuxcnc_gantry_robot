@@ -1,0 +1,108 @@
+# Inverse Kinematics
+
+The `calibxyzkins` module uses the Newton-Raphson method to solve the inverse kinematics problem iteratively. Given desired axis positions $(x', y', z')$, the module finds the corresponding joint positions $(x, y, z)$ that satisfy the transformation equation.
+
+## Problem Statement
+
+The inverse kinematics problem is to solve for $(x, y, z)$ given $(x', y', z')$ in the equation:
+
+$$\mathbf{f}(x, y, z) = A \begin{bmatrix} x \\ y \\ z \end{bmatrix} + B \begin{bmatrix} x^2 \\ y^2 \\ z^2 \end{bmatrix} + C = \begin{bmatrix} x' \\ y' \\ z' \end{bmatrix}$$
+
+This is equivalent to finding the roots of:
+
+$$\mathbf{F}(x, y, z) = A \begin{bmatrix} x \\ y \\ z \end{bmatrix} + B \begin{bmatrix} x^2 \\ y^2 \\ z^2 \end{bmatrix} + C - \begin{bmatrix} x' \\ y' \\ z' \end{bmatrix} = 0$$
+
+## Newton-Raphson Algorithm
+
+The Newton-Raphson method iteratively refines the solution using:
+
+$$\begin{bmatrix} x \\ y \\ z \end{bmatrix}_{n+1} = \begin{bmatrix} x \\ y \\ z \end{bmatrix}_n - J^{-1} \mathbf{F}(x_n, y_n, z_n)$$
+
+where $J$ is the Jacobian matrix of the transformation function.
+
+## Jacobian Matrix
+
+The Jacobian matrix is computed as:
+
+$$J = \frac{\partial \mathbf{F}}{\partial [x, y, z]} = A + 2 \cdot \text{diag}(x, y, z) \cdot B$$
+
+Expanding this:
+
+$$J = \begin{bmatrix}
+a_{11} + 2b_{11}x & a_{12} + 2b_{12}y & a_{13} + 2b_{13}z \\
+a_{21} + 2b_{21}x & a_{22} + 2b_{22}y & a_{23} + 2b_{23}z \\
+a_{31} + 2b_{31}x & a_{32} + 2b_{32}y & a_{33} + 2b_{33}z
+\end{bmatrix}$$
+
+## Algorithm Steps
+
+The inverse kinematics solver follows these steps:
+
+1. **Initialize joint positions**: Start with the previous solution or bounded initialization if joint limits are specified.
+
+2. **Compute function value**: Calculate $\mathbf{F}(x, y, z)$ using current joint positions.
+
+3. **Check convergence**: If $\|\mathbf{F}\| < \text{tolerance}$, the solution has converged.
+
+4. **Compute Jacobian**: Calculate $J$ at the current joint positions.
+
+5. **Solve linear system**: Compute $\Delta = J^{-1} \mathbf{F}$.
+
+6. **Update joints**: Set $\begin{bmatrix} x \\ y \\ z \end{bmatrix} = \begin{bmatrix} x \\ y \\ z \end{bmatrix} - \Delta$.
+
+7. **Apply constraints**: Ensure joint positions remain within specified limits.
+
+8. **Check iteration limit**: If maximum iterations reached, report convergence failure.
+
+9. **Repeat**: Go to step 2 until convergence or failure.
+
+## Solver Parameters
+
+The solver behavior is controlled by two HAL pins:
+
+- **`calibxyzkins.max-iter`** (default: 10): Maximum number of iterations
+- **`calibxyzkins.tol`** (default: 1e-3): Convergence tolerance for $\|\mathbf{F}\|$
+
+## Joint Limits
+
+Optional joint limits can be specified to constrain the solution:
+
+- **`calibxyzkins.min-limit.x/y/z`**: Minimum joint positions  
+- **`calibxyzkins.max-limit.x/y/z`**: Maximum joint positions
+
+When limits are specified:
+- Initial guess is bounded within the limits
+- Solution is clamped to the limits after each iteration
+- This helps prevent the solver from diverging to unrealistic positions
+
+## Convergence Considerations
+
+### Well-Conditioned Cases
+For small calibration corrections (typical case):
+- The Jacobian is close to the identity matrix
+- Convergence is typically achieved in 2-3 iterations
+- Default tolerance of 1e-3 is usually sufficient
+
+### Challenging Cases
+For larger corrections or poorly conditioned systems:
+- May require more iterations (`max-iter` > 10)
+- Tighter tolerance may be needed (`tol` < 1e-3)
+- Joint limits become more important to prevent divergence
+
+### Convergence Failure
+If the solver fails to converge:
+- Check that calibration parameters are valid
+- Verify that the desired position is achievable
+- Consider relaxing the tolerance or increasing iteration limit
+- Ensure joint limits are reasonable if specified
+
+## Debugging
+
+Verbose output of the inverse kinematics solver can be enabled by compiling the code with the `CALIB_XYZ_INVERSE_PRINT_ITER` macro defined. This will print:
+- Iteration number
+- Current joint positions
+- Function value and norm
+- Jacobian matrix
+- Update step
+
+This debugging information is useful for understanding convergence behavior and diagnosing problems with specific calibration parameter sets.

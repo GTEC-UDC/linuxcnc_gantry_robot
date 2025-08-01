@@ -1,0 +1,784 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="./">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Bibliography" href="bibliography.html" /><link rel="prev" title="5. calibxyzkins - Calibrated XYZ Kinematics Module for LinuxCNC" href="doc/05_calibxyzkins_module/00_index.html" />
+
+    <link rel="shortcut icon" href="_static/favicon.png"/><!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>GNU Free Documentation License - LinuxCNC Gantry Robot System</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="_static/css/custom.css?v=4e80d089" />
+    <link rel="stylesheet" type="text/css" href="_static/css/tables.css?v=2e456b7d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --font-stack: IBM Plex Sans, Helvetica, sans-serif;
+  --font-stack--monospace: IBM Plex Mono, monospace;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">LinuxCNC Gantry Robot System</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/logo_udc_gtec_citic.svg" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">LinuxCNC Gantry Robot System</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="doc/01_introduction/introduction.html">1. Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="doc/02_igus_dryve_d1/00_index.html">2. igus® dryve D1 Controllers</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of 2. igus® dryve D1 Controllers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_igus_dryve_d1/01_start_page.html">2.1. “Start” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_igus_dryve_d1/02_motor_page.html">2.2. “Motor” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_igus_dryve_d1/03_axis_page.html">2.3. “Axis” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_igus_dryve_d1/04_communication_page.html">2.4. “Communication” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_igus_dryve_d1/05_inputs_outputs_page.html">2.5. “Inputs/Outputs” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_igus_dryve_d1/06_drive_profile_page.html">2.6. “Drive Profile” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/02_igus_dryve_d1/07_oscilloscope_page.html">2.7. “Oscilloscope” Page</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="doc/03_linuxcnc/00_index.html">3. LinuxCNC</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of 3. LinuxCNC</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_linuxcnc/01_installation.html">3.1. Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_linuxcnc/02_latency_analysis.html">3.2. System Latency Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_linuxcnc/03_latency_tuning.html">3.3. System Latency Tuning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_linuxcnc/04_mesa_7i96s_configuration.html">3.4. MESA 7I96S Board Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_linuxcnc/05_mesa_7i77_configuration.html">3.5. MESA 7I77 Board Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_linuxcnc/06_linuxcnc_introduction.html">3.6. Introduction to LinuxCNC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_linuxcnc/07_linuxcnc_basic_usage.html">3.7. Basic LinuxCNC Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/03_linuxcnc/08_linuxcnc_configuration.html">3.8. LinuxCNC Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="doc/04_error_analysis_calibration/00_index.html">4. Error Analysis and Calibration</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of 4. Error Analysis and Calibration</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_error_analysis_calibration/01_installation.html">4.1. Installation and Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_error_analysis_calibration/02_calibration.html">4.2. Data and Calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="doc/04_error_analysis_calibration/03_usage.html">4.3. Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="doc/05_calibxyzkins_module/00_index.html">5. calibxyzkins - Calibrated XYZ Kinematics Module for LinuxCNC</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">GNU Free Documentation License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bibliography.html">Bibliography</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="_sources/fdl-1.3.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="gnu-free-documentation-license">
+<h1>GNU Free Documentation License<a class="headerlink" href="#gnu-free-documentation-license" title="Link to this heading">¶</a></h1>
+<p>Version 1.3, 3 November 2008</p>
+<p>Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation,
+Inc. <a class="reference external" href="https://fsf.org/">https://fsf.org/</a></p>
+<p>Everyone is permitted to copy and distribute verbatim copies of this
+license document, but changing it is not allowed.</p>
+<section id="preamble">
+<h2>0. PREAMBLE<a class="headerlink" href="#preamble" title="Link to this heading">¶</a></h2>
+<p>The purpose of this License is to make a manual, textbook, or other
+functional and useful document “free” in the sense of freedom: to
+assure everyone the effective freedom to copy and redistribute it,
+with or without modifying it, either commercially or noncommercially.
+Secondarily, this License preserves for the author and publisher a way
+to get credit for their work, while not being considered responsible
+for modifications made by others.</p>
+<p>This License is a kind of “copyleft”, which means that derivative
+works of the document must themselves be free in the same sense. It
+complements the GNU General Public License, which is a copyleft
+license designed for free software.</p>
+<p>We have designed this License in order to use it for manuals for free
+software, because free software needs free documentation: a free
+program should come with manuals providing the same freedoms that the
+software does. But this License is not limited to software manuals; it
+can be used for any textual work, regardless of subject matter or
+whether it is published as a printed book. We recommend this License
+principally for works whose purpose is instruction or reference.</p>
+</section>
+<section id="applicability-and-definitions">
+<h2>1. APPLICABILITY AND DEFINITIONS<a class="headerlink" href="#applicability-and-definitions" title="Link to this heading">¶</a></h2>
+<p>This License applies to any manual or other work, in any medium, that
+contains a notice placed by the copyright holder saying it can be
+distributed under the terms of this License. Such a notice grants a
+world-wide, royalty-free license, unlimited in duration, to use that
+work under the conditions stated herein. The “Document”, below, refers
+to any such manual or work. Any member of the public is a licensee,
+and is addressed as “you”. You accept the license if you copy, modify
+or distribute the work in a way requiring permission under copyright
+law.</p>
+<p>A “Modified Version” of the Document means any work containing the
+Document or a portion of it, either copied verbatim, or with
+modifications and/or translated into another language.</p>
+<p>A “Secondary Section” is a named appendix or a front-matter section of
+the Document that deals exclusively with the relationship of the
+publishers or authors of the Document to the Document’s overall
+subject (or to related matters) and contains nothing that could fall
+directly within that overall subject. (Thus, if the Document is in
+part a textbook of mathematics, a Secondary Section may not explain
+any mathematics.) The relationship could be a matter of historical
+connection with the subject or with related matters, or of legal,
+commercial, philosophical, ethical or political position regarding
+them.</p>
+<p>The “Invariant Sections” are certain Secondary Sections whose titles
+are designated, as being those of Invariant Sections, in the notice
+that says that the Document is released under this License. If a
+section does not fit the above definition of Secondary then it is not
+allowed to be designated as Invariant. The Document may contain zero
+Invariant Sections. If the Document does not identify any Invariant
+Sections then there are none.</p>
+<p>The “Cover Texts” are certain short passages of text that are listed,
+as Front-Cover Texts or Back-Cover Texts, in the notice that says that
+the Document is released under this License. A Front-Cover Text may be
+at most 5 words, and a Back-Cover Text may be at most 25 words.</p>
+<p>A “Transparent” copy of the Document means a machine-readable copy,
+represented in a format whose specification is available to the
+general public, that is suitable for revising the document
+straightforwardly with generic text editors or (for images composed of
+pixels) generic paint programs or (for drawings) some widely available
+drawing editor, and that is suitable for input to text formatters or
+for automatic translation to a variety of formats suitable for input
+to text formatters. A copy made in an otherwise Transparent file
+format whose markup, or absence of markup, has been arranged to thwart
+or discourage subsequent modification by readers is not Transparent.
+An image format is not Transparent if used for any substantial amount
+of text. A copy that is not “Transparent” is called “Opaque”.</p>
+<p>Examples of suitable formats for Transparent copies include plain
+ASCII without markup, Texinfo input format, LaTeX input format, SGML
+or XML using a publicly available DTD, and standard-conforming simple
+HTML, PostScript or PDF designed for human modification. Examples of
+transparent image formats include PNG, XCF and JPG. Opaque formats
+include proprietary formats that can be read and edited only by
+proprietary word processors, SGML or XML for which the DTD and/or
+processing tools are not generally available, and the
+machine-generated HTML, PostScript or PDF produced by some word
+processors for output purposes only.</p>
+<p>The “Title Page” means, for a printed book, the title page itself,
+plus such following pages as are needed to hold, legibly, the material
+this License requires to appear in the title page. For works in
+formats which do not have any title page as such, “Title Page” means
+the text near the most prominent appearance of the work’s title,
+preceding the beginning of the body of the text.</p>
+<p>The “publisher” means any person or entity that distributes copies of
+the Document to the public.</p>
+<p>A section “Entitled XYZ” means a named subunit of the Document whose
+title either is precisely XYZ or contains XYZ in parentheses following
+text that translates XYZ in another language. (Here XYZ stands for a
+specific section name mentioned below, such as “Acknowledgements”,
+“Dedications”, “Endorsements”, or “History”.) To “Preserve the Title”
+of such a section when you modify the Document means that it remains a
+section “Entitled XYZ” according to this definition.</p>
+<p>The Document may include Warranty Disclaimers next to the notice which
+states that this License applies to the Document. These Warranty
+Disclaimers are considered to be included by reference in this
+License, but only as regards disclaiming warranties: any other
+implication that these Warranty Disclaimers may have is void and has
+no effect on the meaning of this License.</p>
+</section>
+<section id="verbatim-copying">
+<h2>2. VERBATIM COPYING<a class="headerlink" href="#verbatim-copying" title="Link to this heading">¶</a></h2>
+<p>You may copy and distribute the Document in any medium, either
+commercially or noncommercially, provided that this License, the
+copyright notices, and the license notice saying this License applies
+to the Document are reproduced in all copies, and that you add no
+other conditions whatsoever to those of this License. You may not use
+technical measures to obstruct or control the reading or further
+copying of the copies you make or distribute. However, you may accept
+compensation in exchange for copies. If you distribute a large enough
+number of copies you must also follow the conditions in section 3.</p>
+<p>You may also lend copies, under the same conditions stated above, and
+you may publicly display copies.</p>
+</section>
+<section id="copying-in-quantity">
+<h2>3. COPYING IN QUANTITY<a class="headerlink" href="#copying-in-quantity" title="Link to this heading">¶</a></h2>
+<p>If you publish printed copies (or copies in media that commonly have
+printed covers) of the Document, numbering more than 100, and the
+Document’s license notice requires Cover Texts, you must enclose the
+copies in covers that carry, clearly and legibly, all these Cover
+Texts: Front-Cover Texts on the front cover, and Back-Cover Texts on
+the back cover. Both covers must also clearly and legibly identify you
+as the publisher of these copies. The front cover must present the
+full title with all words of the title equally prominent and visible.
+You may add other material on the covers in addition. Copying with
+changes limited to the covers, as long as they preserve the title of
+the Document and satisfy these conditions, can be treated as verbatim
+copying in other respects.</p>
+<p>If the required texts for either cover are too voluminous to fit
+legibly, you should put the first ones listed (as many as fit
+reasonably) on the actual cover, and continue the rest onto adjacent
+pages.</p>
+<p>If you publish or distribute Opaque copies of the Document numbering
+more than 100, you must either include a machine-readable Transparent
+copy along with each Opaque copy, or state in or with each Opaque copy
+a computer-network location from which the general network-using
+public has access to download using public-standard network protocols
+a complete Transparent copy of the Document, free of added material.
+If you use the latter option, you must take reasonably prudent steps,
+when you begin distribution of Opaque copies in quantity, to ensure
+that this Transparent copy will remain thus accessible at the stated
+location until at least one year after the last time you distribute an
+Opaque copy (directly or through your agents or retailers) of that
+edition to the public.</p>
+<p>It is requested, but not required, that you contact the authors of the
+Document well before redistributing any large number of copies, to
+give them a chance to provide you with an updated version of the
+Document.</p>
+</section>
+<section id="modifications">
+<h2>4. MODIFICATIONS<a class="headerlink" href="#modifications" title="Link to this heading">¶</a></h2>
+<p>You may copy and distribute a Modified Version of the Document under
+the conditions of sections 2 and 3 above, provided that you release
+the Modified Version under precisely this License, with the Modified
+Version filling the role of the Document, thus licensing distribution
+and modification of the Modified Version to whoever possesses a copy
+of it. In addition, you must do these things in the Modified Version:</p>
+<ul class="simple">
+<li><p>A. Use in the Title Page (and on the covers, if any) a title
+distinct from that of the Document, and from those of previous
+versions (which should, if there were any, be listed in the
+History section of the Document). You may use the same title as a
+previous version if the original publisher of that version
+gives permission.</p></li>
+<li><p>B. List on the Title Page, as authors, one or more persons or
+entities responsible for authorship of the modifications in the
+Modified Version, together with at least five of the principal
+authors of the Document (all of its principal authors, if it has
+fewer than five), unless they release you from this requirement.</p></li>
+<li><p>C. State on the Title page the name of the publisher of the
+Modified Version, as the publisher.</p></li>
+<li><p>D. Preserve all the copyright notices of the Document.</p></li>
+<li><p>E. Add an appropriate copyright notice for your modifications
+adjacent to the other copyright notices.</p></li>
+<li><p>F. Include, immediately after the copyright notices, a license
+notice giving the public permission to use the Modified Version
+under the terms of this License, in the form shown in the
+Addendum below.</p></li>
+<li><p>G. Preserve in that license notice the full lists of Invariant
+Sections and required Cover Texts given in the Document’s
+license notice.</p></li>
+<li><p>H. Include an unaltered copy of this License.</p></li>
+<li><p>I. Preserve the section Entitled “History”, Preserve its Title,
+and add to it an item stating at least the title, year, new
+authors, and publisher of the Modified Version as given on the
+Title Page. If there is no section Entitled “History” in the
+Document, create one stating the title, year, authors, and
+publisher of the Document as given on its Title Page, then add an
+item describing the Modified Version as stated in the
+previous sentence.</p></li>
+<li><p>J. Preserve the network location, if any, given in the Document
+for public access to a Transparent copy of the Document, and
+likewise the network locations given in the Document for previous
+versions it was based on. These may be placed in the “History”
+section. You may omit a network location for a work that was
+published at least four years before the Document itself, or if
+the original publisher of the version it refers to
+gives permission.</p></li>
+<li><p>K. For any section Entitled “Acknowledgements” or “Dedications”,
+Preserve the Title of the section, and preserve in the section all
+the substance and tone of each of the contributor acknowledgements
+and/or dedications given therein.</p></li>
+<li><p>L. Preserve all the Invariant Sections of the Document, unaltered
+in their text and in their titles. Section numbers or the
+equivalent are not considered part of the section titles.</p></li>
+<li><p>M. Delete any section Entitled “Endorsements”. Such a section may
+not be included in the Modified Version.</p></li>
+<li><p>N. Do not retitle any existing section to be Entitled
+“Endorsements” or to conflict in title with any Invariant Section.</p></li>
+<li><p>O. Preserve any Warranty Disclaimers.</p></li>
+</ul>
+<p>If the Modified Version includes new front-matter sections or
+appendices that qualify as Secondary Sections and contain no material
+copied from the Document, you may at your option designate some or all
+of these sections as invariant. To do this, add their titles to the
+list of Invariant Sections in the Modified Version’s license notice.
+These titles must be distinct from any other section titles.</p>
+<p>You may add a section Entitled “Endorsements”, provided it contains
+nothing but endorsements of your Modified Version by various
+parties—for example, statements of peer review or that the text has
+been approved by an organization as the authoritative definition of a
+standard.</p>
+<p>You may add a passage of up to five words as a Front-Cover Text, and a
+passage of up to 25 words as a Back-Cover Text, to the end of the list
+of Cover Texts in the Modified Version. Only one passage of
+Front-Cover Text and one of Back-Cover Text may be added by (or
+through arrangements made by) any one entity. If the Document already
+includes a cover text for the same cover, previously added by you or
+by arrangement made by the same entity you are acting on behalf of,
+you may not add another; but you may replace the old one, on explicit
+permission from the previous publisher that added the old one.</p>
+<p>The author(s) and publisher(s) of the Document do not by this License
+give permission to use their names for publicity for or to assert or
+imply endorsement of any Modified Version.</p>
+</section>
+<section id="combining-documents">
+<h2>5. COMBINING DOCUMENTS<a class="headerlink" href="#combining-documents" title="Link to this heading">¶</a></h2>
+<p>You may combine the Document with other documents released under this
+License, under the terms defined in section 4 above for modified
+versions, provided that you include in the combination all of the
+Invariant Sections of all of the original documents, unmodified, and
+list them all as Invariant Sections of your combined work in its
+license notice, and that you preserve all their Warranty Disclaimers.</p>
+<p>The combined work need only contain one copy of this License, and
+multiple identical Invariant Sections may be replaced with a single
+copy. If there are multiple Invariant Sections with the same name but
+different contents, make the title of each such section unique by
+adding at the end of it, in parentheses, the name of the original
+author or publisher of that section if known, or else a unique number.
+Make the same adjustment to the section titles in the list of
+Invariant Sections in the license notice of the combined work.</p>
+<p>In the combination, you must combine any sections Entitled “History”
+in the various original documents, forming one section Entitled
+“History”; likewise combine any sections Entitled “Acknowledgements”,
+and any sections Entitled “Dedications”. You must delete all sections
+Entitled “Endorsements”.</p>
+</section>
+<section id="collections-of-documents">
+<h2>6. COLLECTIONS OF DOCUMENTS<a class="headerlink" href="#collections-of-documents" title="Link to this heading">¶</a></h2>
+<p>You may make a collection consisting of the Document and other
+documents released under this License, and replace the individual
+copies of this License in the various documents with a single copy
+that is included in the collection, provided that you follow the rules
+of this License for verbatim copying of each of the documents in all
+other respects.</p>
+<p>You may extract a single document from such a collection, and
+distribute it individually under this License, provided you insert a
+copy of this License into the extracted document, and follow this
+License in all other respects regarding verbatim copying of that
+document.</p>
+</section>
+<section id="aggregation-with-independent-works">
+<h2>7. AGGREGATION WITH INDEPENDENT WORKS<a class="headerlink" href="#aggregation-with-independent-works" title="Link to this heading">¶</a></h2>
+<p>A compilation of the Document or its derivatives with other separate
+and independent documents or works, in or on a volume of a storage or
+distribution medium, is called an “aggregate” if the copyright
+resulting from the compilation is not used to limit the legal rights
+of the compilation’s users beyond what the individual works permit.
+When the Document is included in an aggregate, this License does not
+apply to the other works in the aggregate which are not themselves
+derivative works of the Document.</p>
+<p>If the Cover Text requirement of section 3 is applicable to these
+copies of the Document, then if the Document is less than one half of
+the entire aggregate, the Document’s Cover Texts may be placed on
+covers that bracket the Document within the aggregate, or the
+electronic equivalent of covers if the Document is in electronic form.
+Otherwise they must appear on printed covers that bracket the whole
+aggregate.</p>
+</section>
+<section id="translation">
+<h2>8. TRANSLATION<a class="headerlink" href="#translation" title="Link to this heading">¶</a></h2>
+<p>Translation is considered a kind of modification, so you may
+distribute translations of the Document under the terms of section 4.
+Replacing Invariant Sections with translations requires special
+permission from their copyright holders, but you may include
+translations of some or all Invariant Sections in addition to the
+original versions of these Invariant Sections. You may include a
+translation of this License, and all the license notices in the
+Document, and any Warranty Disclaimers, provided that you also include
+the original English version of this License and the original versions
+of those notices and disclaimers. In case of a disagreement between
+the translation and the original version of this License or a notice
+or disclaimer, the original version will prevail.</p>
+<p>If a section in the Document is Entitled “Acknowledgements”,
+“Dedications”, or “History”, the requirement (section 4) to Preserve
+its Title (section 1) will typically require changing the actual
+title.</p>
+</section>
+<section id="termination">
+<h2>9. TERMINATION<a class="headerlink" href="#termination" title="Link to this heading">¶</a></h2>
+<p>You may not copy, modify, sublicense, or distribute the Document
+except as expressly provided under this License. Any attempt otherwise
+to copy, modify, sublicense, or distribute it is void, and will
+automatically terminate your rights under this License.</p>
+<p>However, if you cease all violation of this License, then your license
+from a particular copyright holder is reinstated (a) provisionally,
+unless and until the copyright holder explicitly and finally
+terminates your license, and (b) permanently, if the copyright holder
+fails to notify you of the violation by some reasonable means prior to
+60 days after the cessation.</p>
+<p>Moreover, your license from a particular copyright holder is
+reinstated permanently if the copyright holder notifies you of the
+violation by some reasonable means, this is the first time you have
+received notice of violation of this License (for any work) from that
+copyright holder, and you cure the violation prior to 30 days after
+your receipt of the notice.</p>
+<p>Termination of your rights under this section does not terminate the
+licenses of parties who have received copies or rights from you under
+this License. If your rights have been terminated and not permanently
+reinstated, receipt of a copy of some or all of the same material does
+not give you any rights to use it.</p>
+</section>
+<section id="future-revisions-of-this-license">
+<h2>10. FUTURE REVISIONS OF THIS LICENSE<a class="headerlink" href="#future-revisions-of-this-license" title="Link to this heading">¶</a></h2>
+<p>The Free Software Foundation may publish new, revised versions of the
+GNU Free Documentation License from time to time. Such new versions
+will be similar in spirit to the present version, but may differ in
+detail to address new problems or concerns. See
+<a class="reference external" href="https://www.gnu.org/licenses/">https://www.gnu.org/licenses/</a>.</p>
+<p>Each version of the License is given a distinguishing version number.
+If the Document specifies that a particular numbered version of this
+License “or any later version” applies to it, you have the option of
+following the terms and conditions either of that specified version or
+of any later version that has been published (not as a draft) by the
+Free Software Foundation. If the Document does not specify a version
+number of this License, you may choose any version ever published (not
+as a draft) by the Free Software Foundation. If the Document specifies
+that a proxy can decide which future versions of this License can be
+used, that proxy’s public statement of acceptance of a version
+permanently authorizes you to choose that version for the Document.</p>
+</section>
+<section id="relicensing">
+<h2>11. RELICENSING<a class="headerlink" href="#relicensing" title="Link to this heading">¶</a></h2>
+<p>“Massive Multiauthor Collaboration Site” (or “MMC Site”) means any
+World Wide Web server that publishes copyrightable works and also
+provides prominent facilities for anybody to edit those works. A
+public wiki that anybody can edit is an example of such a server. A
+“Massive Multiauthor Collaboration” (or “MMC”) contained in the site
+means any set of copyrightable works thus published on the MMC site.</p>
+<p>“CC-BY-SA” means the Creative Commons Attribution-Share Alike 3.0
+license published by Creative Commons Corporation, a not-for-profit
+corporation with a principal place of business in San Francisco,
+California, as well as future copyleft versions of that license
+published by that same organization.</p>
+<p>“Incorporate” means to publish or republish a Document, in whole or in
+part, as part of another Document.</p>
+<p>An MMC is “eligible for relicensing” if it is licensed under this
+License, and if all works that were first published under this License
+somewhere other than this MMC, and subsequently incorporated in whole
+or in part into the MMC, (1) had no cover texts or invariant sections,
+and (2) were thus incorporated prior to November 1, 2008.</p>
+<p>The operator of an MMC Site may republish an MMC contained in the site
+under CC-BY-SA on the same site at any time before August 1, 2009,
+provided the MMC is eligible for relicensing.</p>
+</section>
+<section id="addendum-how-to-use-this-license-for-your-documents">
+<h2>ADDENDUM: How to use this License for your documents<a class="headerlink" href="#addendum-how-to-use-this-license-for-your-documents" title="Link to this heading">¶</a></h2>
+<p>To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and
+license notices just after the title page:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    Copyright (C)  YEAR  YOUR NAME.
+    Permission is granted to copy, distribute and/or modify this document
+    under the terms of the GNU Free Documentation License, Version 1.3
+    or any later version published by the Free Software Foundation;
+    with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+    A copy of the license is included in the section entitled &quot;GNU
+    Free Documentation License&quot;.
+</pre></div>
+</div>
+<p>If you have Invariant Sections, Front-Cover Texts and Back-Cover
+Texts, replace the “with … Texts.” line with this:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>    with the Invariant Sections being LIST THEIR TITLES, with the
+    Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.
+</pre></div>
+</div>
+<p>If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.</p>
+<p>If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License, to
+permit their use in free software.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="bibliography.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Bibliography</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="doc/05_calibxyzkins_module/00_index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title"><span class="section-number">5. </span>calibxyzkins - Calibrated XYZ Kinematics Module for LinuxCNC</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2000–2022 LinuxCNC.org; 2025 Tomás Domínguez Bolaño, Valentín Barral Vales, Carlos José Escudero Cascón, and José Antonio García Naya (CITIC Research Center, University of A Coruña, Spain)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            <div class="last-updated">
+              Last updated on Aug 01, 2025</div>
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">GNU Free Documentation License</a><ul>
+<li><a class="reference internal" href="#preamble">0. PREAMBLE</a></li>
+<li><a class="reference internal" href="#applicability-and-definitions">1. APPLICABILITY AND DEFINITIONS</a></li>
+<li><a class="reference internal" href="#verbatim-copying">2. VERBATIM COPYING</a></li>
+<li><a class="reference internal" href="#copying-in-quantity">3. COPYING IN QUANTITY</a></li>
+<li><a class="reference internal" href="#modifications">4. MODIFICATIONS</a></li>
+<li><a class="reference internal" href="#combining-documents">5. COMBINING DOCUMENTS</a></li>
+<li><a class="reference internal" href="#collections-of-documents">6. COLLECTIONS OF DOCUMENTS</a></li>
+<li><a class="reference internal" href="#aggregation-with-independent-works">7. AGGREGATION WITH INDEPENDENT WORKS</a></li>
+<li><a class="reference internal" href="#translation">8. TRANSLATION</a></li>
+<li><a class="reference internal" href="#termination">9. TERMINATION</a></li>
+<li><a class="reference internal" href="#future-revisions-of-this-license">10. FUTURE REVISIONS OF THIS LICENSE</a></li>
+<li><a class="reference internal" href="#relicensing">11. RELICENSING</a></li>
+<li><a class="reference internal" href="#addendum-how-to-use-this-license-for-your-documents">ADDENDUM: How to use this License for your documents</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

@@ -1,0 +1,477 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="3.4. MESA 7I96S Board Configuration" href="04_mesa_7i96s_configuration.html" /><link rel="prev" title="3.2. System Latency Analysis" href="02_latency_analysis.html" />
+
+    <link rel="shortcut icon" href="../../_static/favicon.png"/><!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>3.3. System Latency Tuning - LinuxCNC Gantry Robot System</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=4e80d089" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/tables.css?v=2e456b7d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --font-stack: IBM Plex Sans, Helvetica, sans-serif;
+  --font-stack--monospace: IBM Plex Mono, monospace;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">LinuxCNC Gantry Robot System</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/logo_udc_gtec_citic.svg" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">LinuxCNC Gantry Robot System</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../01_introduction/introduction.html">1. Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02_igus_dryve_d1/00_index.html">2. igus® dryve D1 Controllers</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of 2. igus® dryve D1 Controllers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/01_start_page.html">2.1. “Start” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/02_motor_page.html">2.2. “Motor” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/03_axis_page.html">2.3. “Axis” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/04_communication_page.html">2.4. “Communication” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/05_inputs_outputs_page.html">2.5. “Inputs/Outputs” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/06_drive_profile_page.html">2.6. “Drive Profile” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/07_oscilloscope_page.html">2.7. “Oscilloscope” Page</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="00_index.html">3. LinuxCNC</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of 3. LinuxCNC</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="01_installation.html">3.1. Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_latency_analysis.html">3.2. System Latency Analysis</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">3.3. System Latency Tuning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_mesa_7i96s_configuration.html">3.4. MESA 7I96S Board Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_mesa_7i77_configuration.html">3.5. MESA 7I77 Board Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="06_linuxcnc_introduction.html">3.6. Introduction to LinuxCNC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="07_linuxcnc_basic_usage.html">3.7. Basic LinuxCNC Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08_linuxcnc_configuration.html">3.8. LinuxCNC Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04_error_analysis_calibration/00_index.html">4. Error Analysis and Calibration</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of 4. Error Analysis and Calibration</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04_error_analysis_calibration/01_installation.html">4.1. Installation and Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04_error_analysis_calibration/02_calibration.html">4.2. Data and Calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04_error_analysis_calibration/03_usage.html">4.3. Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../05_calibxyzkins_module/00_index.html">5. calibxyzkins - Calibrated XYZ Kinematics Module for LinuxCNC</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../fdl-1.3.html">GNU Free Documentation License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/doc/03_linuxcnc/03_latency_tuning.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="system-latency-tuning">
+<h1><span class="section-number">3.3. </span>System Latency Tuning<a class="headerlink" href="#system-latency-tuning" title="Link to this heading">¶</a></h1>
+<p>The maximum system latency can depend on various factors such as hardware, firmware configuration, system load, and hardware interrupt handling. If the maximum system latency is too high, adjustments to the system configuration will be necessary to reduce it. Various sources, including official documentation, guides, and talks, provide detailed guidelines for optimizing the performance of real-time Linux systems <span id="id1">[<a class="reference internal" href="../../bibliography.html#id20" title="Red Hat, Inc. Optimizing RHEL 9 for real time for low latency operation. 2023. URL: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_for_real_time/9/html/optimizing_rhel_9_for_real_time_for_low_latency_operation/index (visited on 2023-10-20).">RedHatInc23a</a>, <a class="reference internal" href="../../bibliography.html#id17" title="Edoardo Barbieri. Tuning a real-time kernel. June 2023. Article in the Ubuntu blog. URL: https://ubuntu.com/blog/real-time-kernel-tuning (visited on 2023-10-20).">Bar23</a>, <a class="reference internal" href="../../bibliography.html#id18" title="Gratian Crisan. Tips, tricks, and gotchas for Linux real-time tuning. June 2022. URL: https://www.youtube.com/watch?v=8Vb94pHf3LQ (visited on 2023-10-20).">Cri22</a>, <a class="reference internal" href="../../bibliography.html#id19" title="Krzysztof Kozlowski. Preparing Linux real-time kernel and tuning robotics platform with modern ARM64 SoC. June 2023. URL: https://www.youtube.com/watch?v=UMWGNjgZS6A (visited on 2023-10-20).">Koz23</a>]</span>. The LinuxCNC user manual <span id="id2">[<a class="reference internal" href="../../bibliography.html#id14" title="LinuxCNC Documentation. 2023. URL: https://linuxcnc.org/docs/.">lin23</a>]</span> also suggests several potential adjustments to reduce latency, which are detailed in <a class="reference internal" href="#sec-firmware-settings"><span class="std std-numref">Section 3.3.1</span></a> and <a class="reference internal" href="#sec-linux-settings"><span class="std std-numref">Section 3.3.2</span></a>.</p>
+<p>For our gantry robot setup, we used a Beelink EQR6 mini computer equipped with an AMD Ryzen 5 6600U CPU. In our case, latency values were sufficiently low, similar to the ones shown in <a class="reference internal" href="02_latency_analysis.html#fig-linuxcnc-latency-plot"><span class="std std-numref">Fig. 18</span></a>, <a class="reference internal" href="02_latency_analysis.html#fig-linuxcnc-latency-test"><span class="std std-numref">Fig. 20</span></a>, and <a class="reference internal" href="02_latency_analysis.html#fig-linuxcnc-latency-histogram"><span class="std std-numref">Fig. 19</span></a>. However, note that for other hardware, even with the same operating system, the latency values could be higher. If the system latency becomes too high during LinuxCNC operation, a warning similar to <a class="reference internal" href="#fig-linuxcnc-gui-axis-delay-warning"><span class="std std-numref">Fig. 21</span></a> would appear. In that case check <a class="reference internal" href="#sec-firmware-settings"><span class="std std-numref">Section 3.3.1</span></a> and <a class="reference internal" href="#sec-linux-settings"><span class="std std-numref">Section 3.3.2</span></a> for potential solutions.</p>
+<figure class="align-default" id="fig-linuxcnc-gui-axis-delay-warning">
+<img alt="../../_images/linuxcnc_gui_axis_delay_warning.png" src="../../_images/linuxcnc_gui_axis_delay_warning.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 21 </span><span class="caption-text">LinuxCNC warning for unexpected latency values.</span><a class="headerlink" href="#fig-linuxcnc-gui-axis-delay-warning" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>While our system latency measurements were within acceptable ranges, we encountered a high network latency problem on the LinuxCNC communication with the MESA 7I96S via Ethernet. This issue was resolved by replacing the open-source Realtek driver with the official closed-source Realtek driver as explained in <a class="reference internal" href="#sec-network-latency-issues"><span class="std std-numref">Section 3.3.3</span></a>.</p>
+<section id="firmware-settings">
+<span id="sec-firmware-settings"></span><h2><span class="section-number">3.3.1. </span>Firmware Settings<a class="headerlink" href="#firmware-settings" title="Link to this heading">¶</a></h2>
+<p>System firmware such as the <abbr title="Basic Input/Output System">BIOS</abbr> or <abbr title="Unified Extensible Firmware Interface">UEFI</abbr>, can significantly impact system latency. This impact varies depending on the hardware manufacturer and the quality of the provided firmware. Firmware is responsible for initializing and configuring system hardware before the operating system loads. If the firmware is not properly configured to provide accurate timing or does not adequately manage interrupts and hardware devices, it can contribute to increased system latency.</p>
+<p>The firmware settings recommended in the LinuxCNC user manual <span id="id3">[<a class="reference internal" href="../../bibliography.html#id14" title="LinuxCNC Documentation. 2023. URL: https://linuxcnc.org/docs/.">lin23</a>]</span> that can help reduce latency include the following:</p>
+<ul class="simple">
+<li><p>Disable <abbr title="Advanced Power Management">APM</abbr>, <abbr title="Advanced Configuration and Power Interface">ACPI</abbr>, and other power-saving functions, including all suspension related features and CPU frequency scaling.</p></li>
+<li><p>Disable CPU “turbo” mode.</p></li>
+<li><p>Disable CPU simultaneous multithreading technology, e.g., Intel’s Hyper-Threading technology.</p></li>
+<li><p>Disable or limit SMIs (System Management Interrupts).</p></li>
+<li><p>Disable unused hardware.</p></li>
+</ul>
+</section>
+<section id="linux-settings">
+<span id="sec-linux-settings"></span><h2><span class="section-number">3.3.2. </span>Linux Settings<a class="headerlink" href="#linux-settings" title="Link to this heading">¶</a></h2>
+<p>Linux offers various options that can help improve latency. Specifically, for our case, we will consider kernel boot command-line parameters and runtime parameters configured via the <code class="docutils literal notranslate"><span class="pre">sysctl</span></code> command. These parameters are described below.</p>
+<section id="kernel-boot-command-line-parameters">
+<h3><span class="section-number">3.3.2.1. </span>Kernel Boot Command-Line Parameters<a class="headerlink" href="#kernel-boot-command-line-parameters" title="Link to this heading">¶</a></h3>
+<p>A comprehensive list of parameters is available at <a class="reference external" href="https://docs.kernel.org/admin-guide/kernel-parameters.html">https://docs.kernel.org/admin-guide/kernel-parameters.html</a>. In Debian, command-line parameters can be specified in the following ways:</p>
+<ol class="arabic simple">
+<li><p>In the GRUB bootloader, you can press a key (often <kbd class="kbd docutils literal notranslate">e</kbd>) to edit the selected boot entry and append the parameters to the end of the line. Once added, you can boot the system by pressing <kbd class="kbd docutils literal notranslate">F10</kbd> or <kbd class="kbd docutils literal notranslate">Ctrl</kbd>+<kbd class="kbd docutils literal notranslate">X</kbd>.</p></li>
+<li><p>To persistently specify parameters, edit the <code class="docutils literal notranslate"><span class="pre">/etc/default/grub</span></code> file, adding the parameters to the <code class="docutils literal notranslate"><span class="pre">GRUB_CMDLINE_LINUX_DEFAULT</span></code> variable, and then run the <code class="docutils literal notranslate"><span class="pre">update-grub</span></code> command. For more information about GRUB configuration variables, refer to the corresponding manual page at <a class="reference external" href="https://www.gnu.org/software/grub/manual/grub/html_node/Simple-configuration.html">https://www.gnu.org/software/grub/manual/grub/html_node/Simple-configuration.html</a>.</p></li>
+</ol>
+<p>For latency optimization, the most relevant parameters, as suggested in the LinuxCNC user manual <span id="id4">[<a class="reference internal" href="../../bibliography.html#id14" title="LinuxCNC Documentation. 2023. URL: https://linuxcnc.org/docs/.">lin23</a>]</span>, are:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">isolcpus</span></code>: A list of CPUs that will be isolated from balancing and scheduling algorithms. This prevents most system processes from using the specified CPUs, thereby making more CPU time available for LinuxCNC.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">irqaffinity</span></code>: A list of CPUs to set as the default IRQ affinity mask. This selects the CPUs that will handle interrupts, ensuring that the remaining CPUs do not have to perform this task.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rcu_nocbs</span></code>: A list of CPUs whose <abbr title="Read-Copy-Update">RCU</abbr> callbacks will be executed on other CPUs.<span id="id5">[<a class="reference internal" href="../../bibliography.html#id15" title="Wikipedia contributors. Read-copy-update — Wikipedia, the free encyclopedia. 2023. URL: https://en.wikipedia.org/w/index.php?title=Read-copy-update&amp;oldid=1169786538 (visited on 2023-10-20).">Wikipediacontributors23c</a>, <a class="reference internal" href="../../bibliography.html#id16" title="Red Hat, Inc. Optimizing RHEL 9 for real time for low latency operation. 2023. Chapter 25. Improving CPU performance by using RCU callbacks. URL: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_for_real_time/9/html/optimizing_rhel_9_for_real_time_for_low_latency_operation/assembly_working-with-rcu-callbacks_optimizing-rhel9-for-real-time-for-low-latency-operation (visited on 2023-10-20).">RedHatInc23b</a>]</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rcu_nocb_poll</span></code>: This option periodically wakes up <abbr title="Read-Copy-Update">RCU</abbr> callback execution threads using a timer to check for callbacks to execute. Without this option, the CPUs specified in <code class="docutils literal notranslate"><span class="pre">rcu_nocbs</span></code> are responsible for waking up the threads that execute <abbr title="Read-Copy-Update">RCU</abbr> callbacks <span id="id6">[<a class="reference internal" href="../../bibliography.html#id16" title="Red Hat, Inc. Optimizing RHEL 9 for real time for low latency operation. 2023. Chapter 25. Improving CPU performance by using RCU callbacks. URL: https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_for_real_time/9/html/optimizing_rhel_9_for_real_time_for_low_latency_operation/assembly_working-with-rcu-callbacks_optimizing-rhel9-for-real-time-for-low-latency-operation (visited on 2023-10-20).">RedHatInc23b</a>]</span>. This option improves the real-time responsiveness of the CPUs listed in <code class="docutils literal notranslate"><span class="pre">rcu_nocbs</span></code> by freeing them from the need to wake up their corresponding threads.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">nohz_full</span></code>: A list of CPUs that will cease receiving timing ticks when only one task is executing. As a result, these CPUs can dedicate more time to executing applications and less time to handling interrupts and context switching. The CPUs in this list will have their <abbr title="Read-Copy-Update">RCU</abbr> callbacks transferred to other CPUs, as if they had been specified with the <code class="docutils literal notranslate"><span class="pre">rcu_nocbs</span></code> option.</p></li>
+</ul>
+<p>To determine the number of processors in your system, you can use either the <code class="docutils literal notranslate"><span class="pre">nproc</span></code> command or <code class="docutils literal notranslate"><span class="pre">cat</span> <span class="pre">/proc/cpuinfo</span></code>. For instance, in a system with 4 CPUs, if you wish to isolate 3 CPUs from disturbances, you can use the following parameters:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>isolcpus=1-3 nohz_full=1-3 rcu_nocb_poll irqaffinity=0
+</pre></div>
+</div>
+</section>
+<section id="runtime-parameters-using-sysctl">
+<h3><span class="section-number">3.3.2.2. </span>Runtime Parameters using <code class="docutils literal notranslate"><span class="pre">sysctl</span></code><a class="headerlink" href="#runtime-parameters-using-sysctl" title="Link to this heading">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">sysctl</span></code> command is used to modify kernel parameters at runtime. The available parameters are those listed in <code class="docutils literal notranslate"><span class="pre">/proc/sys/</span></code>. For latency, the LinuxCNC user manual <span id="id7">[<a class="reference internal" href="../../bibliography.html#id14" title="LinuxCNC Documentation. 2023. URL: https://linuxcnc.org/docs/.">lin23</a>]</span> suggests the following parameter:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sysctl.kernel.sched_rt_runtime_us</span></code>: This sets a global limit on the maximum CPU time that real-time tasks can consume. Set to -1 to remove the time limit. More information about this parameter can be found at <a class="reference external" href="https://www.kernel.org/doc/html/latest/scheduler/sched-rt-group.html">https://www.kernel.org/doc/html/latest/scheduler/sched-rt-group.html</a>.</p></li>
+</ul>
+<p>To persistently set these parameters, they must be added to the <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.conf</span></code> file or, preferably, to a new file within the <code class="docutils literal notranslate"><span class="pre">/etc/sysctl.d</span></code> directory. For more information, consult the <code class="docutils literal notranslate"><span class="pre">sysctl.conf</span></code> manual page.</p>
+</section>
+</section>
+<section id="network-latency-issues">
+<span id="sec-network-latency-issues"></span><h2><span class="section-number">3.3.3. </span>Network Latency Issues<a class="headerlink" href="#network-latency-issues" title="Link to this heading">¶</a></h2>
+<p>LinuxCNC requires very low latencies for proper operation. In our system, we encountered a specific issue where LinuxCNC would raise the error <strong>“error finishing read”</strong> due to high latencies of network packets when communicating with the MESA 7I96S Ethernet card.</p>
+<p>The issue has been documented in the LinuxCNC GitHub repository (<a class="reference external" href="https://github.com/LinuxCNC/linuxcnc/issues/2281">https://github.com/LinuxCNC/linuxcnc/issues/2281</a>) and seems to affect systems with Realtek network cards more frequently than those with Intel NICs, likely due to the Realtek cards being slower than Intel NICs. Our system has a RealTek 8168h network card and was using the open-source Linux driver <code class="docutils literal notranslate"><span class="pre">r8168-dkms</span></code>.</p>
+<p>The problem occurs when excessive latency on the Linux kernel leaves insufficient time for the real-time thread to communicate with the MESA card during a servo thread cycle. When this happens, the MESA card shuts down and operation is disabled until a LinuxCNC restart.</p>
+<section id="solution">
+<h3><span class="section-number">3.3.3.1. </span>Solution<a class="headerlink" href="#solution" title="Link to this heading">¶</a></h3>
+<p>The most effective solution we found was to replace the default open-source Realtek driver with the official closed-source Realtek driver. Debian provides three Realtek drivers:</p>
+<ul class="simple">
+<li><p><strong>r8169</strong>: The default open-source driver included in the Linux kernel.</p></li>
+<li><p><strong>r8168-dkms</strong>: Closed-source driver for a large range of NICs (including our RealTek 8168h).</p></li>
+<li><p><strong>r8125-dkms</strong>: Closed-source driver for 2.5 Gb NICs found on newer PCs.</p></li>
+</ul>
+<p>The r8168-dkms and r8125-dkms drivers are closed-source and available in the non-free archive area of the Debian repositories. For our system with a RealTek 8168h network card, we needed to install the r8168-dkms driver.</p>
+<p>To install the correct driver:</p>
+<ol class="arabic">
+<li><p>Enable non-free packages by editing the apt sources list:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>nano<span class="w"> </span>/etc/apt/sources.list
+</pre></div>
+</div>
+<p>Add <code class="docutils literal notranslate"><span class="pre">non-free</span></code> to the end of the main repository lines. For example:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>deb http://deb.debian.org/debian bookworm main contrib non-free
+deb-src http://deb.debian.org/debian bookworm main contrib non-free
+</pre></div>
+</div>
+</li>
+<li><p>Update the package list:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>update
+</pre></div>
+</div>
+</li>
+<li><p>Install the r8168-dkms driver:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>r8168-dkms
+</pre></div>
+</div>
+</li>
+<li><p>Reboot the system to ensure the new driver is loaded:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>reboot
+</pre></div>
+</div>
+</li>
+<li><p>After reboot, verify that the correct driver is loaded:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>ethtool<span class="w"> </span>-i<span class="w"> </span>&lt;interface_name&gt;
+</pre></div>
+</div>
+<p>The output should show <code class="docutils literal notranslate"><span class="pre">driver:</span> <span class="pre">r8168</span></code> instead of <code class="docutils literal notranslate"><span class="pre">driver:</span> <span class="pre">r8169</span></code>.</p>
+</li>
+</ol>
+<p>This solution has been reported to work for multiple users experiencing similar issues, and it provides a more stable and lower-latency network connection for LinuxCNC operations.</p>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="04_mesa_7i96s_configuration.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title"><span class="section-number">3.4. </span>MESA 7I96S Board Configuration</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="02_latency_analysis.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title"><span class="section-number">3.2. </span>System Latency Analysis</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2000–2022 LinuxCNC.org; 2025 Tomás Domínguez Bolaño, Valentín Barral Vales, Carlos José Escudero Cascón, and José Antonio García Naya (CITIC Research Center, University of A Coruña, Spain)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            <div class="last-updated">
+              Last updated on Aug 01, 2025</div>
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">3.3. System Latency Tuning</a><ul>
+<li><a class="reference internal" href="#firmware-settings">3.3.1. Firmware Settings</a></li>
+<li><a class="reference internal" href="#linux-settings">3.3.2. Linux Settings</a><ul>
+<li><a class="reference internal" href="#kernel-boot-command-line-parameters">3.3.2.1. Kernel Boot Command-Line Parameters</a></li>
+<li><a class="reference internal" href="#runtime-parameters-using-sysctl">3.3.2.2. Runtime Parameters using <code class="docutils literal notranslate"><span class="pre">sysctl</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#network-latency-issues">3.3.3. Network Latency Issues</a><ul>
+<li><a class="reference internal" href="#solution">3.3.3.1. Solution</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

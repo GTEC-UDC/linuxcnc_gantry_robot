@@ -1,0 +1,499 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="2. igus® dryve D1 Controllers" href="../02_igus_dryve_d1/00_index.html" /><link rel="prev" title="LinuxCNC Gantry Robot System" href="../../index.html" />
+
+    <link rel="shortcut icon" href="../../_static/favicon.png"/><!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>1. Introduction - LinuxCNC Gantry Robot System</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=4e80d089" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/tables.css?v=2e456b7d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --font-stack: IBM Plex Sans, Helvetica, sans-serif;
+  --font-stack--monospace: IBM Plex Mono, monospace;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">LinuxCNC Gantry Robot System</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/logo_udc_gtec_citic.svg" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">LinuxCNC Gantry Robot System</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">1. Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02_igus_dryve_d1/00_index.html">2. igus® dryve D1 Controllers</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of 2. igus® dryve D1 Controllers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/01_start_page.html">2.1. “Start” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/02_motor_page.html">2.2. “Motor” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/03_axis_page.html">2.3. “Axis” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/04_communication_page.html">2.4. “Communication” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/05_inputs_outputs_page.html">2.5. “Inputs/Outputs” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/06_drive_profile_page.html">2.6. “Drive Profile” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/07_oscilloscope_page.html">2.7. “Oscilloscope” Page</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../03_linuxcnc/00_index.html">3. LinuxCNC</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of 3. LinuxCNC</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../03_linuxcnc/01_installation.html">3.1. Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03_linuxcnc/02_latency_analysis.html">3.2. System Latency Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03_linuxcnc/03_latency_tuning.html">3.3. System Latency Tuning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03_linuxcnc/04_mesa_7i96s_configuration.html">3.4. MESA 7I96S Board Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03_linuxcnc/05_mesa_7i77_configuration.html">3.5. MESA 7I77 Board Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03_linuxcnc/06_linuxcnc_introduction.html">3.6. Introduction to LinuxCNC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03_linuxcnc/07_linuxcnc_basic_usage.html">3.7. Basic LinuxCNC Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../03_linuxcnc/08_linuxcnc_configuration.html">3.8. LinuxCNC Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04_error_analysis_calibration/00_index.html">4. Error Analysis and Calibration</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of 4. Error Analysis and Calibration</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04_error_analysis_calibration/01_installation.html">4.1. Installation and Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04_error_analysis_calibration/02_calibration.html">4.2. Data and Calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04_error_analysis_calibration/03_usage.html">4.3. Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../05_calibxyzkins_module/00_index.html">5. calibxyzkins - Calibrated XYZ Kinematics Module for LinuxCNC</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../fdl-1.3.html">GNU Free Documentation License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/doc/01_introduction/introduction.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="introduction">
+<h1><span class="section-number">1. </span>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h1>
+<p>The gantry robot uses LinuxCNC as its control platform, integrated with Mesa Electronics interface boards and igus® dryve D1 motor controllers. It provides a displacement range of 5.3m (X) × 5.2m (Y) × 1m (Z), with a total work volume of approximately 6m (X) × 6m (Y) × 2m (Z). <a class="reference internal" href="#fig-installation"><span class="std std-numref">Fig. 1</span></a> shows a photograph of the gantry robot structure. The system diagram is shown in <a class="reference internal" href="#fig-system-diagram"><span class="std std-numref">Fig. 2</span></a>.</p>
+<p>This system was developed from our LinuxCNC testbed (<a class="reference external" href="https://github.com/GTEC-UDC/linuxcnc_testbed">https://github.com/GTEC-UDC/linuxcnc_testbed</a>). The system wiring diagram, detailing all components and their interconnections, is available in the <a class="reference external" href="https://github.com/GTEC-UDC/linuxcnc_gantry_robot">project repository</a>. Below, we detail the system’s configuration, including the boards and components used.</p>
+<figure class="align-default" id="fig-installation">
+<a class="reference internal image-reference" href="../../_images/gantry_robot.jpg"><img alt="../../_images/gantry_robot.jpg" src="../../_images/gantry_robot.jpg" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">Gantry robot structure.</span><a class="headerlink" href="#fig-installation" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="fig-system-diagram">
+<a class="reference internal image-reference" href="../../_images/system_diagram.svg"><img alt="../../_images/system_diagram.svg" src="../../_images/system_diagram.svg" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 2 </span><span class="caption-text">Gantry robot system diagram.</span><a class="headerlink" href="#fig-system-diagram" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<section id="linuxcnc">
+<h2><span class="section-number">1.1. </span>LinuxCNC<a class="headerlink" href="#linuxcnc" title="Link to this heading">¶</a></h2>
+<p>LinuxCNC, formerly known as the <abbr title="Enhanced Machine Controller">EMC</abbr>, is a software system designed for the computer control of various machine tools, such as milling machines and lathes, as well as robots like PUMA and SCARA, and other computer-controlled machinery with up to nine axes. LinuxCNC is free, open-source software. Current versions are fully licensed under the <a class="reference external" href="https://www.gnu.org/licenses/gpl.html"><abbr title="GNU General Public License">GPL</abbr></a> and <a class="reference external" href="https://gnu.org/licenses/lgpl.html"><abbr title="GNU Lesser General Public License">LGPL</abbr></a>.</p>
+<p>In our system, LinuxCNC communicates with the igus® dryve D1 controllers via the MESA 7I96S and 7I77 boards. LinuxCNC is responsible for coordinating the operation of all motors, providing precise, real-time control over the system.</p>
+<p>Detailed information on LinuxCNC’s operation and configuration can be found in <a class="reference internal" href="../03_linuxcnc/00_index.html#sec-linuxcnc"><span class="std std-numref">Section 3</span></a>.</p>
+</section>
+<section id="system-hardware">
+<span id="sec-hardware"></span><h2><span class="section-number">1.2. </span>System Hardware<a class="headerlink" href="#system-hardware" title="Link to this heading">¶</a></h2>
+<p>The following section describe the different hardware components of the system, such as the motor controllers, interface boards, motors, and safety systems. <a class="reference internal" href="#fig-electrical-overview"><span class="std std-numref">Fig. 3</span></a> belowshows the electrical cabinet and rack that house the interface boards, motor controllers, and power supplies.</p>
+<figure class="align-default" id="fig-electrical-overview">
+<a class="reference internal image-reference" href="../../_images/electrical_cabinet_and_rack.jpg"><img alt="../../_images/electrical_cabinet_and_rack.jpg" src="../../_images/electrical_cabinet_and_rack.jpg" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">Electrical cabinet (left) containing the MESA interface boards and rack (right) containing the motor controllers and power supplies.</span><a class="headerlink" href="#fig-electrical-overview" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<section id="main-components">
+<h3><span class="section-number">1.2.1. </span>Main Components<a class="headerlink" href="#main-components" title="Link to this heading">¶</a></h3>
+<ul>
+<li><p><strong>Control Computer</strong>: PC running <a class="reference external" href="https://www.linuxcnc.org">LinuxCNC</a> for real-time motor coordination</p></li>
+<li><p><strong>4 Motor Controllers</strong> <a class="reference external" href="https://www.igus.eu/product/D1">igus® dryve D1</a>: igus® dryve D1 can be used for controlling stepper, DC, and brushless motors in industrial and automation applications. The igus® dryve D1 supports the following communication methods with control systems:</p>
+<ul>
+<li><p><strong>CANopen</strong>: A communication protocol widely used in industrial automation systems, built upon the CAN bus (ISO 11898) standard.</p></li>
+<li><p><strong>Modbus TCP</strong>: A communication protocol extensively employed in industrial applications for data transmission over Ethernet networks using the TCP protocol.</p></li>
+<li><p><strong>Analog and Digital Signals</strong>: In addition to network communication options, the igus® dryve D1 can receive analog and digital signals for direct control.</p>
+<p>In this system, we communicate with the igus® dryve D1 controllers using MESA 7I96S and 7I77 boards using digital and analog signals. This setup enables LinuxCNC to have precise, real-time control over the motors’ operation.</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><a class="reference internal" href="#fig-rack-interior"><span class="std std-numref">Fig. 4</span></a> below shows the interior of the rack containing the four igus® dryve D1 motor controllers and the power supplies.</p>
+<figure class="align-default" id="fig-rack-interior">
+<a class="reference internal image-reference" href="../../_images/rack.jpg"><img alt="../../_images/rack.jpg" src="../../_images/rack.jpg" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">Interior view of the rack showing the igus® dryve D1 motor controllers and power supplies.</span><a class="headerlink" href="#fig-rack-interior" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="interface-boards">
+<h3><span class="section-number">1.2.2. </span>Interface Boards<a class="headerlink" href="#interface-boards" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Main Board</strong> <a class="reference external" href="https://store.mesanet.com/index.php?route=product/product&amp;amp;product_id=374">MESA 7I96S</a>: This board is the primary hardware interface between LinuxCNC and the igus® dryve D1 controllers. It connects to the computer running LinuxCNC via an Ethernet connection. Its main functions include:</p>
+<ul>
+<li><p>Controlling the stepper motor by sending step and direction signals to its designated igus® dryve D1 controller.</p></li>
+<li><p>Receiving input signals from limit switches.</p></li>
+</ul>
+</li>
+<li><p><strong>Expansion Board</strong> <a class="reference external" href="https://store.mesanet.com/index.php?route=product/product&amp;amp;product_id=120">MESA 7I77</a>: This board connects to the 7I96S board via a 25-pin flat cable. Its primary functions are:</p>
+<ul>
+<li><p>Controlling the brushless motor by sending an analog speed signal to its corresponding igus® dryve D1 controller.</p></li>
+<li><p>Receiving position feedback signals from motor encoders.</p></li>
+<li><p>Receiving warning and error signals from the controllers.</p></li>
+<li><p>Receiving the emergency stop signal when the emergency stop switch is activated.</p></li>
+</ul>
+</li>
+</ul>
+<p><a class="reference internal" href="#fig-electrical-cabinet"><span class="std std-numref">Fig. 5</span></a> below shows the MESA 7I96S and 7I77 boards installed in the electrical cabinet.</p>
+<figure class="align-default" id="fig-electrical-cabinet">
+<a class="reference internal image-reference" href="../../_images/electrical_cabinet.jpg"><img alt="../../_images/electrical_cabinet.jpg" src="../../_images/electrical_cabinet.jpg" style="width: 75%;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 5 </span><span class="caption-text">Interior view of the electrical cabinet showing the MESA 7I96S and 7I77 interface boards.</span><a class="headerlink" href="#fig-electrical-cabinet" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="motors-and-actuators">
+<h3><span class="section-number">1.2.3. </span>Motors and Actuators<a class="headerlink" href="#motors-and-actuators" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>X-axis Motors</strong>: 2 × <a class="reference external" href="https://www.igus.eu/product/MOT-EC-86-C-I-A">igus® MOT-EC-86-C-I-A</a> - NEMA 34 brushless with integrated 1000 <abbr title="Pulses per Revolution">PPR</abbr> encoder. A 10:1 reduction gear was installed on the motor shaft.</p></li>
+<li><p><strong>Y-axis Motor</strong>: 1 × <a class="reference external" href="https://www.igus.eu/product/MOT-EC-86-C-I-A">igus® MOT-EC-86-C-I-A</a> - NEMA 34 brushless with integrated 1000 <abbr title="Pulses per Revolution">PPR</abbr> encoder. A 10:1 reduction gear was installed on the motor shaft.</p></li>
+<li><p><strong>Z-axis Motor</strong>: 1 × <a class="reference external" href="https://www.igus.eu/product/motors-and-gears">igus® MOT-AN-S-060-035-060-M-C-AAAC</a> - NEMA 24 stepper with 500 <abbr title="Pulses per Revolution">PPR</abbr> encoder.</p></li>
+</ul>
+</section>
+<section id="safety-systems-and-sensors">
+<h3><span class="section-number">1.2.4. </span>Safety Systems and Sensors<a class="headerlink" href="#safety-systems-and-sensors" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>Emergency Stop Switch</strong>: This switch has both a normally closed and a normally open contact.</p></li>
+<li><p><strong>Limit Sensors</strong>: 4 × igus® inductive sensors for position limit detection.</p></li>
+<li><p><strong>LED Indicators</strong>: Custom indicators with red, yellow, and green LEDs, which provide a visual display of the system’s status.</p></li>
+</ul>
+</section>
+<section id="power-supply">
+<h3><span class="section-number">1.2.5. </span>Power Supply<a class="headerlink" href="#power-supply" title="Link to this heading">¶</a></h3>
+<ul class="simple">
+<li><p><strong>48V Power Supplies</strong>: 3 × <a class="reference external" href="https://www.meanwell.com/webapp/product/search.aspx?prod=SDR-960">MEAN WELL SDR-960-48</a> for brushless motor power.</p></li>
+<li><p><strong>24V Power Supply</strong>: 1 × <a class="reference external" href="https://www.meanwell.com/webapp/product/search.aspx?prod=SDR-240">MEAN WELL SDR-240-24</a> for stepper motor power.</p></li>
+<li><p><strong>Additional 24V Power Supply</strong>: For igus® dryve D1 logic and MESA 7I77 field power.</p></li>
+<li><p><strong>5V Power Supply</strong>: <a class="reference external" href="https://www.meanwell.com/webapp/product/search.aspx?prod=MDR-20">MEAN WELL MDR-20-5</a> for MESA 7I77 field I/O logic.</p></li>
+</ul>
+</section>
+<section id="linear-units">
+<h3><span class="section-number">1.2.6. </span>Linear Units<a class="headerlink" href="#linear-units" title="Link to this heading">¶</a></h3>
+<p>The system is built with igus® self-lubricating linear units that enable lifetime operation of moving parts without external lubrication. The linear units details are the following:</p>
+<ul class="simple">
+<li><p><strong>X and Y axes</strong>: <a class="reference external" href="https://www.igus.eu/drive-technology/linear-axes-with-toothed-belts/technical-data">igus® ZLW-20120/20200</a> linear axes with toothed belts. The feed rate is 144 mm/rev.</p></li>
+<li><p><strong>Z axis</strong>: <a class="reference external" href="https://www.igus.eu/product/20908?artNr=SLW-1660-xxx">igus® SAW-1660</a> linear axis with lead screws. The feed rate is 4 mm/rev.</p></li>
+</ul>
+</section>
+</section>
+<section id="calibration-system">
+<h2><span class="section-number">1.3. </span>Calibration System<a class="headerlink" href="#calibration-system" title="Link to this heading">¶</a></h2>
+<p>This project includes the following calibration components:</p>
+<ul class="simple">
+<li><p><strong>Custom LinuxCNC kinematic module</strong> <code class="docutils literal notranslate"><span class="pre">calibxyzkins</span></code> in <code class="docutils literal notranslate"><span class="pre">linuxcnc/components/linuxcnc_calibrated_xyz_kins</span></code>: enables real-time positioning error compensation.</p></li>
+<li><p><strong>Calibration analysis software</strong> in <code class="docutils literal notranslate"><span class="pre">calibration/</span></code>: Python-based tools for processing OptiTrack data and generating calibration parameters.</p></li>
+</ul>
+<p>This solution enables the gantry robot to achieve sub-centimeter precision throughout the entire working volume of 5.3m × 5.2m × 1m.</p>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../02_igus_dryve_d1/00_index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title"><span class="section-number">2. </span>igus® dryve D1 Controllers</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../../index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Home</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2000–2022 LinuxCNC.org; 2025 Tomás Domínguez Bolaño, Valentín Barral Vales, Carlos José Escudero Cascón, and José Antonio García Naya (CITIC Research Center, University of A Coruña, Spain)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            <div class="last-updated">
+              Last updated on Aug 01, 2025</div>
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">1. Introduction</a><ul>
+<li><a class="reference internal" href="#linuxcnc">1.1. LinuxCNC</a></li>
+<li><a class="reference internal" href="#system-hardware">1.2. System Hardware</a><ul>
+<li><a class="reference internal" href="#main-components">1.2.1. Main Components</a></li>
+<li><a class="reference internal" href="#interface-boards">1.2.2. Interface Boards</a></li>
+<li><a class="reference internal" href="#motors-and-actuators">1.2.3. Motors and Actuators</a></li>
+<li><a class="reference internal" href="#safety-systems-and-sensors">1.2.4. Safety Systems and Sensors</a></li>
+<li><a class="reference internal" href="#power-supply">1.2.5. Power Supply</a></li>
+<li><a class="reference internal" href="#linear-units">1.2.6. Linear Units</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#calibration-system">1.3. Calibration System</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

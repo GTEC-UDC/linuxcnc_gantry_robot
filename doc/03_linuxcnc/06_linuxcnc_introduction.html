@@ -1,0 +1,517 @@
+<!doctype html>
+<html class="no-js" lang="en" data-content_root="../../">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" /><link rel="next" title="3.7. Basic LinuxCNC Usage" href="07_linuxcnc_basic_usage.html" /><link rel="prev" title="3.5. MESA 7I77 Board Configuration" href="05_mesa_7i77_configuration.html" />
+
+    <link rel="shortcut icon" href="../../_static/favicon.png"/><!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
+        <title>3.6. Introduction to LinuxCNC - LinuxCNC Gantry Robot System</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=4e80d089" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/tables.css?v=2e456b7d" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  --font-stack: IBM Plex Sans, Helvetica, sans-serif;
+  --font-stack--monospace: IBM Plex Mono, monospace;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-with-moon" viewBox="0 0 24 24">
+    <title>Auto light/dark, in light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path style="opacity: 50%" d="M 5.411 14.504 C 5.471 14.504 5.532 14.504 5.591 14.504 C 3.639 16.319 4.383 19.569 6.931 20.352 C 7.693 20.586 8.512 20.551 9.25 20.252 C 8.023 23.207 4.056 23.725 2.11 21.184 C 0.166 18.642 1.702 14.949 4.874 14.536 C 5.051 14.512 5.231 14.5 5.411 14.5 L 5.411 14.504 Z"/>
+      <line x1="14.5" y1="3.25" x2="14.5" y2="1.25"/>
+      <line x1="14.5" y1="15.85" x2="14.5" y2="17.85"/>
+      <line x1="10.044" y1="5.094" x2="8.63" y2="3.68"/>
+      <line x1="19" y1="14.05" x2="20.414" y2="15.464"/>
+      <line x1="8.2" y1="9.55" x2="6.2" y2="9.55"/>
+      <line x1="20.8" y1="9.55" x2="22.8" y2="9.55"/>
+      <line x1="10.044" y1="14.006" x2="8.63" y2="15.42"/>
+      <line x1="19" y1="5.05" x2="20.414" y2="3.636"/>
+      <circle cx="14.5" cy="9.55" r="3.6"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon-with-sun" viewBox="0 0 24 24">
+    <title>Auto light/dark, in dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+      class="icon-custom-derived-from-feather-sun-and-tabler-moon">
+      <path d="M 8.282 7.007 C 8.385 7.007 8.494 7.007 8.595 7.007 C 5.18 10.184 6.481 15.869 10.942 17.24 C 12.275 17.648 13.706 17.589 15 17.066 C 12.851 22.236 5.91 23.143 2.505 18.696 C -0.897 14.249 1.791 7.786 7.342 7.063 C 7.652 7.021 7.965 7 8.282 7 L 8.282 7.007 Z"/>
+      <line style="opacity: 50%" x1="18" y1="3.705" x2="18" y2="2.5"/>
+      <line style="opacity: 50%" x1="18" y1="11.295" x2="18" y2="12.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="4.816" x2="14.464" y2="3.964"/>
+      <line style="opacity: 50%" x1="20.711" y1="10.212" x2="21.563" y2="11.063"/>
+      <line style="opacity: 50%" x1="14.205" y1="7.5" x2="13.001" y2="7.5"/>
+      <line style="opacity: 50%" x1="21.795" y1="7.5" x2="23" y2="7.5"/>
+      <line style="opacity: 50%" x1="15.316" y1="10.184" x2="14.464" y2="11.036"/>
+      <line style="opacity: 50%" x1="20.711" y1="4.789" x2="21.563" y2="3.937"/>
+      <circle style="opacity: 50%" cx="18" cy="7.5" r="2.169"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-pencil" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-pencil-code">
+      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+      <path d="M13.5 6.5l4 4" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+  <symbol id="svg-eye" viewBox="0 0 24 24">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-eye-code">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+      <path
+        d="M11.11 17.958c-3.209 -.307 -5.91 -2.293 -8.11 -5.958c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6c-.21 .352 -.427 .688 -.647 1.008" />
+      <path d="M20 21l2 -2l-2 -2" />
+      <path d="M17 17l-2 2l2 2" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+<a class="skip-to-content muted-link" href="#furo-main-content">Skip to content</a>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">LinuxCNC Gantry Robot System</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+          <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/logo_udc_gtec_citic.svg" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">LinuxCNC Gantry Robot System</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../01_introduction/introduction.html">1. Introduction</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../02_igus_dryve_d1/00_index.html">2. igus® dryve D1 Controllers</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of 2. igus® dryve D1 Controllers</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/01_start_page.html">2.1. “Start” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/02_motor_page.html">2.2. “Motor” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/03_axis_page.html">2.3. “Axis” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/04_communication_page.html">2.4. “Communication” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/05_inputs_outputs_page.html">2.5. “Inputs/Outputs” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/06_drive_profile_page.html">2.6. “Drive Profile” Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../02_igus_dryve_d1/07_oscilloscope_page.html">2.7. “Oscilloscope” Page</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="00_index.html">3. LinuxCNC</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle navigation of 3. LinuxCNC</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="01_installation.html">3.1. Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="02_latency_analysis.html">3.2. System Latency Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="03_latency_tuning.html">3.3. System Latency Tuning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="04_mesa_7i96s_configuration.html">3.4. MESA 7I96S Board Configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="05_mesa_7i77_configuration.html">3.5. MESA 7I77 Board Configuration</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">3.6. Introduction to LinuxCNC</a></li>
+<li class="toctree-l2"><a class="reference internal" href="07_linuxcnc_basic_usage.html">3.7. Basic LinuxCNC Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="08_linuxcnc_configuration.html">3.8. LinuxCNC Configuration</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../04_error_analysis_calibration/00_index.html">4. Error Analysis and Calibration</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of 4. Error Analysis and Calibration</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../04_error_analysis_calibration/01_installation.html">4.1. Installation and Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04_error_analysis_calibration/02_calibration.html">4.2. Data and Calibration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../04_error_analysis_calibration/03_usage.html">4.3. Usage</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../05_calibxyzkins_module/00_index.html">5. calibxyzkins - Calibrated XYZ Kinematics Module for LinuxCNC</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../fdl-1.3.html">GNU Free Documentation License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bibliography.html">Bibliography</a></li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="view-this-page">
+  <a class="muted-link" href="../../_sources/doc/03_linuxcnc/06_linuxcnc_introduction.md.txt" title="View this page">
+    <svg><use href="#svg-eye"></use></svg>
+    <span class="visually-hidden">View this page</span>
+  </a>
+</div>
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto-light"><use href="#svg-sun-with-moon"></use></svg>
+              <svg class="theme-icon-when-auto-dark"><use href="#svg-moon-with-sun"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main" id="furo-main-content">
+          <section class="tex2jax_ignore mathjax_ignore" id="introduction-to-linuxcnc">
+<h1><span class="section-number">3.6. </span>Introduction to LinuxCNC<a class="headerlink" href="#introduction-to-linuxcnc" title="Link to this heading">¶</a></h1>
+<p>LinuxCNC is a highly customizable suite of applications for controlling <abbr title="Computer Numerical Control">CNC</abbr> machines, 3D printers, robots, and other automated devices. It is capable of providing coordinated control of up to nine axes of motion. LinuxCNC comprises several key components integrated into a complete system <span id="id1">[<a class="reference internal" href="../../bibliography.html#id14" title="LinuxCNC Documentation. 2023. URL: https://linuxcnc.org/docs/.">lin23</a>]</span>:</p>
+<ul class="simple">
+<li><p>A <abbr title="Graphical User Interface">GUI</abbr>, which serves as the primary interface between the operator, the software, and the <abbr title="Computer Numerical Control">CNC</abbr> machine itself.</p></li>
+<li><p>The <abbr title="Hardware Abstraction Layer">HAL</abbr>, which enables the linking of signals from the external environment with LinuxCNC and vice versa.</p></li>
+<li><p>High-level modules that coordinate the generation, execution, and motion control of the <abbr title="Computer Numerical Control">CNC</abbr> machine, specifically the motion controller, the input/output controller, and the task executor.</p></li>
+</ul>
+<p>This document provides only a brief overview of LinuxCNC; for more detailed information, it is recommended to consult the LinuxCNC user manual <span id="id2">[<a class="reference internal" href="../../bibliography.html#id14" title="LinuxCNC Documentation. 2023. URL: https://linuxcnc.org/docs/.">lin23</a>]</span>, which comprehensively describes how to use the software. On a system with LinuxCNC installed, the manual can be accessed by clicking on <span class="menuselection">Applications menu ‣ CNC ‣ Documentation</span>.</p>
+<section id="running-linuxcnc">
+<h2><span class="section-number">3.6.1. </span>Running LinuxCNC<a class="headerlink" href="#running-linuxcnc" title="Link to this heading">¶</a></h2>
+<p>You can run LinuxCNC by clicking on <span class="menuselection">Applications menu ‣ CNC ‣ LinuxCNC</span> or by using the <code class="docutils literal notranslate"><span class="pre">linuxcnc</span></code> command. Its usage is shown in <a class="reference internal" href="#lst-linuxcnc-help"><span class="std std-numref">Listing 4</span></a>.</p>
+<div class="literal-block-wrapper docutils container" id="lst-linuxcnc-help">
+<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">Usage of the linuxcnc command</span><a class="headerlink" href="#lst-linuxcnc-help" title="Link to this code">¶</a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>linuxcnc: Run LinuxCNC
+
+Usage:
+  $ linuxcnc -h
+    This help
+
+  $ linuxcnc [Options]
+    Choose the configuration INI file graphically
+
+  $ linuxcnc [Options] path/to/your_ini_file
+    Name the configuration INI file using its path
+
+  $ linuxcnc [Options] -l
+    Use the previously used configuration INI file
+
+Options:
+    -d: Turn on &quot;debug&quot; mode
+    -v: Turn on &quot;verbose&quot; mode
+    -r: Disable redirection of stdout and stderr to ~/linuxcnc_print.txt and
+        ~/linuxcnc_debug.txt when stdin is not a tty.
+        Used when running linuxcnc tests non-interactively.
+    -l: Use the last-used INI file
+    -k: Continue in the presence of errors in HAL files
+    -t &quot;tpmodulename [parameters]&quot;
+            specify custom trajectory_planning_module
+            overrides optional INI setting [TRAJ]TPMOD
+    -m &quot;homemodulename [parameters]&quot;
+            specify custom homing_module
+            overrides optional INI setting [EMCMOT]HOMEMOD
+    -H &quot;dirname&quot;: search dirname for HAL files before searching
+                  INI directory and system library:
+                  /home/git/linuxcnc-dev/lib/hallib
+Note:
+    The -H &quot;dirname&quot; option may be specified multiple times
+</pre></div>
+</div>
+</div>
+<p>If you click on <span class="menuselection">Applications menu ‣ CNC ‣ LinuxCNC</span> or run the <code class="docutils literal notranslate"><span class="pre">linuxcnc</span></code> command without specifying a configuration file, the LinuxCNC configuration selector will open, as shown in <a class="reference internal" href="#fig-linuxcnc-conf-selector"><span class="std std-numref">Fig. 25</span></a>.</p>
+<figure class="align-default" id="fig-linuxcnc-conf-selector">
+<img alt="../../_images/configuration_selector.png" src="../../_images/configuration_selector.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 25 </span><span class="caption-text">LinuxCNC configuration selector.</span><a class="headerlink" href="#fig-linuxcnc-conf-selector" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>In the configuration selector, available configurations are displayed in a tree structure, reflecting their directory structure, with two initial nodes:</p>
+<ul class="simple">
+<li><p><strong>My configurations</strong>: User-defined configurations, stored in the <code class="docutils literal notranslate"><span class="pre">~/linuxcnc/configs</span></code> folder.</p></li>
+<li><p><strong>Sample configurations</strong>: Example configurations provided by default with LinuxCNC, stored in <code class="docutils literal notranslate"><span class="pre">/usr/share/linuxcnc/configs</span></code>.</p></li>
+</ul>
+<p>To start LinuxCNC with a configuration, simply double-click on it or select it and press the <span class="guilabel">OK</span> button.
+If you check the “Create Desktop Shortcut” box, a desktop icon will also be created to directly launch LinuxCNC with the respective configuration. Finally, if the configuration is one of the <em>Sample configurations</em>, LinuxCNC will prompt the user to copy it to the <code class="docutils literal notranslate"><span class="pre">~/linuxcnc/configs</span></code> folder, allowing for later modification. If the user accepts, the configuration will subsequently appear under the <em>My configurations</em> category.</p>
+</section>
+<section id="configuration-files">
+<span id="sec-linuxcnc-intro-config"></span><h2><span class="section-number">3.6.2. </span>Configuration Files<a class="headerlink" href="#configuration-files" title="Link to this heading">¶</a></h2>
+<p>A LinuxCNC configuration typically consists of several files. For example, considering a configuration folder named “robot,” a typical setup would include the following files:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">robot.ini</span></code>: The main LinuxCNC configuration file. This defines parameters such as speeds, accelerations, axis configuration, and other important settings.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">robot.hal</span></code>: The main <abbr title="Hardware Abstraction Layer">HAL</abbr> file. This contains the configuration for mapping LinuxCNC signals with the system’s hardware interface, defining how physical components relate to logical signals within LinuxCNC. When LinuxCNC starts, this file is read and processed before the <abbr title="Graphical User Interface">GUI</abbr> is loaded.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">robot_custom.hal</span></code> (optional): LinuxCNC allows for specifying multiple <code class="docutils literal notranslate"><span class="pre">.hal</span></code> files. This file would contain additional <abbr title="Hardware Abstraction Layer">HAL</abbr> configurations.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">robot_postgui.hal</span></code> (optional): <abbr title="Hardware Abstraction Layer">HAL</abbr> configurations that are executed after the <abbr title="Graphical User Interface">GUI</abbr> has loaded. This can include display configurations, such as linking a LinuxCNC signal to a <abbr title="Graphical User Interface">GUI</abbr> element to display its value.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rs274ngc.var</span></code> (optional): Parameters for the G-code interpreter (see <a class="reference internal" href="#sec-linuxcnc-intro-gcode"><span class="std std-numref">Section 3.6.3</span></a>) that will persist across different LinuxCNC executions.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">tool.tbl</span></code> (optional): The tool table configuration. This is used to define tools and their properties, such as dimensions and offsets.</p></li>
+</ul>
+<p><a class="reference internal" href="08_linuxcnc_configuration.html#sec-linuxcnc-configuration"><span class="std std-numref">Section 3.8</span></a> shows an example of a LinuxCNC configuration.</p>
+</section>
+<section id="g-code-language">
+<span id="sec-linuxcnc-intro-gcode"></span><h2><span class="section-number">3.6.3. </span>G-code Language<a class="headerlink" href="#g-code-language" title="Link to this heading">¶</a></h2>
+<p>G-code is the most widely used programming language in <abbr title="Computer Numerical Control">CNC</abbr>. A G-code program consists of a series of instructions that command the machine on how to move or perform specific operations. G-code has its origins in the early days of industrial automation, developed as a standard method for communicating instructions to <abbr title="Computer Numerical Control">CNC</abbr> machines in the 1950s and 60s. It was standardized as RS-274 by the <abbr title="Electronic Industries Alliance">EIA</abbr> in 1963, with its final revision standardized as RS-274-D in 1979 and as ISO 6984 in 1982. Subsequently, numerous implementations and derived standards emerged, developed by both public and private entities.</p>
+<p>In LinuxCNC, G-code is the language used to control machine movement. Specifically, the version implemented by LinuxCNC is based on the RS274/NGC language developed by the <abbr title="National Institute of Standards and Technology">NIST</abbr> <span id="id3">[<a class="reference internal" href="../../bibliography.html#id21" title="Thomas R. Kramer, Frederick M. Proctor, and Elena Messina. The NIST RS274NGC interpreter – version 3. August 2000. URL: https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=823374 (visited on 2023-10-24).">RKMPM00</a>]</span>. The LinuxCNC documentation extensively details the G-code language <span id="id4">[<a class="reference internal" href="../../bibliography.html#id14" title="LinuxCNC Documentation. 2023. URL: https://linuxcnc.org/docs/.">lin23</a>, section G-code Programming]</span>. Some example G-code commands are presented below:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">G0</span> <span class="pre">X10</span> <span class="pre">Y5</span> <span class="pre">Z3</span></code>: Rapid linear movement to coordinates X=10, Y=5, and Z=3.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">F100</span></code>: Sets the feed rate to 100 units per minute.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">G1</span> <span class="pre">X20</span> <span class="pre">Y15</span></code>: Linear movement to coordinates X=20 and Y=15 at the current feed rate.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">G1</span> <span class="pre">F100</span> <span class="pre">X20</span> <span class="pre">Y15</span></code>: Sets the feed rate to 100 units per minute and then moves linearly to coordinates X=20 and Y=15.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">G2</span> <span class="pre">X30</span> <span class="pre">Y10</span> <span class="pre">I5</span> <span class="pre">J0</span></code>: Clockwise circular movement with center at X=5, Y=0 and a radius of 5 units.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">G3</span> <span class="pre">X40</span> <span class="pre">Y5</span> <span class="pre">I2</span> <span class="pre">J3</span></code>: Counter-clockwise circular movement with center at X=2, Y=3 and a radius of 5 units.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">M3</span> <span class="pre">S1000</span></code>: Activates the spindle at 1000 rpm in a clockwise direction.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">M5</span></code>: Deactivates the spindle.</p></li>
+</ul>
+<p>These are just a few basic examples of G-code commands. In practice, G-code programs typically consist of multiple lines, each containing a command, and like any other programming language, they can define variables, subroutines, and incorporate loops or flow control.</p>
+</section>
+<section id="modes-of-operation">
+<span id="sec-linuxcnc-modes-of-operation"></span><h2><span class="section-number">3.6.4. </span>Modes of Operation<a class="headerlink" href="#modes-of-operation" title="Link to this heading">¶</a></h2>
+<p>LinuxCNC offers three distinct modes of operation, each designed for a specific purpose: manual, automatic, and <abbr title="Manual Data Input">MDI</abbr>. These modes define how commands are entered and executed:</p>
+<ul class="simple">
+<li><p>In manual mode, commands are entered individually. These commands represent direct actions, such as “activate coolant” or “move X-axis to 25 inches per minute.” In graphical interfaces, manual control is typically handled via buttons or keyboard shortcuts.</p></li>
+<li><p>Automatic mode enables the full execution of G-code programs stored in files. A single command can load and execute an entire file.</p></li>
+<li><p>MDI mode allows for the execution of individual G-code commands.</p></li>
+</ul>
+<p>It is important to note that certain commands, such as <em>Abort</em>, <em>Emergency Stop</em>, and <em>Feed Rate Override</em>, can be used in all modes.</p>
+</section>
+<section id="graphical-interface">
+<h2><span class="section-number">3.6.5. </span>Graphical Interface<a class="headerlink" href="#graphical-interface" title="Link to this heading">¶</a></h2>
+<p>LinuxCNC provides various graphical interfaces for controlling <abbr title="Computer Numerical Control">CNC</abbr> machines. The specific interface to use is configured within the <code class="docutils literal notranslate"><span class="pre">.ini</span></code> file. A comprehensive list of available graphical interfaces, along with images and examples, can be found in the LinuxCNC user manual <span id="id5">[<a class="reference internal" href="../../bibliography.html#id14" title="LinuxCNC Documentation. 2023. URL: https://linuxcnc.org/docs/.">lin23</a>]</span>.</p>
+<p>One of the most popular graphical interfaces is “AXIS,” designed for control via keyboard and mouse. This graphical interface is shown in <a class="reference internal" href="#fig-linuxcnc-gui-axis-estop"><span class="std std-numref">Fig. 26</span></a>. Additionally, LinuxCNC also offers the “HALUI” interface, a purely hardware-based interface that allows controlling the <abbr title="Computer Numerical Control">CNC</abbr> machine using only physical buttons and switches.</p>
+<figure class="align-default" id="fig-linuxcnc-gui-axis-estop">
+<img alt="../../_images/linuxcnc_gui_axis.png" src="../../_images/linuxcnc_gui_axis.png" />
+<figcaption>
+<p><span class="caption-number">Fig. 26 </span><span class="caption-text">LinuxCNC “AXIS” graphical interface.</span><a class="headerlink" href="#fig-linuxcnc-gui-axis-estop" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>In our gantry robot system, we have considered the AXIS graphical interface. The window of this interface, as shown in <a class="reference internal" href="#fig-linuxcnc-gui-axis-estop"><span class="std std-numref">Fig. 26</span></a>, contains the following elements:</p>
+<ul>
+<li><p>A display area with two tabs:</p>
+<ul class="simple">
+<li><p>“Preview” tab: Shows the position of the point controlled by the machine. Subsequently, it will display the path traced by the machine.</p></li>
+<li><p>“DRO” (Digital Readout) tab: Shows the current position and all active offsets.</p></li>
+</ul>
+</li>
+<li><p>A menu bar and a toolbar that enable various actions.</p></li>
+<li><p>“Manual Control” tab: Allows for manual machine movement.</p></li>
+<li><p>“MDI” (Manual Data Input) tab: Allows entering G-code programs manually, line by line.</p></li>
+<li><p>“Feed Override”: Allows scaling the speed of programmed movements.</p></li>
+<li><p>“Rapid Override”: Allows scaling the speed of rapid movements (e.g., G-code <code class="docutils literal notranslate"><span class="pre">G0</span></code> commands).</p></li>
+<li><p>“Jog Speed”: Allows configuring the “jog” speed, which is the speed when the robot is controlled with the <span class="guilabel">+</span> and <span class="guilabel">-</span> controls of the “Manual Control” tab.</p></li>
+<li><p>“Max Velocity”: Allows limiting the maximum speed of all programmed movements.</p></li>
+<li><p>“Active G-codes”: Shows the modal G-codes that are currently active. Some of the most relevant ones displayed in <a class="reference internal" href="#fig-linuxcnc-gui-axis-estop"><span class="std std-numref">Fig. 26</span></a> are:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">G17</span></code>: Sets the machine’s work plane to XY.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">G21</span></code>: Sets the units of measurement to millimeters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">G90</span></code>: Sets the absolute coordinate mode.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">G94</span></code>: Sets the feed rate to be interpreted in units per minute.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">F0</span></code>: Sets the feed rate to zero.</p>
+<p>Detailed information on G-codes can be found in the LinuxCNC user manual <span id="id6">[<a class="reference internal" href="../../bibliography.html#id14" title="LinuxCNC Documentation. 2023. URL: https://linuxcnc.org/docs/.">lin23</a>, section G-Codes]</span>, also available at <a class="reference external" href="https://linuxcnc.org/docs/html/gcode/g-code.html">https://linuxcnc.org/docs/html/gcode/g-code.html</a>.</p>
+</li>
+</ul>
+</li>
+<li><p>A text display area that shows the loaded G-code file.</p></li>
+<li><p>A status bar that shows various useful data:</p>
+<ul class="simple">
+<li><p>Machine status: “ESTOP” (emergency stop), “OFF” (off), or “ON” (on).</p></li>
+<li><p>Tool currently inserted.</p></li>
+<li><p>Displayed position: “relative” (showing all offsets), or “actual” (showing feedback position).</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="07_linuxcnc_basic_usage.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title"><span class="section-number">3.7. </span>Basic LinuxCNC Usage</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="05_mesa_7i77_configuration.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title"><span class="section-number">3.5. </span>MESA 7I77 Board Configuration</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2000–2022 LinuxCNC.org; 2025 Tomás Domínguez Bolaño, Valentín Barral Vales, Carlos José Escudero Cascón, and José Antonio García Naya (CITIC Research Center, University of A Coruña, Spain)
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            <div class="last-updated">
+              Last updated on Aug 01, 2025</div>
+          </div>
+          <div class="right-details">
+            
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">3.6. Introduction to LinuxCNC</a><ul>
+<li><a class="reference internal" href="#running-linuxcnc">3.6.1. Running LinuxCNC</a></li>
+<li><a class="reference internal" href="#configuration-files">3.6.2. Configuration Files</a></li>
+<li><a class="reference internal" href="#g-code-language">3.6.3. G-code Language</a></li>
+<li><a class="reference internal" href="#modes-of-operation">3.6.4. Modes of Operation</a></li>
+<li><a class="reference internal" href="#graphical-interface">3.6.5. Graphical Interface</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    </body>
+</html>

@@ -1,0 +1,23 @@
+# calibxyzkins - Calibrated XYZ Kinematics Module
+
+
+The `calibxyzkins` module is a LinuxCNC kinematics component that provides coordinate transformations for cartesian machines to correct minor structural deviations and positioning errors. This module extends the standard trivial kinematics by applying mathematical corrections to compensate for systematic positioning errors in gantry robots and similar cartesian machines.
+
+The module is particularly useful for correcting:
+
+- Mechanical inaccuracies in manufacturing or assembly
+- Structural deformations under load
+- Non-perpendicular axes alignment
+- Position-dependent errors
+
+:::{toctree}
+:maxdepth: 2
+:caption: Table of Contents
+
+01_overview.md
+02_coordinate_transformation.md
+03_installation.md
+04_module_parameters.md
+05_hal_parameters.md
+06_inverse_kinematics.md
+:::

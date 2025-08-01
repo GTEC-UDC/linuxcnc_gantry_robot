@@ -1,0 +1,121 @@
+/* Rules for column alignment in tables */
+
+table.align-col1-c>tbody>tr>td:nth-child(1) {
+    text-align: center;
+}
+
+table.align-col1-l>tbody>tr>td:nth-child(1) {
+    text-align: left;
+}
+
+table.align-col1-r>tbody>tr>td:nth-child(1) {
+    text-align: right;
+}
+
+table.align-col2-c>tbody>tr>td:nth-child(2) {
+    text-align: center;
+}
+
+table.align-col2-l>tbody>tr>td:nth-child(2) {
+    text-align: left;
+}
+
+table.align-col2-r>tbody>tr>td:nth-child(2) {
+    text-align: right;
+}
+
+table.align-col3-c>tbody>tr>td:nth-child(3) {
+    text-align: center;
+}
+
+table.align-col3-l>tbody>tr>td:nth-child(3) {
+    text-align: left;
+}
+
+table.align-col3-r>tbody>tr>td:nth-child(3) {
+    text-align: right;
+}
+
+table.align-col4-c>tbody>tr>td:nth-child(4) {
+    text-align: center;
+}
+
+table.align-col4-l>tbody>tr>td:nth-child(4) {
+    text-align: left;
+}
+
+table.align-col4-r>tbody>tr>td:nth-child(4) {
+    text-align: right;
+}
+
+table.align-col5-c>tbody>tr>td:nth-child(5) {
+    text-align: center;
+}
+
+table.align-col5-l>tbody>tr>td:nth-child(5) {
+    text-align: left;
+}
+
+table.align-col5-r>tbody>tr>td:nth-child(5) {
+    text-align: right;
+}
+
+table.align-col6-c>tbody>tr>td:nth-child(6) {
+    text-align: center;
+}
+
+table.align-col6-l>tbody>tr>td:nth-child(6) {
+    text-align: left;
+}
+
+table.align-col6-r>tbody>tr>td:nth-child(6) {
+    text-align: right;
+}
+
+table.align-col7-c>tbody>tr>td:nth-child(7) {
+    text-align: center;
+}
+
+table.align-col7-l>tbody>tr>td:nth-child(7) {
+    text-align: left;
+}
+
+table.align-col7-r>tbody>tr>td:nth-child(7) {
+    text-align: right;
+}
+
+table.align-col8-c>tbody>tr>td:nth-child(8) {
+    text-align: center;
+}
+
+table.align-col8-l>tbody>tr>td:nth-child(8) {
+    text-align: left;
+}
+
+table.align-col8-r>tbody>tr>td:nth-child(8) {
+    text-align: right;
+}
+
+table.align-col9-c>tbody>tr>td:nth-child(9) {
+    text-align: center;
+}
+
+table.align-col9-l>tbody>tr>td:nth-child(9) {
+    text-align: left;
+}
+
+table.align-col9-r>tbody>tr>td:nth-child(9) {
+    text-align: right;
+}
+
+table.align-col10-c>tbody>tr>td:nth-child(10) {
+    text-align: center;
+}
+
+table.align-col10-l>tbody>tr>td:nth-child(10) {
+    text-align: left;
+}
+
+table.align-col10-r>tbody>tr>td:nth-child(10) {
+    text-align: right;
+}

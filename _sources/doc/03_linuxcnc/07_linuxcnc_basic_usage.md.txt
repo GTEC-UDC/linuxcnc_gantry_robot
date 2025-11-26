@@ -58,8 +58,6 @@ To perform the homing process, you can click the {guilabel}`Home All` button on 
 3. Move the motor again towards the limit switch until it is activated, this time at a slower speed to precisely locate the switch's position.
 4. Move the motor to the designated home reference position.
 
-In the `mesa_7i96s_7i77_xy` and `mesa_7i96s_7i77_xx` configurations, you must manually activate the limit switches for both motors. In the `mesa_7i96s_7i77_xc` configuration, only the brushless motor's limit switch needs manual activation; the stepper motor in this case uses a different homing process that simply seeks the encoder's index pulse position.
-
 {numref}`fig:linuxcnc_gui_axis_on_homed` shows the interface window after the homing process is complete. The {{homed_symbol}} symbol can now be seen next to the X and Y axis information in the display area, indicating that the axes are homed.
 
 :::{figure} images/linuxcnc/linuxcnc_gui_axis_on_homed.png

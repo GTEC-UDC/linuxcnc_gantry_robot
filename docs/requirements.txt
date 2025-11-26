@@ -1,4 +1,5 @@
 furo
+myst-parser
 pygments-csv-lexer
 sphinx >= 7.0.0
 sphinx-copybutton

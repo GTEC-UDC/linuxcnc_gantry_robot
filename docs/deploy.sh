@@ -135,9 +135,9 @@ else
     print_status "Committing changes..."
     git commit -m "Deploy documentation to GitHub Pages
 
-    Built from branch: master
-    Build date: $(date)
-    Source commit: $MASTER_COMMIT"
+Built from branch: master
+Build date: $(date)
+Source commit: $MASTER_COMMIT"
 
     print_success "Deployment process completed."
     print_status "Now you can push to remote gh-pages branch by doing:"

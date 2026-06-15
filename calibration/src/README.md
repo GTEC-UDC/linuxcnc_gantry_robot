@@ -55,7 +55,7 @@ x' \\ y' \\ z'
 \begin{bmatrix}
 a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33}
 \end{bmatrix}
-}_{\normalsize A}
+}_{\normalsize \mathbf{A}}
 \begin{bmatrix}
 x \\ y \\ z
 \end{bmatrix} +
@@ -63,7 +63,7 @@ x \\ y \\ z
 \begin{bmatrix}
 b_{11} & b_{12} & 0 \\ b_{21} & b_{22} & 0 \\ b_{31} & b_{32} & 0
 \end{bmatrix}
-}_{\normalsize B}
+}_{\normalsize \mathbf{B}}
 \begin{bmatrix}
 x^2 \\ y^2 \\ z^2
 \end{bmatrix} +
@@ -71,18 +71,18 @@ x^2 \\ y^2 \\ z^2
 \begin{bmatrix}
 c_1 \\ c_2 \\ c_3
 \end{bmatrix}
-}_{\normalsize C}
+}_{\normalsize \mathbf{c}}
 $$
 
-where $x, y, z$ are the aligned OptiTrack position coordinates (the actual position of the gantry robot), $x', y', z'$ are the corrected position coordinates (the target position for the gantry control), and $A, B, C$ are the transformation matrices and vector that need to be optimized.
+where $x, y, z$ are the aligned OptiTrack position coordinates (the actual position of the gantry robot), $x', y', z'$ are the corrected position coordinates (the target position for the gantry control), and $\mathbf{A}, \mathbf{B}, \mathbf{c}$ are the transformation matrices and vector that need to be optimized.
 
-**Note**: The third column of the second-order matrix $B$ is set to zero because the Z-axis measurement interval is small, making the $z^2$ term unreliable if $z$ is extrapolated.
+**Note**: The third column of the second-order matrix $\mathbf{B}$ is set to zero because the Z-axis measurement interval is small, making the $z^2$ term unreliable if $z$ is extrapolated.
 
 This transformation consists of:
 
-1. Matrix $A$: Linear transformation that handles scaling, rotation, and shear.
-2. Matrix $B$: Quadratic transformation that corrects non-linear distortions.
-3. Vector $C$: Constant offset.
+1. Matrix $\mathbf{A}$: Linear transformation that handles scaling, rotation, and shear.
+2. Matrix $\mathbf{B}$: Quadratic transformation that corrects non-linear distortions.
+3. Vector $\mathbf{c}$: Constant offset.
 
 The correction parameters are found using numerical optimization, with the Powell method by default, to minimize the mean squared error between gantry and the corrected OptiTrack positions. The optimization is performed using the `scipy.optimize.minimize` function.
 
@@ -90,7 +90,7 @@ The correction parameters are found using numerical optimization, with the Powel
 
 The `calibxyzkins` module of LinuxCNC included in this repository uses the Newton-Raphson algorithm to solve the inverse kinematics problem: given desired axes positions $x', y', z'$, it finds the corresponding joint positions $x, y, z$ that satisfy the transformation equation:
 
-$$\mathbf{f}(x, y, z) = A \begin{bmatrix} x \\ y \\ z \end{bmatrix} + B \begin{bmatrix} x^2 \\ y^2 \\ z^2 \end{bmatrix} + C = \begin{bmatrix} x' \\ y' \\ z' \end{bmatrix}$$
+$$\mathbf{f}(x, y, z) = \mathbf{A} \begin{bmatrix} x \\ y \\ z \end{bmatrix} + \mathbf{B} \begin{bmatrix} x^2 \\ y^2 \\ z^2 \end{bmatrix} + \mathbf{c} = \begin{bmatrix} x' \\ y' \\ z' \end{bmatrix}$$
 
 To ensure the calibration parameters are valid we include the `check_params.py` script, which performs the following validation tests:
 
@@ -98,20 +98,20 @@ To ensure the calibration parameters are valid we include the `check_params.py` 
 
 The Newton-Raphson method requires computing the Jacobian matrix of the transformation function:
 
-$$J = \frac{\partial \mathbf{f}}{\partial [x, y, z]} = A + 2 \cdot \text{diag}(x, y, z) \cdot B$$
+$$\mathbf{J} = \frac{\partial \mathbf{f}}{\partial [x, y, z]} = \mathbf{A} + 2 \cdot \text{diag}(x, y, z) \cdot \mathbf{B}$$
 
 The Jacobian matrix must be invertible throughout the robot's workspace. This is tested using an approach based on the Neumann series.
 
-The Neumann series states that $(I - T)$ is invertible if $\|T\| < 1$, where $I$ is the identity matrix and $\|\cdot\|$ denotes a matrix norm.
+The Neumann series states that $(\mathbf{I} - \mathbf{T})$ is invertible if $\|\mathbf{T}\| < 1$, where $\mathbf{I}$ is the identity matrix and $\|\cdot\|$ denotes a matrix norm.
 
-For a matrix of the form $X + Y = X(I + X^{-1}Y)$, the matrix has an inverse if $\|X^{-1}Y\| < 1$.
+For a matrix of the form $\mathbf{X} + \mathbf{Y} = \mathbf{X}(\mathbf{I} + \mathbf{X}^{-1}\mathbf{Y})$, the matrix has an inverse if $\|\mathbf{X}^{-1}\mathbf{Y}\| < 1$.
 
 Applying this to our Jacobian:
 
-- $X = A$
-- $Y = 2 \cdot \text{diag}(x, y, z) \cdot B$
+- $\mathbf{X} = \mathbf{A}$
+- $\mathbf{Y} = 2 \cdot \text{diag}(x, y, z) \cdot \mathbf{B}$
 
-Therefore, the Jacobian $J$ is invertible if $A$ is invertible and $\|2 \cdot A^{-1} \cdot \text{diag}(x, y, z) \cdot B\| < 1$ for the maximum absolute values of $x, y, z$ in the joint space bounds.
+Therefore, the Jacobian $\mathbf{J}$ is invertible if $\mathbf{A}$ is invertible and $\|2 \cdot \mathbf{A}^{-1} \cdot \text{diag}(x, y, z) \cdot \mathbf{B}\| < 1$ for the maximum absolute values of $x, y, z$ in the joint space bounds.
 
 This condition is checked in the `check_params.py` script using both the 1-norm and infinity-norm.
 

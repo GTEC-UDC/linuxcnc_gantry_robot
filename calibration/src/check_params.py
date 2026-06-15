@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 def forward_kinematics(
     joint_values: np.ndarray, params: tuple[np.ndarray, np.ndarray, np.ndarray]
 ) -> np.ndarray:
-    A, B, C = params
-    return joint_values @ A + joint_values**2 @ B + C
+    A, B, c = params
+    return joint_values @ A + joint_values**2 @ B + c
 
 
 def inverse_kinematics(
@@ -26,11 +26,11 @@ def inverse_kinematics(
     max_iter: int = 10,
     tol: float = 1e-3,
 ) -> np.ndarray:
-    A, B, C = params
+    A, B, c = params
 
     # Function to minimize
     def f_opt(x: np.ndarray) -> np.ndarray:
-        return x @ A + x**2 @ B + C - pos
+        return x @ A + x**2 @ B + c - pos
 
     # Jacobian
     def J(x: np.ndarray) -> np.ndarray:
@@ -88,8 +88,6 @@ def get_joint_bounds(
     params: tuple[np.ndarray, np.ndarray, np.ndarray],
     axis_bounds: tuple[np.ndarray, np.ndarray],
 ) -> tuple[np.ndarray, np.ndarray]:
-    A, B, C = params
-
     min_joints = np.zeros(3)
     max_joints = np.zeros(3)
 

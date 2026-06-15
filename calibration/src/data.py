@@ -408,16 +408,16 @@ def get_processed_data(
     #
     # We consider the following transformation:
     #
-    #   pos_optitrack = pos_gantry * A + pos_gantry ** 2 * B + C
+    #   pos_optitrack = pos_gantry * A + pos_gantry ** 2 * B + c
     #
     # where:
     #   - pos_gantry is the position of the gantry (row vector)
     #   - pos_optitrack is the position of the OptiTrack system (row vector)
     #   - A is a 3x3 matrix
     #   - B is a 3x3 matrix
-    #   - C is a 3x1 vector
+    #   - c is a 3x1 vector
     #
-    # The parameters are the elements of the matrices A, B, and C.
+    # The parameters are the elements of the matrices A and B, and vector c.
     # -------------------------------------------------------------------------
 
     correction_params_array: Optional[np.ndarray] = None

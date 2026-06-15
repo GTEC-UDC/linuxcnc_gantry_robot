@@ -27,11 +27,7 @@ if __name__ == "__main__":
     # coordinate vectors.
     A = params[0].T
     B = params[1].T
-    C = params[2].T
-
-    # print(A)
-    # print(B)
-    # print(C)
+    c = params[2].T
 
     coords = ["x", "y", "z"]
 
@@ -53,4 +49,4 @@ if __name__ == "__main__":
     print()
     print("# Calibration vector C")
     for row_i, row_coord in enumerate(coords):
-        print(f"setp calibxyzkins.calib-c.{row_coord} {C[row_i]:.10g}")
+        print(f"setp calibxyzkins.calib-c.{row_coord} {c[row_i]:.10g}")

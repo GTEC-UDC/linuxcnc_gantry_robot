@@ -28,15 +28,15 @@ This module provides forward and inverse kinematic functions for a calibrated
 XYZ cartesian machine. The forward transformation from joints jx, jy, jz
 to positions x, y, z is defined as:
 
-[x, y, z]^T = A * [jx, jy, jz]^T + B * [jx^2, jy^2, jz^2]^T + C
+[x, y, z]^T = A * [jx, jy, jz]^T + B * [jx^2, jy^2, jz^2]^T + c
 
-Where A and B are 3x3 matrices, C is a 3x1 vector, and ^T is the transpose
+Where A and B are 3x3 matrices, c is a 3x1 vector, and ^T is the transpose
 operation.
 
-The default values for A, B, and C are:
+The default values for A, B, and c are:
   - A: 3x3 identity matrix
   - B: all zero 3x3 matrix
-  - C: all zero 3x1 matrix
+  - c: all zero 3x1 matrix
 
 Thus, by default the kinematics are just the trivial kinematics.
 
@@ -67,7 +67,7 @@ HAL parameters (defaults in parentheses):
     calibxyzkins.calib-b.zy (0)
     calibxyzkins.calib-b.zz (0)
 
-  * Calibration vector C:
+  * Calibration vector c:
     calibxyzkins.calib-c.x (0)
     calibxyzkins.calib-c.y (0)
     calibxyzkins.calib-c.z (0)

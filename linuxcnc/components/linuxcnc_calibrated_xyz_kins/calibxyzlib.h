@@ -31,13 +31,13 @@
  *
  * [p_0, p_1, p_2]^T = A * [j_0, j_1, j_2]^T +
  *                     B * [j_0^2, j_1^2, j_2^2]^T +
- *                     C
+ *                     c
  *
  * Where p_i and j_i are the ith position and joint coordinates, respectively,
  * and ^T is the transpose operation.
  */
 void calib_xyz_forward(const double A[3][3], const double B[3][3],
-                       const double C[3], const double joints[3],
+                       const double c[3], const double joints[3],
                        double position[3]);
 
 /**
@@ -47,7 +47,7 @@ void calib_xyz_forward(const double A[3][3], const double B[3][3],
  *
  * [p_0, p_1, p_2]^T = A * [j_0, j_1, j_2]^T +
  *                     B * [j_0^2, j_1^2, j_2^2]^T +
- *                     C
+ *                     c
  *
  * Where p_i and j_i are the ith position and joint coordinates, respectively,
  * and ^T is the transpose operation.
@@ -70,10 +70,10 @@ void calib_xyz_forward(const double A[3][3], const double B[3][3],
  * being non-invertible, 0 in other case.
  */
 int calib_xyz_inverse(const double A[3][3], const double B[3][3],
-                      const double C[3], const double *min_bounds,
+                      const double c[3], const double *min_bounds,
                       const double *max_bounds, const unsigned int max_iter,
                       const double tol, const double position[3],
-                      double joints[3], double *F_norm);
+                      double joints[3], double *f_norm);
 
 /*
  * Check that inverse exist within min and max bounds for calibration matrices A

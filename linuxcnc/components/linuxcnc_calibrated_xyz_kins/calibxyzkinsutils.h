@@ -33,16 +33,16 @@
 /*
  * HAL data
  * Parameters:
- *  - Calibration matrices A and B, and vector C
+ *  - Calibration matrices A and B, and vector c
  *  - Min/max values of joints of XYZ coordinates
  * Pins:
  *  - Max iterations for inverse kinematics
  *  - Tolerance for inverse kinematics
  */
 typedef struct {
-  hal_float_t calib_m_A[3][3];
-  hal_float_t calib_m_B[3][3];
-  hal_float_t calib_v_C[3];
+  hal_float_t calib_A[3][3];
+  hal_float_t calib_B[3][3];
+  hal_float_t calib_c[3];
   hal_float_t joints_min[3];
   hal_float_t joints_max[3];
   hal_u32_t *max_iter;

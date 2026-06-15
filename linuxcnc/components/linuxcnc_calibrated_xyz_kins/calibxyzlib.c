@@ -31,10 +31,10 @@
 #include "linalg3.h"
 
 void calib_xyz_forward(const double A[3][3], const double B[3][3],
-                       const double C[3], const double joints[3],
+                       const double c[3], const double joints[3],
                        double position[3]) {
   for (int i = 0; i < 3; ++i) {
-    position[i] = C[i];
+    position[i] = c[i];
     for (int j = 0; j < 3; ++j) {
       position[i] += A[i][j] * joints[j] + B[i][j] * joints[j] * joints[j];
     }
@@ -47,12 +47,12 @@ static double clamp(double val, double min, double max) {
 }
 
 int calib_xyz_inverse(const double A[3][3], const double B[3][3],
-                      const double C[3], const double *min_bounds,
+                      const double c[3], const double *min_bounds,
                       const double *max_bounds, const unsigned int max_iter,
                       const double tol, const double position[3],
-                      double joints[3], double *F_norm) {
-  double F[3];
-  double F_norm_val;
+                      double joints[3], double *f_norm) {
+  double f[3];
+  double f_norm_val;
   double J[3][3];
   double inv_J[3][3];
   double delta[3];
@@ -72,25 +72,25 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
   }
 
   for (int iter = 0; iter < max_iter; ++iter) {
-    // F = A * joints + B * joints^2 + C - position
+    // f = A * joints + B * joints^2 + c - position
     for (int i = 0; i < 3; ++i) {
-      F[i] = C[i] - position[i];
+      f[i] = c[i] - position[i];
       for (int j = 0; j < 3; ++j) {
-        F[i] += A[i][j] * joints[j] + B[i][j] * joints[j] * joints[j];
+        f[i] += A[i][j] * joints[j] + B[i][j] * joints[j] * joints[j];
       }
     }
 
-    // Euclidean norm of F
-    F_norm_val = sqrt(F[0] * F[0] + F[1] * F[1] + F[2] * F[2]);
+    // Euclidean norm of f
+    f_norm_val = sqrt(f[0] * f[0] + f[1] * f[1] + f[2] * f[2]);
 
 #ifdef CALIB_XYZ_INVERSE_PRINT_ITER
-    printf("Iteration %d F = %5.4g, %5.4g, %5.4g\n", iter, F[0], F[1], F[2]);
+    printf("Iteration %d f = %5.4g, %5.4g, %5.4g\n", iter, f[0], f[1], f[2]);
     printf("Iteration %d joints = %5.4g, %5.4g, %5.4g\n", iter, joints[0],
            joints[1], joints[2]);
-    printf("Iteration %d F_norm = %8.4g\n", iter, F_norm);
+    printf("Iteration %d f_norm = %8.4g\n", iter, f_norm);
 #endif
 
-    if (F_norm_val < tol) {
+    if (f_norm_val < tol) {
       break;
     }
 
@@ -106,8 +106,8 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
       return -EINVAL;
     }
 
-    // delta = J^-1 * F
-    mult_mv_3x3(inv_J, F, delta);
+    // delta = J^-1 * f
+    mult_mv_3x3(inv_J, f, delta);
 
     // Update joints
     if (bound_result) {
@@ -121,8 +121,8 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
     }
   }
 
-  if (F_norm != NULL) {
-    *F_norm = F_norm_val;
+  if (f_norm != NULL) {
+    *f_norm = f_norm_val;
   }
 
   return 0;

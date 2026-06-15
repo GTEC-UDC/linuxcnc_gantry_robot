@@ -181,20 +181,20 @@ int init_hal_params(int comp_id, haldata_t *haldata) {
   // Calibration matrices A, B, and vector C
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_m_A[i][j],
+      if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_A[i][j],
                                       comp_id, "calibxyzkins.calib-a.%c%c",
                                       coord_letter[i], coord_letter[j])) < 0) {
         return res;
       }
 
-      if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_m_B[i][j],
+      if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_B[i][j],
                                       comp_id, "calibxyzkins.calib-b.%c%c",
                                       coord_letter[i], coord_letter[j])) < 0) {
         return res;
       }
     }
 
-    if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_v_C[i], comp_id,
+    if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_c[i], comp_id,
                                     "calibxyzkins.calib-c.%c",
                                     coord_letter[i])) < 0) {
       return res;
@@ -217,13 +217,13 @@ int init_hal_params(int comp_id, haldata_t *haldata) {
   }
 
   // Initialize matrix A to identity, matrix B and vector C to zero
-  memset((real_t *)haldata->calib_m_A, 0, sizeof(real_t) * 9);
-  memset((real_t *)haldata->calib_m_B, 0, sizeof(real_t) * 9);
-  memset((real_t *)haldata->calib_v_C, 0, sizeof(real_t) * 3);
+  memset((real_t *)haldata->calib_A, 0, sizeof(real_t) * 9);
+  memset((real_t *)haldata->calib_B, 0, sizeof(real_t) * 9);
+  memset((real_t *)haldata->calib_c, 0, sizeof(real_t) * 3);
 
-  haldata->calib_m_A[0][0] = 1.0;
-  haldata->calib_m_A[1][1] = 1.0;
-  haldata->calib_m_A[2][2] = 1.0;
+  haldata->calib_A[0][0] = 1.0;
+  haldata->calib_A[1][1] = 1.0;
+  haldata->calib_A[2][2] = 1.0;
 
   // Initialize joints min/max to -inf/+inf
   for (int i = 0; i < 3; ++i) {
@@ -353,10 +353,10 @@ static void read_hal_calibration_params(const haldata_t *haldata,
                                         double C[3]) {
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      A[i][j] = haldata->calib_m_A[i][j];
-      B[i][j] = haldata->calib_m_B[i][j];
+      A[i][j] = haldata->calib_A[i][j];
+      B[i][j] = haldata->calib_B[i][j];
     }
-    C[i] = haldata->calib_v_C[i];
+    C[i] = haldata->calib_c[i];
   }
 }
 

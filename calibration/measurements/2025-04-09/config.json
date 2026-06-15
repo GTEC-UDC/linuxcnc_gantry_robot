@@ -1,8 +1,8 @@
 {
   "alignment": {
-    "init_params": [2500, 2500, -2500, 0, 0, -1.5707963267948966, 50],
+    "init_params": [50, 0, 0, -1.5707963267948966, 2500, 2500, -2500],
     "max_rotation": 0.098174770424681,
-    "rotation_center": [2500, 2500, -750],
+    "rotation_center": [0, 0, 1500],
     "optimization": {
       "method": "Powell",
       "tolerance": 1e-9,

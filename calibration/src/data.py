@@ -317,11 +317,11 @@ def get_processed_data(
         return coord_transform(
             df,
             [
-                TransformShiftXYZ(x[0], x[1], x[2], **kwargs),
-                TransformRotate("x", x[3], rotation_center, **kwargs),
-                TransformRotate("y", x[4], rotation_center, **kwargs),
-                TransformRotate("z", x[5], rotation_center, **kwargs),
-                TransformShiftT(x[6], time_col, **kwargs),
+                TransformShiftT(x[0], time_col, **kwargs),
+                TransformRotate("x", x[1], rotation_center, **kwargs),
+                TransformRotate("y", x[2], rotation_center, **kwargs),
+                TransformRotate("z", x[3], rotation_center, **kwargs),
+                TransformShiftXYZ(x[4], x[5], x[6], **kwargs),
             ],
         )
 
@@ -347,9 +347,9 @@ def get_processed_data(
 
         if max_rotation := config.alignment.max_rotation:
             bounds = [(None, None) for _ in range(len(x0))]
+            bounds[1] = (x0[1] - max_rotation, x0[1] + max_rotation)
+            bounds[2] = (x0[2] - max_rotation, x0[2] + max_rotation)
             bounds[3] = (x0[3] - max_rotation, x0[3] + max_rotation)
-            bounds[4] = (x0[4] - max_rotation, x0[4] + max_rotation)
-            bounds[5] = (x0[5] - max_rotation, x0[5] + max_rotation)
 
         def opt_callback(intermediate_result):
             if config.alignment.optimization.display:

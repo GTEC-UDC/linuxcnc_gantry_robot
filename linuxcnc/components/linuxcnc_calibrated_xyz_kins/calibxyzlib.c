@@ -25,7 +25,6 @@
 #include <errno.h>
 #include <math.h>
 #include <stdbool.h>
-#include <string.h>
 
 #include "calibxyzlib.h"
 #include "linalg3.h"

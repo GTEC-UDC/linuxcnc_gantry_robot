@@ -27,6 +27,7 @@
 #include <math.h>
 #include <string.h>
 #include <strings.h>
+#include <stdbool.h>
 
 #include "emcmotcfg.h"
 #include "hal.h"

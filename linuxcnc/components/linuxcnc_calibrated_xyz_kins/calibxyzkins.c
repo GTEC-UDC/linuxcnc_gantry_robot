@@ -89,6 +89,7 @@ HAL pins (defaults in parentheses):
 ---------------------------------------------------------------------*/
 
 #include <errno.h>
+#include <stdbool.h>
 
 #include "hal.h"
 #include "kinematics.h"

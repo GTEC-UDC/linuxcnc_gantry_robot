@@ -73,7 +73,7 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
                       const double c[3], const double *min_bounds,
                       const double *max_bounds, const unsigned int max_iter,
                       const double tol, const double position[3],
-                      double joints[3], double *f_norm);
+                      double joints[3], double *r_norm);
 
 /*
  * Check that inverse exist within min and max bounds for calibration matrices A

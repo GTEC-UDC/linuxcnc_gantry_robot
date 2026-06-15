@@ -14,17 +14,17 @@ void run_test_calib_xyz(double A[3][3], double B[3][3], double C[3],
   double joints_result[3];
   int maxiter = 20;
   double tol = 1e-5;
-  double F_norm;
+  double r_norm;
 
   // Get position from joints
   calib_xyz_forward(A, B, C, joints, position);
 
   // Get joints from position
   calib_xyz_inverse(A, B, C, min_bounds, max_bounds, maxiter, tol, position,
-                    joints_result, &F_norm);
+                    joints_result, &r_norm);
 
   // Check optimization function norm
-  TEST_ASSERT_DOUBLE_WITHIN(5 * tol, 0, F_norm);
+  TEST_ASSERT_DOUBLE_WITHIN(5 * tol, 0, r_norm);
 
   // Check obtained joints
   TEST_ASSERT_DOUBLE_ARRAY_WITHIN(5 * tol, joints, joints_result, 3);

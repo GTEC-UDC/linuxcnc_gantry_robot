@@ -49,9 +49,9 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
                       const double c[3], const double *min_bounds,
                       const double *max_bounds, const unsigned int max_iter,
                       const double tol, const double position[3],
-                      double joints[3], double *f_norm) {
-  double f[3];
-  double f_norm_val;
+                      double joints[3], double *r_norm) {
+  double r[3];
+  double r_norm_val;
   double J[3][3];
   double inv_J[3][3];
   double delta[3];
@@ -71,25 +71,25 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
   }
 
   for (int iter = 0; iter < max_iter; ++iter) {
-    // f = A * joints + B * joints^2 + c - position
+    // r = A * joints + B * joints^2 + c - position
     for (int i = 0; i < 3; ++i) {
-      f[i] = c[i] - position[i];
+      r[i] = c[i] - position[i];
       for (int j = 0; j < 3; ++j) {
-        f[i] += A[i][j] * joints[j] + B[i][j] * joints[j] * joints[j];
+        r[i] += A[i][j] * joints[j] + B[i][j] * joints[j] * joints[j];
       }
     }
 
-    // Euclidean norm of f
-    f_norm_val = sqrt(f[0] * f[0] + f[1] * f[1] + f[2] * f[2]);
+    // Euclidean norm of r
+    r_norm_val = sqrt(r[0] * r[0] + r[1] * r[1] + r[2] * r[2]);
 
 #ifdef CALIB_XYZ_INVERSE_PRINT_ITER
-    printf("Iteration %d f = %5.4g, %5.4g, %5.4g\n", iter, f[0], f[1], f[2]);
+    printf("Iteration %d r = %5.4g, %5.4g, %5.4g\n", iter, r[0], r[1], r[2]);
     printf("Iteration %d joints = %5.4g, %5.4g, %5.4g\n", iter, joints[0],
            joints[1], joints[2]);
-    printf("Iteration %d f_norm = %8.4g\n", iter, f_norm);
+    printf("Iteration %d r_norm = %8.4g\n", iter, r_norm_val);
 #endif
 
-    if (f_norm_val < tol) {
+    if (r_norm_val < tol) {
       break;
     }
 
@@ -105,8 +105,8 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
       return -EINVAL;
     }
 
-    // delta = J^-1 * f
-    mult_mv_3x3(inv_J, f, delta);
+    // delta = J^-1 * r
+    mult_mv_3x3(inv_J, r, delta);
 
     // Update joints
     if (bound_result) {
@@ -120,8 +120,8 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
     }
   }
 
-  if (f_norm != NULL) {
-    *f_norm = f_norm_val;
+  if (r_norm != NULL) {
+    *r_norm = r_norm_val;
   }
 
   return 0;

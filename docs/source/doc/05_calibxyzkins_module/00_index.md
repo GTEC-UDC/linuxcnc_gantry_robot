@@ -149,10 +149,10 @@ The module uses the Newton-Raphson method to solve the inverse kinematics proble
 
 1. Initialize the $3 \times 1$ vector of joint positions $\mathbf{x}$ to the target position $\mathbf{x'}$ (bounded by joint limits if specified)
 2. Perform Newton-Raphson iterations until convergence or max iterations reached:
-   1. Compute residual: $\mathbf{f} = \mathbf{A} \, \mathbf{x} + \mathbf{B} \, \mathbf{x}^2 + \mathbf{c} - \mathbf{x'}$
-   2. Return if convergence reached ($\|\mathbf{f}\|_2 < \text{tolerance}$).
+   1. Compute residual: $\mathbf{r} = \mathbf{A} \, \mathbf{x} + \mathbf{B} \, \mathbf{x}^2 + \mathbf{c} - \mathbf{x'}$
+   2. Return if convergence reached ($\|\mathbf{r}\|_2 < \text{tolerance}$).
    3. Compute Jacobian: $\mathbf{J} = \mathbf{A} + 2 \, \mathbf{B} \, \text{diag}(\mathbf{x})$
-   4. Update joints: $\mathbf{x} := \mathbf{x} - \mathbf{J}^{-1} \mathbf{f}$
+   4. Update joints: $\mathbf{x} := \mathbf{x} - \mathbf{J}^{-1} \mathbf{r}$
 
 ## Debugging
 

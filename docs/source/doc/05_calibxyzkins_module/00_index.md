@@ -13,22 +13,22 @@ The `calibxyzkins` module extends the standard LinuxCNC trivial kinematics modul
 
 The module implements a coordinate transformation that corrects the relationship between joint positions and actual machine coordinates using both linear and quadratic terms:
 
-$[x', y', z']^T = A [x, y, z]^T + B [x^2, y^2, z^2]^T + C$
+$[x', y', z']^T = \mathbf{A} [x, y, z]^T + \mathbf{B} [x^2, y^2, z^2]^T + \mathbf{c}$
 
 Where:
 
 - $(\cdot)^T$: Transpose operator
-- $A$: 3×3 linear transformation matrix (scaling, rotation, shear, etc.)
-- $B$: 3×3 quadratic transformation matrix (corrects non-linear distortions)
-- $C$: 3×1 offset vector (constant position offset)
+- $\mathbf{A}$: 3×3 linear transformation matrix (scaling, rotation, shear, etc.)
+- $\mathbf{B}$: 3×3 quadratic transformation matrix (corrects non-linear distortions)
+- $\mathbf{c}$: 3×1 offset vector (constant position offset)
 - $x, y, z$: joint positions
 - $x', y', z'$: axes coordinates
 
 The default values of the parameters are:
 
-- $A$: 3x3 identity matrix
-- $B$: all zeros
-- $C$: all zeros
+- $\mathbf{A}$: 3x3 identity matrix
+- $\mathbf{B}$: all zeros
+- $\mathbf{c}$: all zeros
 
 ## Installation
 
@@ -119,7 +119,7 @@ Examples:
 - `calibxyzkins.calib-b.zy` (float, RW, default: 0.0)
 - `calibxyzkins.calib-b.zz` (float, RW, default: 0.0)
 
-**Calibration Vector C (Offset Terms)**:
+**Calibration Vector c (Offset Terms)**:
 
 - `calibxyzkins.calib-c.x` (float, RW, default: 0.0)
 - `calibxyzkins.calib-c.y` (float, RW, default: 0.0)
@@ -147,11 +147,12 @@ Examples:
 
 The module uses the Newton-Raphson method to solve the inverse kinematics problem iteratively:
 
-1. Initialize the $3 \times 1$ vector of joint positions $\mathbf{x}$ (bounded by joint limits if specified)
-2. Compute function: $F = A \, \mathbf{x} + B \, \mathbf{x}^2 + C - \text{target_position}$
-3. Compute Jacobian: $J = A + 2 \, B \, \text{diag}(\mathbf{x})$
-4. Update joints: $\mathbf{x} := \mathbf{x} - J^{-1} F$
-5. Repeat until convergence ($\|F\| < \text{tolerance}$) or max iterations reached.
+1. Initialize the $3 \times 1$ vector of joint positions $\mathbf{x}$ to the target position $\mathbf{x'}$ (bounded by joint limits if specified)
+2. Perform Newton-Raphson iterations until convergence or max iterations reached:
+   1. Compute residual: $\mathbf{f} = \mathbf{A} \, \mathbf{x} + \mathbf{B} \, \mathbf{x}^2 + \mathbf{c} - \mathbf{x'}$
+   2. Return if convergence reached ($\|\mathbf{f}\|_2 < \text{tolerance}$).
+   3. Compute Jacobian: $\mathbf{J} = \mathbf{A} + 2 \, \mathbf{B} \, \text{diag}(\mathbf{x})$
+   4. Update joints: $\mathbf{x} := \mathbf{x} - \mathbf{J}^{-1} \mathbf{f}$
 
 ## Debugging
 

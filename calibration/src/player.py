@@ -16,7 +16,7 @@ class PlayerFrameData:
     frame_time: float
 
 
-class Player(FuncAnimation, ABC):
+class Player[T: PlayerFrameData](FuncAnimation, ABC):
     def __init__(
         self,
         fig: Figure,
@@ -66,7 +66,7 @@ class Player(FuncAnimation, ABC):
     def get_frame_time(self, frame_idx: int) -> float: ...
 
     @abstractmethod
-    def get_frame_data(self, frame_idx: int) -> PlayerFrameData: ...
+    def get_frame_data(self, frame_idx: int) -> T: ...
 
     def start(self):
         self.run = True
@@ -200,12 +200,10 @@ i/o: Jump to start/end
 
     # Animation update function
     @abstractmethod
-    def update[
-        T: PlayerFrameData
-    ](self, frame_data: Optional[T]) -> Iterable[Artist]: ...
+    def update(self, frame_data: Optional[T]) -> Iterable[Artist]: ...
 
-    def generate_frames_real_time(self) -> Iterator[Optional[PlayerFrameData]]:
-        frame_data: Optional[PlayerFrameData] = None
+    def generate_frames_real_time(self) -> Iterator[Optional[T]]:
+        frame_data: Optional[T] = None
         last_time = time.time()  # Last update time
         start_time = self.get_start_frame_time()
         end_time = self.get_end_frame_time()
@@ -246,7 +244,7 @@ i/o: Jump to start/end
                 frame_data = self.get_frame_data(self.frame_idx)
                 yield frame_data
 
-    def generate_frames_non_real_time(self) -> Iterator[Optional[PlayerFrameData]]:
+    def generate_frames_non_real_time(self) -> Iterator[Optional[T]]:
         # set frame_idx and elapsed_time to the start of the video
         self.go_to_start()
 
@@ -271,7 +269,7 @@ i/o: Jump to start/end
                 else:
                     break
 
-    def generate_frames(self) -> Iterator[Optional[PlayerFrameData]]:
+    def generate_frames(self) -> Iterator[Optional[T]]:
         if self.real_time:
             yield from self.generate_frames_real_time()
         else:

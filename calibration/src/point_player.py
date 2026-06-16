@@ -47,7 +47,7 @@ class PointFrameData(PlayerFrameData):
     ]
 
 
-class PointPlayer(Player):
+class PointPlayer(Player[PointFrameData]):
     def __init__(
         self,
         ax: axes3d.Axes3D,
@@ -163,7 +163,7 @@ class PointPlayer(Player):
 
         return ret
 
-    def update(self, frame_data: PointFrameData | None):
+    def update(self, frame_data: Optional[PointFrameData]):
         title = self.set_title(frame_data)
 
         if frame_data is None:

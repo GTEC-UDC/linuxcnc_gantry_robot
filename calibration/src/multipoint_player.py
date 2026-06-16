@@ -48,7 +48,7 @@ class MultiPointFrameData(PlayerFrameData):
     trails: list[POINTS_SEQ_TYPE]
 
 
-class MultiPointPlayer(Player):
+class MultiPointPlayer(Player[MultiPointFrameData]):
     def __init__(
         self,
         ax: axes3d.Axes3D,
@@ -237,7 +237,7 @@ class MultiPointPlayer(Player):
 
         return ret
 
-    def update(self, frame_data: MultiPointFrameData | None):
+    def update(self, frame_data: Optional[MultiPointFrameData]):
         title = self.set_title(frame_data)
         ret = [title]
 

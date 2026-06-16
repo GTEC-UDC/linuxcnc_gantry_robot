@@ -2,6 +2,7 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Any, Optional, cast
 
+from matplotlib.figure import SubFigure
 import mpl_toolkits.mplot3d.art3d as art3d
 import mpl_toolkits.mplot3d.axes3d as axes3d
 import numpy as np
@@ -54,11 +55,15 @@ class MultiPointPlayer(Player):
         df: pd.DataFrame,
         time_col: str = "time",
         point_cols: list[tuple[str, str, str]] = [("x", "y", "z")],
-        points_styles: list[dict[str, Any]] = [{"color": "r", "marker": "o", "markersize": 5}],
+        points_styles: list[dict[str, Any]] = [
+            {"color": "r", "marker": "o", "markersize": 5}
+        ],
         marker_cols: list[list[tuple[str, str, str]]] = [],
         marker_styles: list[dict[str, Any]] = [],
         trail_cols: list[tuple[str, str, str]] = [("x", "y", "z")],
-        trail_styles: list[dict[str, Any]] = [{"color": "b", "linestyle": "-", "alpha": 0.25}],
+        trail_styles: list[dict[str, Any]] = [
+            {"color": "b", "linestyle": "-", "alpha": 0.25}
+        ],
         trail_after_samples: list[int] | int = [],
         trail_before_samples: list[int] | int = [],
         xlim: Optional[tuple[float, float]] = None,
@@ -139,7 +144,9 @@ class MultiPointPlayer(Player):
         ax.set_ylabel("Y")
         ax.set_zlabel("Z")
 
-        # Initialize the parent
+        if isinstance(ax.figure, SubFigure):
+            raise ValueError("The player cannot be created in a subfigure")
+
         super().__init__(ax.figure, **kwargs)
 
     def get_start_frame_idx(self) -> int:
@@ -163,21 +170,33 @@ class MultiPointPlayer(Player):
             for point_col in self.point_cols
         ]
 
-        trails = []
+        trails: list[POINTS_SEQ_TYPE] = []
         for i, trail_cols in enumerate(self.trail_cols):
             trail_min = max(0, (frame_idx - self.trail_before_samples[i]))
             trail_max = min(len(self.df), (frame_idx + self.trail_after_samples[i]))
 
             trails.append(
-                tuple(self.df[c][trail_min:trail_max].to_numpy() for c in trail_cols)
+                cast(
+                    POINTS_SEQ_TYPE,
+                    tuple(
+                        self.df[c][trail_min:trail_max].to_numpy(np.float64)
+                        for c in trail_cols
+                    ),
+                )
             )
 
-        markers = []
+        markers: list[POINTS_SEQ_TYPE] = []
         for i, marker_cols in enumerate(self.marker_cols):
             markers.append(
-                tuple(
-                    np.array([self.df[p[i]][frame_idx].item() for p in marker_cols])
-                    for i in range(3)
+                cast(
+                    POINTS_SEQ_TYPE,
+                    tuple(
+                        np.array(
+                            [self.df[p[i]][frame_idx].item() for p in marker_cols],
+                            dtype=np.float64,
+                        )
+                        for i in range(3)
+                    ),
                 )
             )
 

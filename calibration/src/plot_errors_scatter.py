@@ -64,8 +64,8 @@ def plot_errors_scatter(
 
             # Add fit line
             if plot_fit and (mask := df.loc[:, [pos, err]].notna().all(axis=1)).any():
-                x = df.loc[mask, pos]
-                y = df.loc[mask, err]
+                x = df.loc[mask, pos].to_numpy(np.float64)
+                y = df.loc[mask, err].to_numpy(np.float64)
 
                 if pos[-1] in ["X", "Y"]:
                     legend_str = "Quadratic fit"

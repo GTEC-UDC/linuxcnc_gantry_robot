@@ -39,7 +39,7 @@ def coord_mse(
         + (df_z - df_o_interp_z) ** 2
     )
 
-    result = np.nanmean(np.sqrt(err))
+    result = float(np.nanmean(np.sqrt(err)))
 
     if np.isnan(result):
         print(f"Warning: Invalid MSE result: {result}. Returning inf.")

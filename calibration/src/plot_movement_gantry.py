@@ -16,7 +16,7 @@ def plot_movement_gantry(
     xlim: Optional[tuple[float, float]] = None,
     ylim: Optional[tuple[float, float]] = None,
     zlim: Optional[tuple[float, float]] = None,
-) -> plt.Axes:
+) -> None:
     df = load_gantry_data(gantry_file)
 
     # Set the time relative to the start time
@@ -54,8 +54,6 @@ def plot_movement_gantry(
     plt.tight_layout()
     plt.show()
 
-    return ax
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -83,7 +81,6 @@ if __name__ == "__main__":
         type=int,
         default=0,
     )
-
 
     default_axis_limits = {
         "x": (0, 5000),

@@ -40,12 +40,16 @@ class TransformationPlotter:
         self.ranges = {"x": (0, 5200), "y": (0, 5200), "z": (-1050, 0)}
 
         # Create coordinate selection buttons
+
         self.buttons = []
         self.button_axes = []
         for i, coord in enumerate(["x", "y", "z"]):
+            def on_click(_, c: str = coord) -> None:
+                self.set_coordinate(c)
+
             ax = self.fig.add_axes((0.1 + i * 0.125, 0.05, 0.1, 0.05))
             button = Button(ax, f"{coord.upper()} diff")
-            button.on_clicked(lambda event, c=coord: self.set_coordinate(c))
+            button.on_clicked(on_click)
             self.buttons.append(button)
             self.button_axes.append(ax)
 
@@ -133,7 +137,7 @@ class TransformationPlotter:
             self.surf.remove()
 
         # Create new surface plot
-        self.surf = self.ax.plot_surface(mesh_ax1, mesh_ax2, mesh_diff, cmap="viridis")  # type: ignore
+        self.surf = self.ax.plot_surface(mesh_ax1, mesh_ax2, mesh_diff, cmap="viridis")
         self.colorbar = self.fig.colorbar(
             self.surf,
             label=f"Difference in {self.current_coord} (transformed - original)",
@@ -149,7 +153,8 @@ class TransformationPlotter:
 
         # Update title
         self.ax.set_title(
-            f"Coordinate transformation difference\nFixed {self.current_coord}={self.fixed_value:.2f}"
+            "Coordinate transformation difference\n"
+            f"Fixed {self.current_coord}={self.fixed_value:.2f}"
         )
 
         plt.draw()

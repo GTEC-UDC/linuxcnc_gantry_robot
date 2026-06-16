@@ -1,14 +1,14 @@
-from dataclasses import dataclass
 from collections.abc import Callable, Iterable
+from dataclasses import dataclass
 from typing import Any, Optional, cast
 
-import pandas as pd
 import mpl_toolkits.mplot3d.art3d as art3d
 import mpl_toolkits.mplot3d.axes3d as axes3d
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 from matplotlib.artist import Artist
-
+from matplotlib.figure import SubFigure
 from player import Player, PlayerFrameData
 
 
@@ -54,8 +54,16 @@ class PointPlayer(Player):
         df: pd.DataFrame,
         time_col: str = "time",
         coord_cols: list[str] = ["x", "y", "z"],
-        point_plot_style: dict[str, Any] = {"color": "r", "marker": "o", "markersize": 5},
-        trail_plot_style: dict[str, Any] = {"color": "b", "linestyle": "-", "alpha": 0.25},
+        point_plot_style: dict[str, Any] = {
+            "color": "r",
+            "marker": "o",
+            "markersize": 5,
+        },
+        trail_plot_style: dict[str, Any] = {
+            "color": "b",
+            "linestyle": "-",
+            "alpha": 0.25,
+        },
         trail_after_samples: Optional[int] = None,
         trail_before_samples: Optional[int] = None,
         init_cb: Optional[Callable[[], Iterable[Artist]]] = None,
@@ -70,7 +78,6 @@ class PointPlayer(Player):
         self.trail_before_samples = trail_before_samples
         self.init_cb = init_cb
         self.update_cb = update_cb
-
 
         # Initialize the trail
         if trail_after_samples or trail_before_samples:
@@ -87,9 +94,10 @@ class PointPlayer(Player):
             ax.plot([], [], [], **point_plot_style)[0],
         )
 
-        # Initialize the parent
-        super().__init__(ax.figure, **kwargs)
+        if isinstance(ax.figure, SubFigure):
+            raise ValueError("The player cannot be created in a subfigure")
 
+        super().__init__(ax.figure, **kwargs)
 
     def get_start_frame_idx(self) -> int:
         return 0
@@ -112,8 +120,11 @@ class PointPlayer(Player):
         z = self.df[self.coord_cols[2]][frame_idx].item()
 
         if self.trail is not None:
-            trail_min = max(0, (frame_idx - self.trail_before_samples))
-            trail_max = min(len(self.df), (frame_idx + self.trail_after_samples))
+            trail_before_samples = self.trail_before_samples or 0
+            trail_after_samples = self.trail_after_samples or 0
+
+            trail_min = max(0, frame_idx - trail_before_samples)
+            trail_max = min(len(self.df), frame_idx + trail_after_samples)
 
             trail_x = self.df[self.coord_cols[0]][trail_min:trail_max].to_numpy()
             trail_y = self.df[self.coord_cols[1]][trail_min:trail_max].to_numpy()
@@ -163,7 +174,7 @@ class PointPlayer(Player):
         )
         ret = [self.point, title]
 
-        if self.trail:
+        if self.trail and frame_data.trail:
             self.trail.set_data_3d(
                 frame_data.trail[0], frame_data.trail[1], frame_data.trail[2]
             )

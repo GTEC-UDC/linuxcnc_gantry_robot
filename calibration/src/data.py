@@ -1,7 +1,7 @@
 import logging
 import re
 from datetime import datetime
-from typing import Any, Optional, cast
+from typing import Any, Literal, Optional, cast
 
 import numpy as np
 import pandas as pd
@@ -35,8 +35,8 @@ def load_optitrack_metadata(filename: str) -> dict[str, Any]:
     """Load and parse OptiTrack metadata from a CSV file.
 
     This function reads the first line of an OptiTrack CSV file and parses the metadata
-    information, including capture frame rate, export frame rate, start frame, total frames,
-    and capture start time.
+    information, including capture frame rate, export frame rate, start frame, total
+    frames, and capture start time.
 
     Args:
         filename (str): Path to the OptiTrack CSV file.
@@ -145,7 +145,7 @@ def load_optitrack_data(
 
     # Create a new dataframe with the columns we want to keep
     df = df.loc[:, df_cols]
-    df.columns = df_col_names
+    df.columns = pd.Index(df_col_names)
 
     # Calculate errors for the markers
     for i in range(1, num_m + 1):
@@ -174,14 +174,14 @@ def load_optitrack_data(
     # Calculate the centroid of the markers
     for coord in ["X", "Y", "Z"]:
         cols = [f"M.{coord}{i}" for i in range(1, num_m + 1)]
-        df_cols = df[cols]
+        df_coords = df[cols]
 
         # Interpolate the optitrack data to fill the missing values
-        df_cols = df_cols.interpolate(
+        df_coords = df_coords.interpolate(
             method="linear", axis=0, limit_area="inside", inplace=False
         )
 
-        df[f"M.{coord}_centroid"] = df_cols.mean(axis=1)
+        df[f"M.{coord}_centroid"] = df_coords.mean(axis=1)
 
     # Set to NA the coordinates where no raw markers were detected
     m_centroid_cols = [f"M.{coord}_centroid" for coord in ["X", "Y", "Z"]]
@@ -214,7 +214,25 @@ def get_calibration_matrices(x) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
 
 class OptimizationConfig(BaseModel):
-    method: str = "Powell"
+    # Method should be one of the supported by scipy.optimize.minimize
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html
+    method: Literal[
+        "Nelder-Mead",
+        "Powell",
+        "CG",
+        "BFGS",
+        "Newton-CG",
+        "L-BFGS-B",
+        "TNC",
+        "COBYLA",
+        "COBYQA",
+        "SLSQP",
+        "trust-constr",
+        "dogleg",
+        "trust-ncg",
+        "trust-exact",
+        "trust-krylov",
+    ] = "Powell"
     tolerance: float = 1e-9
     display: bool = True
 
@@ -331,11 +349,11 @@ def get_processed_data(
     elif config.alignment.enabled:
         # Gantry data
         df_gantry_tr: pd.DataFrame = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
-        df_gantry_tr.columns = ["time", "x", "y", "z"]
+        df_gantry_tr.columns = pd.Index(["time", "x", "y", "z"])
 
         # OptiTrack data
         df_optitrack_tr: pd.DataFrame = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
-        df_optitrack_tr.columns = ["time", "x", "y", "z"]
+        df_optitrack_tr.columns = pd.Index(["time", "x", "y", "z"])
 
         # Initial alignment parameters
         if config.alignment.init_params:
@@ -356,17 +374,13 @@ def get_processed_data(
                 fval = getattr(intermediate_result, "fun", intermediate_result)
                 print(f"fval: {fval}")
 
-        opt_options = {}
-        if config.alignment.optimization.display:
-            opt_options["disp"] = True
-
         logger.info("Aligning optitrack data with gantry data...")
-        res = scp.optimize.minimize(
+        res = scp.optimize.minimize(  # type: ignore[call-overload]
             fun=lambda x: coord_mse(df_gantry_tr, coord_align(x, df_optitrack_tr)),
             x0=x0,
             bounds=bounds,
             tol=config.alignment.optimization.tolerance,
-            options=opt_options,
+            options={"disp": config.alignment.optimization.display},
             callback=opt_callback,
             method=config.alignment.optimization.method,
         )
@@ -432,11 +446,11 @@ def get_processed_data(
 
         # Gantry data
         df_gantry_tr = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
-        df_gantry_tr.columns = ["time", "x", "y", "z"]
+        df_gantry_tr.columns = pd.Index(["time", "x", "y", "z"])
 
         # OptiTrack data
         df_optitrack_tr = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
-        df_optitrack_tr.columns = ["time", "x", "y", "z"]
+        df_optitrack_tr.columns = pd.Index(["time", "x", "y", "z"])
 
         x0 = np.zeros(18)
         x0[[0, 4, 8]] = 1
@@ -446,16 +460,12 @@ def get_processed_data(
                 fval = getattr(intermediate_result, "fun", intermediate_result)
                 print(f"fval: {fval}")
 
-        opt_options = {}
-        if config.correction.optimization.display:
-            opt_options["disp"] = True
-
         logger.info("Correcting gantry data...")
-        res = scp.optimize.minimize(
+        res = scp.optimize.minimize(  # type: ignore[call-overload]
             fun=lambda x: coord_mse(df_optitrack_tr, coord_calibrate(x, df_gantry_tr)),
             x0=x0,
             tol=config.correction.optimization.tolerance,
-            options=opt_options,
+            options={"disp": config.correction.optimization.display},
             callback=opt_callback,
             method=config.correction.optimization.method,
         )
@@ -465,7 +475,7 @@ def get_processed_data(
 
     if correction_params_array is not None:
         df_calib: pd.DataFrame = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]]
-        df_calib.columns = ["x", "y", "z"]
+        df_calib.columns = pd.Index(["x", "y", "z"])
 
         m1, m2, vec = get_calibration_matrices(correction_params_array)
         df_calib = coord_matrix_transform2(df_calib, m1, m2, vec)

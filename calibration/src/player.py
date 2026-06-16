@@ -32,7 +32,7 @@ class Player(FuncAnimation, ABC):
         self.draw_on_pause = draw_on_pause
         self.run = True
         self.play_speed = play_speed
-        self.elapsed_time = 0
+        self.elapsed_time = 0.0
         self.frame_idx = 0
         self.loop = loop
         self.real_time = real_time

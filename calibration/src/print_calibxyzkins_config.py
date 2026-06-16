@@ -31,22 +31,20 @@ if __name__ == "__main__":
 
     coords = ["x", "y", "z"]
 
-    print("# Calibration matrix A")
-    for row_i, row_coord in enumerate(coords):
-        for col_i, col_coord in enumerate(coords):
-            print(
-                f"setp calibxyzkins.calib-a.{row_coord}{col_coord} {A[row_i, col_i]:.10g}"
-            )
+    for matrix_name, matrix in (('A', A), ('B', B)):
+        print(f"# Calibration matrix {matrix_name}")
+        name = matrix_name.lower()
 
-    print()
-    print("# Calibration matrix B")
-    for row_i, row_coord in enumerate(coords):
-        for col_i, col_coord in enumerate(coords):
-            print(
-                f"setp calibxyzkins.calib-b.{row_coord}{col_coord} {B[row_i, col_i]:.10g}"
-            )
+        for row_i, row_coord in enumerate(coords):
+            for col_i, col_coord in enumerate(coords):
+                param = f"calibxyzkins.calib-{name}.{row_coord}{col_coord}"
+                value = matrix[row_i, col_i]
+                print(f"setp {param} {value:.10g}")
 
-    print()
+        print()
+
     print("# Calibration vector C")
     for row_i, row_coord in enumerate(coords):
-        print(f"setp calibxyzkins.calib-c.{row_coord} {c[row_i]:.10g}")
+        param = f"calibxyzkins.calib-c.{row_coord}"
+        value = c[row_i]
+        print(f"setp {param} {value:.10g}")

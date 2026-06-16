@@ -32,9 +32,9 @@ def plot_errors_probability(
     config.skip_frames.enabled = skip_frames
 
     # Ensure the correction is enabled
-    assert config.correction.enabled, (
-        "Correction must be enabled in the configuration file"
-    )
+    assert (
+        config.correction.enabled
+    ), "Correction must be enabled in the configuration file"
 
     # Get the processed data
     df, _, _ = get_processed_data(
@@ -194,7 +194,10 @@ if __name__ == "__main__":
         "--plot-fit",
         action="store_true",
         default=False,
-        help="Plot fitted normal distributions for X, Y, Z errors and Rice distributions for Abs error",
+        help=(
+            "Plot fitted normal distributions for X, Y, Z errors and "
+            "Rice distributions for Abs error"
+        )
     )
 
     parser.add_argument(

@@ -41,14 +41,17 @@ class TransformationPlotter:
         self.buttons = []
         self.button_axes = []
         for i, coord in enumerate(["x", "y", "z"]):
+            def on_click(_, c: str = coord) -> None:
+                self.set_coordinate(c)
+
             ax = self.fig.add_axes((0.1 + i * 0.125, 0.05, 0.1, 0.05))
             button = Button(ax, f"{coord.upper()} axis")
-            button.on_clicked(lambda event, c=coord: self.set_coordinate(c))
+            button.on_clicked(on_click)
             self.buttons.append(button)
             self.button_axes.append(ax)
 
         # Create sliders for other coordinates
-        self.sliders = {}
+        self.sliders: dict[str, Slider] = {}
         self.update_sliders()
 
         # Create plots for left subplot (ax1)

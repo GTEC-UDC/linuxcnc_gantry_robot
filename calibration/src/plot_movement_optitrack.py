@@ -21,8 +21,10 @@ def plot_movement_optitrack(
 
     Args:
         filename: Path to the OptiTrack CSV file
-        trail_after_samples: Number of previous samples to show after the current frame
-        trail_before_samples: Number of previous samples to show before the current frame
+        trail_after_samples: Number of samples after the current frame to show
+            in the trail
+        trail_before_samples: Number of samples before the current frame to show
+            in the trail
         xlim: Optional tuple of (min, max) for the x-axis
         ylim: Optional tuple of (min, max) for the y-axis
         zlim: Optional tuple of (min, max) for the z-axis
@@ -131,14 +133,14 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--trail-before",
-        help="Number of previous samples to show before the current frame",
+        help="Number of samples before the current frame to show in the trail",
         type=int,
         default=2000,
     )
 
     parser.add_argument(
         "--trail-after",
-        help="Number of previous samples to show after the current frame",
+        help="Number of samples after the current frame to show in the trail",
         type=int,
         default=0,
     )

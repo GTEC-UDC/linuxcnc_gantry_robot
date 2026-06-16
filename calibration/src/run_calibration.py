@@ -50,7 +50,7 @@ if __name__ == "__main__":
         if response.lower() != "y":
             print("Exiting...")
             sys.exit(0)
-    
+
     calibration_params = CalibrationParams()
 
     if os.path.exists(args.config):

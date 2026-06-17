@@ -35,7 +35,7 @@ First, the OptiTrack data must be aligned with the gantry data to account for di
 - **Rotation**: Rotations around X, Y, and Z axes. By default the rotation center is `(2500, 2500, -750)`, but it may be changed.
 - **Time Shift**: Temporal alignment to account for timing differences.
 
-The alignment parameters are found using numerical optimization, with the Powell method by default, to minimize the mean squared error between gantry and the aligned OptiTrack positions. The optimization is performed using the `scipy.optimize.minimize` function.
+The alignment parameters are found using numerical optimization with the `scipy.optimize.minimize` function (Powell method by default). The objective to minimize is selectable via the `objective` setting: the mean squared error (`mse`, the default) or the mean Euclidean distance (`mean_distance`) between the gantry and the aligned OptiTrack positions.
 
 ### Step 2: Correction
 
@@ -84,7 +84,7 @@ This transformation consists of:
 2. Matrix $\mathbf{B}$: Quadratic transformation that corrects non-linear distortions.
 3. Vector $\mathbf{c}$: Constant offset.
 
-The correction parameters are found using numerical optimization, with the Powell method by default, to minimize the mean squared error between gantry and the corrected OptiTrack positions. The optimization is performed using the `scipy.optimize.minimize` function.
+The correction parameters are found by minimizing the error between the corrected OptiTrack positions and the gantry positions, with the objective selectable via the `objective` setting. Because the transformation is linear in $\mathbf{A}, \mathbf{B}, \mathbf{c}$, the mean squared error (`mse`, the default) is minimized with `numpy.linalg.lstsq`, while the mean Euclidean distance (`mean_distance`) is minimized iteratively with `scipy.optimize.minimize` (Powell method by default).
 
 ## Parameters Validation
 
@@ -213,10 +213,9 @@ i/o: Jump to start/end
 
 Before running the calibration script, you need to create a JSON configuration file, by default named `config.json`. The configuration file defines the calibration parameters, data processing options, and analysis settings. The configuration format follows the structure defined in the `CalibrationConfig` class in `data.py`, allowing you to customize:
 
-- Alignment parameters and optimization settings
-- Correction (calibration) parameters and methods  
+- Alignment parameters, objective, and `minimize_options` settings
+- Correction parameters, objective, and `minimize_options` settings
 - Frame skipping ranges for excluding poor tracking data
-- Optimization tolerances and display options
 
 The contents of the configuration file used for the `2025-04-09` measurement are the following:
 
@@ -226,16 +225,18 @@ The contents of the configuration file used for the `2025-04-09` measurement are
     "init_params": [2500, 2500, -2500, 0, 0, -1.5707963267948966, 50],
     "max_rotation": 0.098174770424681,
     "rotation_center": [2500, 2500, -750],
-    "optimization": {
+    "objective": "mse",
+    "minimize_options": {
       "method": "Powell",
       "tolerance": 1e-9,
       "display": true
     }
   },
-  "calibration": {
+  "correction": {
     "enabled": true,
-    "optimization": {
-      "method": "Powell", 
+    "objective": "mse",
+    "minimize_options": {
+      "method": "Powell",
       "tolerance": 1e-9,
       "display": true
     }

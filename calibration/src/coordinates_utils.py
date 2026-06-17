@@ -7,14 +7,18 @@ import numpy.typing as npt
 import pandas as pd
 
 
-def coord_mse(
+def coord_sq_error(
     df: pd.DataFrame,
     df_other: pd.DataFrame,
     df_cols: list[str] = ["x", "y", "z"],
     df_other_cols: list[str] = ["x", "y", "z"],
     time_col: str = "time",
-) -> float:
-    """Calculate the mean squared error of the coordinates of two dataframes."""
+) -> npt.NDArray[np.float64]:
+    """Per-sample squared Euclidean distance between two dataframes' coordinates.
+
+    df_other is linearly interpolated onto df's time stamps; samples outside the
+    interpolation range are NaN.
+    """
     assert (
         len(df_cols) == len(df_other_cols) == 3
     ), "df_cols and df_other_cols must have 3 elements"
@@ -33,19 +37,47 @@ def coord_mse(
     df_o_interp_y = np.interp(df_time, df_o_time, df_o_y, left=np.nan, right=np.nan)
     df_o_interp_z = np.interp(df_time, df_o_time, df_o_z, left=np.nan, right=np.nan)
 
-    err = (
+    return (
         (df_x - df_o_interp_x) ** 2
         + (df_y - df_o_interp_y) ** 2
         + (df_z - df_o_interp_z) ** 2
-    )
+    ).to_numpy()
 
+
+def coord_mse(
+    df: pd.DataFrame,
+    df_other: pd.DataFrame,
+    df_cols: list[str] = ["x", "y", "z"],
+    df_other_cols: list[str] = ["x", "y", "z"],
+    time_col: str = "time",
+) -> float:
+    """Mean squared error (mean of the per-sample squared 3D distances)."""
+    err = coord_sq_error(df, df_other, df_cols, df_other_cols, time_col)
+    result = float(np.nanmean(err))
+
+    if np.isnan(result):
+        print("Warning: Invalid MSE result. Returning inf.")
+        return np.inf
+
+    return result
+
+
+def coord_mean_distance(
+    df: pd.DataFrame,
+    df_other: pd.DataFrame,
+    df_cols: list[str] = ["x", "y", "z"],
+    df_other_cols: list[str] = ["x", "y", "z"],
+    time_col: str = "time",
+) -> float:
+    """Mean Euclidean distance (mean per-sample 3D position error)."""
+    err = coord_sq_error(df, df_other, df_cols, df_other_cols, time_col)
     result = float(np.nanmean(np.sqrt(err)))
 
     if np.isnan(result):
-        print(f"Warning: Invalid MSE result: {result}. Returning inf.")
+        print("Warning: Invalid mean distance result. Returning inf.")
         return np.inf
-    else:
-        return result
+
+    return result
 
 
 def coord_shift_xyz(

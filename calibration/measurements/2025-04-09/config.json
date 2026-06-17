@@ -3,16 +3,18 @@
     "init_params": [50, 0, 0, -1.5707963267948966, 2500, 2500, -2500],
     "max_rotation": 0.098174770424681,
     "rotation_center": [0, 0, 1500],
-    "optimization": {
+    "objective": "mse",
+    "minimize_options": {
       "method": "Powell",
       "tolerance": 1e-9,
       "display": true
     }
   },
-  "calibration": {
+  "correction": {
     "enabled": true,
-    "optimization": {
-      "method": "Powell", 
+    "objective": "mse",
+    "minimize_options": {
+      "method": "Powell",
       "tolerance": 1e-9,
       "display": true
     }

@@ -11,6 +11,7 @@ from coordinates_utils import (
     TransformShiftT,
     TransformShiftXYZ,
     coord_matrix_transform2,
+    coord_mean_distance,
     coord_mse,
     coord_transform,
 )
@@ -213,7 +214,12 @@ def get_calibration_matrices(x) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     return A, B, c
 
 
-class OptimizationConfig(BaseModel):
+# Objective to minimize when fitting the alignment/correction parameters
+Objective = Literal["mse", "mean_distance"]
+
+
+class MinimizeOptions(BaseModel):
+    # Options for scipy.optimize.minimize.
     # Method should be one of the supported by scipy.optimize.minimize
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html
     method: Literal[
@@ -241,14 +247,16 @@ class CalibrationAlignmentConfig(BaseModel):
     enabled: bool = True
     init_params: Optional[list[float]] = None
     max_rotation: Optional[float] = np.pi / 32
-    rotation_center: tuple[float, float, float] = (2500, 2500, -750)
-    optimization: OptimizationConfig = Field(default_factory=OptimizationConfig)
+    rotation_center: tuple[float, float, float] = (0, 0, 1500)
+    objective: Objective = "mse"
+    minimize_options: MinimizeOptions = Field(default_factory=MinimizeOptions)
 
 
 class CalibrationCorrectionConfig(BaseModel):
     enabled: bool = True
     init_params: Optional[list[float]] = None
-    optimization: OptimizationConfig = Field(default_factory=OptimizationConfig)
+    objective: Objective = "mse"
+    minimize_options: MinimizeOptions = Field(default_factory=MinimizeOptions)
 
 
 class SkipFramesConfig(BaseModel):
@@ -369,24 +377,36 @@ def get_processed_data(
             bounds[2] = (x0[2] - max_rotation, x0[2] + max_rotation)
             bounds[3] = (x0[3] - max_rotation, x0[3] + max_rotation)
 
+        objective_fn = (
+            coord_mse if config.alignment.objective == "mse" else coord_mean_distance
+        )
+        min_opts = config.alignment.minimize_options
+
         def opt_callback(intermediate_result):
-            if config.alignment.optimization.display:
+            if min_opts.display:
                 fval = getattr(intermediate_result, "fun", intermediate_result)
                 print(f"fval: {fval}")
 
         logger.info("Aligning OptiTrack data with gantry data...")
         res = scp.optimize.minimize(  # type: ignore[call-overload]
-            fun=lambda x: coord_mse(df_g_xyz, coord_align(x, df_o_xyz)),
+            fun=lambda x: objective_fn(df_g_xyz, coord_align(x, df_o_xyz)),
             x0=x0,
             bounds=bounds,
-            tol=config.alignment.optimization.tolerance,
-            options={"disp": config.alignment.optimization.display},
+            tol=min_opts.tolerance,
+            options={"disp": min_opts.display},
             callback=opt_callback,
-            method=config.alignment.optimization.method,
+            method=min_opts.method,
         )
 
         alignment_params_array = res.x
         logger.info("Alignment completed. Parameters: %s", alignment_params_array)
+
+        df_o_aligned = coord_align(res.x, df_o_xyz)
+        mean_dist_err = coord_mean_distance(df_g_xyz, df_o_aligned)
+        mean_sq_err = coord_mse(df_g_xyz, df_o_aligned)
+
+        logger.info("Alignment mean distance error: %f", mean_dist_err)
+        logger.info("Alignment mean square error: %f", mean_sq_err)
 
     # Transform all the OptiTrack coordinates in the dataframe
     cols_params = {
@@ -436,14 +456,14 @@ def get_processed_data(
 
     correction_params_array: Optional[np.ndarray] = None
 
+    # Function to calibrate the gantry data based on an array of params
+    def coord_calibrate(x, df: pd.DataFrame) -> pd.DataFrame:
+        A, B, c = get_calibration_matrices(x)
+        return coord_matrix_transform2(df, A, B, c)
+
     if config.correction.enabled and calibration_params.correction is not None:
         correction_params_array = np.array(calibration_params.correction)
     elif config.correction.enabled:
-        # Function to calibrate the gantry data based on an array of parameters
-        def coord_calibrate(x, df: pd.DataFrame) -> pd.DataFrame:
-            matrix1, matrix2, array = get_calibration_matrices(x)
-            return coord_matrix_transform2(df, matrix1, matrix2, array)
-
         # Gantry data
         df_g_xyz = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
         df_g_xyz.columns = pd.Index(["time", "x", "y", "z"])
@@ -452,33 +472,58 @@ def get_processed_data(
         df_o_xyz = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
         df_o_xyz.columns = pd.Index(["time", "x", "y", "z"])
 
-        x0 = np.zeros(18)
-        x0[[0, 4, 8]] = 1
-
-        def opt_callback(intermediate_result):
-            if config.correction.optimization.display:
-                fval = getattr(intermediate_result, "fun", intermediate_result)
-                print(f"fval: {fval}")
-
         logger.info("Correcting gantry data...")
-        res = scp.optimize.minimize(  # type: ignore[call-overload]
-            fun=lambda x: coord_mse(df_o_xyz, coord_calibrate(x, df_g_xyz)),
-            x0=x0,
-            tol=config.correction.optimization.tolerance,
-            options={"disp": config.correction.optimization.display},
-            callback=opt_callback,
-            method=config.correction.optimization.method,
-        )
+        if config.correction.objective == "mse":
+            # The correction model is linear in A, B and c, so we use linear
+            # least squares to minimize the mean square error.
+            mat_g_xyz = df_g_xyz[["x", "y", "z"]].to_numpy()
+            mat_o_xyz = df_o_xyz[["x", "y", "z"]].to_numpy()
 
-        correction_params_array = res.x
+            mask = ~(np.isnan(mat_g_xyz).any(axis=1) | np.isnan(mat_o_xyz).any(axis=1))
+            mat_g_xyz, mat_o_xyz = mat_g_xyz[mask], mat_o_xyz[mask]
+
+            mat_a = np.column_stack(
+                [mat_g_xyz, mat_g_xyz[:, 0:2] ** 2, np.ones(len(mat_g_xyz))]
+            )
+            mat_x, _, _, _ = np.linalg.lstsq(mat_a, mat_o_xyz)
+
+            correction_params_array = np.concatenate(
+                [mat_x[:3].T.flatten(), mat_x[3:5].T.flatten(), mat_x[5]]
+            )
+        else:
+            x0 = np.zeros(18)
+            x0[[0, 4, 8]] = 1
+            min_opts = config.correction.minimize_options
+
+            def opt_callback(intermediate_result):
+                if min_opts.display:
+                    fval = getattr(intermediate_result, "fun", intermediate_result)
+                    print(f"fval: {fval}")
+
+            res = scp.optimize.minimize(  # type: ignore[call-overload]
+                fun=lambda x: coord_mean_distance(
+                    df_o_xyz, coord_calibrate(x, df_g_xyz)
+                ),
+                x0=x0,
+                tol=min_opts.tolerance,
+                options={"disp": min_opts.display},
+                callback=opt_callback,
+                method=min_opts.method,
+            )
+            correction_params_array = res.x
+
+        df_g_correct = coord_calibrate(correction_params_array, df_g_xyz)
+        mean_dist_err = coord_mean_distance(df_o_xyz, df_g_correct)
+        mean_sq_err = coord_mse(df_o_xyz, df_g_correct)
+
         logger.info("Correction completed. Parameters: %s", correction_params_array)
+        logger.info("Correction mean distance error: %f", mean_dist_err)
+        logger.info("Correction mean square error: %f", mean_sq_err)
 
     if correction_params_array is not None:
         df_correct: pd.DataFrame = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]]
         df_correct.columns = pd.Index(["x", "y", "z"])
-
-        m1, m2, vec = get_calibration_matrices(correction_params_array)
-        df_correct = coord_matrix_transform2(df_correct, m1, m2, vec)
+        df_correct = coord_calibrate(correction_params_array, df_correct)
 
         # Add final calibrated coordinates to the dataframe
         df["GAN.CALIBRATED.X"] = df_correct["x"]

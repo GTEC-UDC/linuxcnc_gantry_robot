@@ -176,7 +176,7 @@ def load_optitrack_data(
         cols = [f"M.{coord}{i}" for i in range(1, num_m + 1)]
         df_coords = df[cols]
 
-        # Interpolate the optitrack data to fill the missing values
+        # Interpolate the OptiTrack data to fill the missing values
         df_coords = df_coords.interpolate(
             method="linear", axis=0, limit_area="inside", inplace=False
         )
@@ -321,10 +321,10 @@ def get_processed_data(
     df["GAN.Z"] = np.interp(t_o, t_g, df_gantry["z"], left=np.nan, right=np.nan)
 
     # -------------------------------------------------------------------------
-    # Align the optitrack data with the gantry data
+    # Align the OptiTrack data with the gantry data
     # -------------------------------------------------------------------------
 
-    # Function to align the optitrack coordinates with the gantry coordinates
+    # Function to align the OptiTrack coordinates with the gantry coordinates
     def coord_align(
         x,
         df: pd.DataFrame,
@@ -374,7 +374,7 @@ def get_processed_data(
                 fval = getattr(intermediate_result, "fun", intermediate_result)
                 print(f"fval: {fval}")
 
-        logger.info("Aligning optitrack data with gantry data...")
+        logger.info("Aligning OptiTrack data with gantry data...")
         res = scp.optimize.minimize(  # type: ignore[call-overload]
             fun=lambda x: coord_mse(df_gantry_tr, coord_align(x, df_optitrack_tr)),
             x0=x0,
@@ -388,7 +388,7 @@ def get_processed_data(
         alignment_params_array = res.x
         logger.info("Alignment completed. Parameters: %s", alignment_params_array)
 
-    # Transform all the optitrack coordinates in the dataframe
+    # Transform all the OptiTrack coordinates in the dataframe
     cols_params = {
         f"{axis.lower()}_cols": [
             col
@@ -508,6 +508,7 @@ def get_processed_data(
     # -------------------------------------------------------------------------
     # Create the CalibrationParams object to return
     # -------------------------------------------------------------------------
+
     def np_to_list(x: Optional[np.ndarray]) -> Optional[list[float]]:
         return x.tolist() if x is not None else None
 

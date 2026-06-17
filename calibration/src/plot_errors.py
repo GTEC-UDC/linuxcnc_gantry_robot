@@ -24,7 +24,7 @@ def plot_errors(
     error_limit: Optional[tuple[float, float]] = None,
     abs_error_limit: Optional[tuple[float, float]] = None,
 ) -> tuple[mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes]:
-    """Plot gantry and optitrack position and error data.
+    """Plot gantry and OptiTrack position and error data.
 
     Args:
         gantry_file: Path to gantry CSV file
@@ -134,7 +134,7 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     parser = argparse.ArgumentParser(
-        description="Plot gantry and optitrack error data.",
+        description="Plot gantry and OptiTrack error data.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
 

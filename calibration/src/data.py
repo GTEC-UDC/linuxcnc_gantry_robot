@@ -301,24 +301,24 @@ def get_processed_data(
     # Load the Gantry and the OptiTrack data
     # -------------------------------------------------------------------------
 
-    df_optitrack, num_markers = load_optitrack_data(optitrack_filename)
-    metadata_optitrack = load_optitrack_metadata(optitrack_filename)
+    df_o, num_markers = load_optitrack_data(optitrack_filename)
+    df_g = load_gantry_data(gantry_filename)
 
-    df_gantry = load_gantry_data(gantry_filename)
+    metadata_o = load_optitrack_metadata(optitrack_filename)
 
     # -------------------------------------------------------------------------
     # Combine the data
     # -------------------------------------------------------------------------
 
-    capture_start_time = metadata_optitrack["Capture Start Time"].timestamp()
+    capture_start_time = metadata_o["Capture Start Time"].timestamp()
 
-    df = df_optitrack.copy()
-    t_o = df_optitrack["time"]
-    t_g = df_gantry["time"] - capture_start_time
+    df = df_o.copy()
+    t_o = df_o["time"]
+    t_g = df_g["time"] - capture_start_time
 
-    df["GAN.X"] = np.interp(t_o, t_g, df_gantry["x"], left=np.nan, right=np.nan)
-    df["GAN.Y"] = np.interp(t_o, t_g, df_gantry["y"], left=np.nan, right=np.nan)
-    df["GAN.Z"] = np.interp(t_o, t_g, df_gantry["z"], left=np.nan, right=np.nan)
+    df["GAN.X"] = np.interp(t_o, t_g, df_g["x"], left=np.nan, right=np.nan)
+    df["GAN.Y"] = np.interp(t_o, t_g, df_g["y"], left=np.nan, right=np.nan)
+    df["GAN.Z"] = np.interp(t_o, t_g, df_g["z"], left=np.nan, right=np.nan)
 
     # -------------------------------------------------------------------------
     # Align the OptiTrack data with the gantry data
@@ -348,12 +348,12 @@ def get_processed_data(
         alignment_params_array = np.array(calibration_params.alignment)
     elif config.alignment.enabled:
         # Gantry data
-        df_gantry_tr: pd.DataFrame = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
-        df_gantry_tr.columns = pd.Index(["time", "x", "y", "z"])
+        df_g_xyz: pd.DataFrame = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
+        df_g_xyz.columns = pd.Index(["time", "x", "y", "z"])
 
         # OptiTrack data
-        df_optitrack_tr: pd.DataFrame = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
-        df_optitrack_tr.columns = pd.Index(["time", "x", "y", "z"])
+        df_o_xyz: pd.DataFrame = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
+        df_o_xyz.columns = pd.Index(["time", "x", "y", "z"])
 
         # Initial alignment parameters
         if config.alignment.init_params:
@@ -376,7 +376,7 @@ def get_processed_data(
 
         logger.info("Aligning OptiTrack data with gantry data...")
         res = scp.optimize.minimize(  # type: ignore[call-overload]
-            fun=lambda x: coord_mse(df_gantry_tr, coord_align(x, df_optitrack_tr)),
+            fun=lambda x: coord_mse(df_g_xyz, coord_align(x, df_o_xyz)),
             x0=x0,
             bounds=bounds,
             tol=config.alignment.optimization.tolerance,
@@ -445,12 +445,12 @@ def get_processed_data(
             return coord_matrix_transform2(df, matrix1, matrix2, array)
 
         # Gantry data
-        df_gantry_tr = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
-        df_gantry_tr.columns = pd.Index(["time", "x", "y", "z"])
+        df_g_xyz = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
+        df_g_xyz.columns = pd.Index(["time", "x", "y", "z"])
 
         # OptiTrack data
-        df_optitrack_tr = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
-        df_optitrack_tr.columns = pd.Index(["time", "x", "y", "z"])
+        df_o_xyz = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
+        df_o_xyz.columns = pd.Index(["time", "x", "y", "z"])
 
         x0 = np.zeros(18)
         x0[[0, 4, 8]] = 1
@@ -462,7 +462,7 @@ def get_processed_data(
 
         logger.info("Correcting gantry data...")
         res = scp.optimize.minimize(  # type: ignore[call-overload]
-            fun=lambda x: coord_mse(df_optitrack_tr, coord_calibrate(x, df_gantry_tr)),
+            fun=lambda x: coord_mse(df_o_xyz, coord_calibrate(x, df_g_xyz)),
             x0=x0,
             tol=config.correction.optimization.tolerance,
             options={"disp": config.correction.optimization.display},
@@ -474,16 +474,16 @@ def get_processed_data(
         logger.info("Correction completed. Parameters: %s", correction_params_array)
 
     if correction_params_array is not None:
-        df_calib: pd.DataFrame = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]]
-        df_calib.columns = pd.Index(["x", "y", "z"])
+        df_correct: pd.DataFrame = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]]
+        df_correct.columns = pd.Index(["x", "y", "z"])
 
         m1, m2, vec = get_calibration_matrices(correction_params_array)
-        df_calib = coord_matrix_transform2(df_calib, m1, m2, vec)
+        df_correct = coord_matrix_transform2(df_correct, m1, m2, vec)
 
         # Add final calibrated coordinates to the dataframe
-        df["GAN.CALIBRATED.X"] = df_calib["x"]
-        df["GAN.CALIBRATED.Y"] = df_calib["y"]
-        df["GAN.CALIBRATED.Z"] = df_calib["z"]
+        df["GAN.CALIBRATED.X"] = df_correct["x"]
+        df["GAN.CALIBRATED.Y"] = df_correct["y"]
+        df["GAN.CALIBRATED.Z"] = df_correct["z"]
     else:
         # Add final calibrated coordinates with nan values
         df["GAN.CALIBRATED.X"] = np.nan

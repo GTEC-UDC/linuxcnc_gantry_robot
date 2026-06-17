@@ -20,14 +20,7 @@ if __name__ == "__main__":
     with open(args.calibration, "r") as f:
         calibration_params = CalibrationParams.model_validate_json(f.read())
 
-    params = get_calibration_matrices(calibration_params.correction)
-
-    # Note that we transpose the calibration matrices because the python code
-    # uses row coordinate vectors, but the calibxyzkins module uses column
-    # coordinate vectors.
-    A = params[0].T
-    B = params[1].T
-    c = params[2].T
+    A, B, c = get_calibration_matrices(calibration_params.correction)
 
     coords = ["x", "y", "z"]
 

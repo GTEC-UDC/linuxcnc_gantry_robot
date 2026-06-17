@@ -214,7 +214,7 @@ def coord_matrix_transform2(
 
     for x, y, z in zip(x_cols, y_cols, z_cols):
         data = df_tr[[x, y, z]]
-        df_tr[[x, y, z]] = data @ matrix1 + data**2 @ matrix2 + array
+        df_tr[[x, y, z]] = data @ matrix1.T + data**2 @ matrix2.T + array
 
     return df_tr
 

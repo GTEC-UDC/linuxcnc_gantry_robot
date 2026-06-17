@@ -30,11 +30,11 @@ def inverse_kinematics(
 
     # Function to minimize
     def f_opt(x: np.ndarray) -> np.ndarray:
-        return x @ A + x**2 @ B + c - pos
+        return A @ x + B @ x**2 + c - pos
 
     # Jacobian
     def J(x: np.ndarray) -> np.ndarray:
-        return A.T + 2 * x * B.T
+        return A + 2 * x * B
 
     x = x0 if x0 is not None else pos
 
@@ -50,7 +50,7 @@ def inverse_kinematics(
             logger.error(f"J is singular at x = {x}")
             break
 
-        x_new = x - f_opt(x) @ J_inv.T
+        x_new = x - J_inv @ f_opt(x)
         tol_i = np.linalg.norm(x_new - x)
 
         if bounds is not None:
@@ -73,7 +73,7 @@ def check_J_inv(
     A, B, _ = params
     max_abs_x = np.max(np.abs(np.array([bounds[0], bounds[1]])), axis=0)
 
-    D = 2 * np.linalg.inv(A.T) @ B.T * max_abs_x
+    D = 2 * np.linalg.inv(A) @ B * max_abs_x
 
     norm_1 = np.linalg.norm(D, 1)
     norm_inf = np.linalg.norm(D, np.inf)

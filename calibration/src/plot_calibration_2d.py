@@ -16,7 +16,7 @@ def coord_transform(
     """
     Transform coordinates with first and second order transformation matrices.
     """
-    return data @ matrix1 + data**2 @ matrix2 + array
+    return data @ matrix1.T + data**2 @ matrix2.T + array
 
 
 class TransformationPlotter:

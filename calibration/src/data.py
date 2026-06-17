@@ -203,14 +203,14 @@ def get_calibration_matrices(x) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
     Returns:
         tuple[np.ndarray, np.ndarray, np.ndarray]: A tuple containing:
-            - 3x3 transformation matrix for the first transformation
-            - 3x3 transformation matrix for the second transformation
-            - 3-element translation array
+            - 3x3 linear transformation matrix A
+            - 3x3 quadratic transformation matrix B (third column is zero)
+            - 3-element offset vector c
     """
-    matrix1 = np.array(x[:9]).reshape(3, 3)
-    matrix2 = np.array(np.concatenate([x[9:15], [0, 0, 0]])).reshape(3, 3)
-    array = np.array(x[15:18])
-    return matrix1, matrix2, array
+    A = np.array(x[:9]).reshape(3, 3)
+    B = np.concatenate((np.array(x[9:15]).reshape(3, 2), np.zeros((3, 1))), axis=1)
+    c = np.array(x[15:18])
+    return A, B, c
 
 
 class OptimizationConfig(BaseModel):
@@ -422,7 +422,7 @@ def get_processed_data(
     #
     # We consider the following transformation:
     #
-    #   pos_optitrack = pos_gantry * A + pos_gantry ** 2 * B + c
+    #   pos_optitrack = pos_gantry @ A.T + pos_gantry ** 2 @ B.T + c
     #
     # where:
     #   - pos_gantry is the position of the gantry (row vector)

@@ -110,7 +110,9 @@ To ensure the calibration parameters are valid we include the `check_params.py` 
 
 The Newton-Raphson method requires computing the Jacobian matrix of the transformation function:
 
-$$\mathbf{J} = \frac{\partial \mathbf{f}}{\partial [x, y, z]} = \mathbf{A} + 2 \cdot \text{diag}(x, y, z) \cdot \mathbf{B}$$
+$$\mathbf{J} = \frac{\partial \mathbf{f}}{\partial \mathbf{x}} = \mathbf{A} + 2 \cdot \mathbf{B} \cdot \text{diag}(x, y, z)$$
+
+where $\mathbf{x} = [x, y, z]^T$ and $\frac{\partial \mathbf{f}}{\partial \mathbf{x}}$ denotes the Jacobian matrix with entries $J_{ij} = \partial f_i / \partial x_j$.
 
 The Jacobian matrix must be invertible throughout the robot's workspace. This is tested using an approach based on the Neumann series.
 
@@ -121,9 +123,9 @@ For a matrix of the form $\mathbf{X} + \mathbf{Y} = \mathbf{X}(\mathbf{I} + \mat
 Applying this to our Jacobian:
 
 - $\mathbf{X} = \mathbf{A}$
-- $\mathbf{Y} = 2 \cdot \text{diag}(x, y, z) \cdot \mathbf{B}$
+- $\mathbf{Y} = 2 \cdot \mathbf{B} \cdot \text{diag}(x, y, z)$
 
-Therefore, the Jacobian $\mathbf{J}$ is invertible if $\mathbf{A}$ is invertible and $\|2 \cdot \mathbf{A}^{-1} \cdot \text{diag}(x, y, z) \cdot \mathbf{B}\| < 1$ for the maximum absolute values of $x, y, z$ in the joint space bounds.
+Therefore, the Jacobian $\mathbf{J}$ is invertible if $\mathbf{A}$ is invertible and $\|2 \cdot \mathbf{A}^{-1} \cdot \mathbf{B} \cdot \text{diag}(x, y, z)\| < 1$ for the maximum absolute values of $x, y, z$ in the joint space bounds.
 
 This condition is checked in the `check_params.py` script using both the 1-norm and infinity-norm.
 

@@ -22,6 +22,7 @@ def plot_errors_scatter(
     color_map: Optional[dict[str, str]] = None,
     cmap: str = "cividis",
     save: Optional[str] = None,
+    dpi: int = 200,
     style: dict[str, Any] = {"alpha": 0.25, "s": 2, "lw": 0},
     fit_style: dict[str, Any] = {"color": "r", "linestyle": "--", "alpha": 0.8},
 ) -> tuple[pd.DataFrame, list[mpl_axes.Axes]]:
@@ -77,6 +78,8 @@ def plot_errors_scatter(
             axes.append(ax)
             col_axes[i].append(ax)
 
+            # Rasterize only the dense point cloud; axes, grid, labels,
+            # legend and the fit line stay vectorial when saving to PDF/SVG
             if color_cross:
                 col_mappable[i] = ax.scatter(
                     df[pos],
@@ -85,10 +88,11 @@ def plot_errors_scatter(
                     cmap=cmap,
                     vmin=in_plane_min,
                     vmax=in_plane_max,
+                    rasterized=True,
                     **style,
                 )
             else:
-                ax.scatter(df[pos], df[err], **style)
+                ax.scatter(df[pos], df[err], rasterized=True, **style)
             ax.grid(True)
             ax.set_xlabel(pos[-1])
             ax.set_ylabel(f"Error {err[-1]}")
@@ -129,7 +133,7 @@ def plot_errors_scatter(
             )
 
     if save is not None:
-        plt.savefig(save, dpi=200, bbox_inches="tight")
+        plt.savefig(save, dpi=dpi, bbox_inches="tight")
     else:
         plt.show()
     return df, axes
@@ -217,6 +221,13 @@ if __name__ == "__main__":
         help="Save the figure to this path instead of showing it",
     )
 
+    parser.add_argument(
+        "--dpi",
+        type=int,
+        default=200,
+        help="Resolution of the rasterized point cloud when saving to PDF/SVG",
+    )
+
     args = parser.parse_args()
 
     scatter_style = (
@@ -238,6 +249,7 @@ if __name__ == "__main__":
         color_cross=args.color_cross,
         cmap=args.cmap,
         save=args.save,
+        dpi=args.dpi,
         style=scatter_style,
     )
 

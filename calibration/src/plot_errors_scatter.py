@@ -22,7 +22,7 @@ def plot_errors_scatter(
     plot_fit: bool = True,
     color_cross: bool = False,
     color_map: Optional[dict[str, str]] = None,
-    cmap: str = "cividis",
+    cmap: str = "viridis",
     save: Optional[str] = None,
     dpi: int = 200,
     figsize: tuple[float, float] = (10.0, 6.0),
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--cmap",
         type=str,
-        default="cividis",
+        default="viridis",
         help="Colormap used when --color-cross is enabled",
     )
 

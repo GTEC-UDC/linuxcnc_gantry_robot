@@ -253,6 +253,13 @@ if __name__ == "__main__":
         help="Figure size in inches as 'width,height'",
     )
 
+    parser.add_argument(
+        "--font",
+        type=str,
+        default=None,
+        help="Override the font family (e.g. 'STIX Two Text')",
+    )
+
     args = parser.parse_args()
 
     scatter_style = (
@@ -260,6 +267,9 @@ if __name__ == "__main__":
         if not args.color_cross
         else {"alpha": 1, "s": 1.5, "lw": 0}
     )
+
+    if args.font is not None:
+        plt.rcParams["font.family"] = args.font
 
     # Create scatter plots of position errors
     df, _ = plot_errors_scatter(

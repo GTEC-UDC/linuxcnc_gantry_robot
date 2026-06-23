@@ -18,6 +18,10 @@ def plot_errors_scatter(
     skip_frames: bool = True,
     ylim: Optional[tuple[float, float]] = None,
     plot_fit: bool = True,
+    color_cross: bool = False,
+    color_map: Optional[dict[str, str]] = None,
+    cmap: str = "cividis",
+    save: Optional[str] = None,
     style: dict[str, Any] = {"alpha": 0.25, "s": 2, "lw": 0},
     fit_style: dict[str, Any] = {"color": "r", "linestyle": "--", "alpha": 0.8},
 ) -> tuple[pd.DataFrame, list[mpl_axes.Axes]]:
@@ -28,6 +32,17 @@ def plot_errors_scatter(
     errors = [f"GAN.ERR{sep}X", f"GAN.ERR{sep}Y", f"GAN.ERR{sep}Z"]
     positions = [f"GAN{sep}X", f"GAN{sep}Y", f"GAN{sep}Z"]
     axes = []
+
+    # In-plane cross axis used to color each position column (the other
+    # in-plane axis for the X/Y columns; Y for the short vertical Z column)
+    if color_map is None:
+        color_map = {"X": "Y", "Y": "X", "Z": "Y"}
+
+    # In-plane workspace range, shared by the X/Y position axes and by the
+    # color scale (the cross axis used for coloring is always in-plane).
+    # Fixing the color range keeps the colorbar ticks symmetric and makes a
+    # given position map to the same color across all columns.
+    in_plane_min, in_plane_max = 0.0, 5200.0
 
     with open(config_file, "r") as f:
         config = CalibrationConfig.model_validate_json(f.read())
@@ -45,17 +60,35 @@ def plot_errors_scatter(
         calibration_params=calibration_params,
     )
 
-    plt.figure(
+    fig = plt.figure(
         constrained_layout=True,
         figsize=(10, 6),
     )
 
+    col_axes: dict[int, list[mpl_axes.Axes]] = {i: [] for i in range(len(positions))}
+    col_mappable: dict[int, Any] = {}
+
     for i, pos in enumerate(positions):
+        color_letter = color_map[pos[-1]]
+        color_col = f"GAN{sep}{color_letter}"
+
         for j, err in enumerate(errors):
             ax = plt.subplot(3, 3, 1 + i + j * 3)
             axes.append(ax)
+            col_axes[i].append(ax)
 
-            ax.scatter(df[pos], df[err], **style)
+            if color_cross:
+                col_mappable[i] = ax.scatter(
+                    df[pos],
+                    df[err],
+                    c=df[color_col],
+                    cmap=cmap,
+                    vmin=in_plane_min,
+                    vmax=in_plane_max,
+                    **style,
+                )
+            else:
+                ax.scatter(df[pos], df[err], **style)
             ax.grid(True)
             ax.set_xlabel(pos[-1])
             ax.set_ylabel(f"Error {err[-1]}")
@@ -70,8 +103,8 @@ def plot_errors_scatter(
                 if pos[-1] in ["X", "Y"]:
                     legend_str = "Quadratic fit"
                     z = np.polyfit(x, y, 2)
-                    x = np.linspace(0, 5200, 100)
-                    ax.set_xlim(0, 5200)
+                    x = np.linspace(in_plane_min, in_plane_max, 100)
+                    ax.set_xlim(in_plane_min, in_plane_max)
                 else:
                     legend_str = "Linear fit"
                     z = np.polyfit(x, y, 1)
@@ -82,7 +115,23 @@ def plot_errors_scatter(
                 ax.plot(x, p(x), label=legend_str, **fit_style)
                 ax.legend()
 
-    plt.show()
+    # One colorbar per column, labeled with the cross axis it encodes
+    if color_cross:
+        for i, pos in enumerate(positions):
+            color_letter = color_map[pos[-1]]
+            fig.colorbar(
+                col_mappable[i],
+                ax=col_axes[i],
+                location="bottom",
+                aspect=30,
+                pad=0.02,
+                label=f"{color_letter} (mm)",
+            )
+
+    if save is not None:
+        plt.savefig(save, dpi=200, bbox_inches="tight")
+    else:
+        plt.show()
     return df, axes
 
 
@@ -147,7 +196,34 @@ if __name__ == "__main__":
         help="Y-axis limit for position plot as 'min,max' (mm)",
     )
 
+    parser.add_argument(
+        "--color-cross",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Color each column by the position of an in-plane cross axis",
+    )
+
+    parser.add_argument(
+        "--cmap",
+        type=str,
+        default="cividis",
+        help="Colormap used when --color-cross is enabled",
+    )
+
+    parser.add_argument(
+        "--save",
+        type=str,
+        default=None,
+        help="Save the figure to this path instead of showing it",
+    )
+
     args = parser.parse_args()
+
+    scatter_style = (
+        {"alpha": 0.25, "s": 2, "lw": 0}
+        if not args.color_cross
+        else {"alpha": 1, "s": 1.5, "lw": 0}
+    )
 
     # Create scatter plots of position errors
     df, _ = plot_errors_scatter(
@@ -159,6 +235,10 @@ if __name__ == "__main__":
         skip_frames=args.skip_frames,
         ylim=args.ylim,
         plot_fit=args.plot_fit,
+        color_cross=args.color_cross,
+        cmap=args.cmap,
+        save=args.save,
+        style=scatter_style,
     )
 
     # Print statistical summary

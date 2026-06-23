@@ -100,8 +100,8 @@ def plot_errors_scatter(
             else:
                 ax.scatter(df[pos], df[err], rasterized=True, **style)
             ax.grid(True)
-            ax.set_xlabel(pos[-1])
-            ax.set_ylabel(f"Error {err[-1]}")
+            ax.set_xlabel(f"{pos[-1]} (mm)")
+            ax.set_ylabel(f"Error {err[-1]} (mm)")
             ax.set_title(f"Error {err[-1]} over {pos[-1]}")
             ax.set_ylim(ylim_map[err[-1]])
 

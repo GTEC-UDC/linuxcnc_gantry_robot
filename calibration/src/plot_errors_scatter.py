@@ -16,13 +16,16 @@ def plot_errors_scatter(
     calibration_file: str = "calibration.json",
     correct: bool = True,
     skip_frames: bool = True,
-    ylim: Optional[tuple[float, float]] = None,
+    ylim_x: Optional[tuple[float, float]] = None,
+    ylim_y: Optional[tuple[float, float]] = None,
+    ylim_z: Optional[tuple[float, float]] = None,
     plot_fit: bool = True,
     color_cross: bool = False,
     color_map: Optional[dict[str, str]] = None,
     cmap: str = "cividis",
     save: Optional[str] = None,
     dpi: int = 200,
+    figsize: tuple[float, float] = (10.0, 6.0),
     style: dict[str, Any] = {"alpha": 0.25, "s": 2, "lw": 0},
     fit_style: dict[str, Any] = {"color": "r", "linestyle": "--", "alpha": 0.8},
 ) -> tuple[pd.DataFrame, list[mpl_axes.Axes]]:
@@ -33,6 +36,9 @@ def plot_errors_scatter(
     errors = [f"GAN.ERR{sep}X", f"GAN.ERR{sep}Y", f"GAN.ERR{sep}Z"]
     positions = [f"GAN{sep}X", f"GAN{sep}Y", f"GAN{sep}Z"]
     axes = []
+
+    # Per-row vertical limits, one per error component (None = autoscale)
+    ylim_map = {"X": ylim_x, "Y": ylim_y, "Z": ylim_z}
 
     # In-plane cross axis used to color each position column (the other
     # in-plane axis for the X/Y columns; Y for the short vertical Z column)
@@ -63,7 +69,7 @@ def plot_errors_scatter(
 
     fig = plt.figure(
         constrained_layout=True,
-        figsize=(10, 6),
+        figsize=figsize,
     )
 
     col_axes: dict[int, list[mpl_axes.Axes]] = {i: [] for i in range(len(positions))}
@@ -97,7 +103,7 @@ def plot_errors_scatter(
             ax.set_xlabel(pos[-1])
             ax.set_ylabel(f"Error {err[-1]}")
             ax.set_title(f"Error {err[-1]} over {pos[-1]}")
-            ax.set_ylim(ylim)
+            ax.set_ylim(ylim_map[err[-1]])
 
             # Add fit line
             if plot_fit and (mask := df.loc[:, [pos, err]].notna().all(axis=1)).any():
@@ -195,9 +201,21 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--ylim",
+        "--ylim-x",
         type=parse_limit,
-        help="Y-axis limit for position plot as 'min,max' (mm)",
+        help="Y-axis limit for the error X row as 'min,max' (mm)",
+    )
+
+    parser.add_argument(
+        "--ylim-y",
+        type=parse_limit,
+        help="Y-axis limit for the error Y row as 'min,max' (mm)",
+    )
+
+    parser.add_argument(
+        "--ylim-z",
+        type=parse_limit,
+        help="Y-axis limit for the error Z row as 'min,max' (mm)",
     )
 
     parser.add_argument(
@@ -228,6 +246,13 @@ if __name__ == "__main__":
         help="Resolution of the rasterized point cloud when saving to PDF/SVG",
     )
 
+    parser.add_argument(
+        "--figsize",
+        type=parse_limit,
+        default=(10.0, 6.0),
+        help="Figure size in inches as 'width,height'",
+    )
+
     args = parser.parse_args()
 
     scatter_style = (
@@ -244,12 +269,15 @@ if __name__ == "__main__":
         calibration_file=args.calibration,
         correct=args.correct,
         skip_frames=args.skip_frames,
-        ylim=args.ylim,
+        ylim_x=args.ylim_x,
+        ylim_y=args.ylim_y,
+        ylim_z=args.ylim_z,
         plot_fit=args.plot_fit,
         color_cross=args.color_cross,
         cmap=args.cmap,
         save=args.save,
         dpi=args.dpi,
+        figsize=args.figsize,
         style=scatter_style,
     )
 

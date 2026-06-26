@@ -1,7 +1,7 @@
 {
   "alignment": {
     "init_params": [50, 0, 0, -1.5707963267948966, 2500, 2500, -2500],
-    "max_rotation": 0.098174770424681,
+    "max_rotation": null,
     "rotation_center": [0, 0, 1500],
     "objective": "mse",
     "minimize_options": {

@@ -1,5 +1,5 @@
 import argparse
-from typing import Any, Optional, cast
+from typing import Any, Optional
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
@@ -291,17 +291,3 @@ if __name__ == "__main__":
         style=scatter_style,
     )
 
-    # Print statistical summary
-    print("\nStatistical Summary of Errors:")
-    print(df[["GAN.ERR.X", "GAN.ERR.Y", "GAN.ERR.Z", "GAN.ERR.Abs"]].describe())
-
-    # Calculate and print R-squared values
-    positions = ["GAN.X", "GAN.Y", "GAN.Z"]
-    errors = ["GAN.ERR.X", "GAN.ERR.Y", "GAN.ERR.Z"]
-    print("\nR-squared values for linear fits:")
-    for pos in positions:
-        for err in errors:
-            if (mask := df.loc[:, [pos, err]].notna().all(axis=1)).any():
-                correlation = cast(float, df.loc[mask, [pos, err]].corr().iloc[0, 1])
-                r_squared = correlation**2
-                print(f"{pos} vs {err}: {r_squared:.4f}")

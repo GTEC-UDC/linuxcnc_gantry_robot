@@ -5,7 +5,7 @@ import pandas as pd
 from data import CalibrationConfig, CalibrationParams, get_processed_data
 
 SETS = [
-    ("Non", "GAN.", "GAN.ERR."),
+    ("Non corrected", "GAN.", "GAN.ERR."),
     ("Corrected", "GAN.CALIBRATED.", "GAN.ERR.CALIBRATED."),
 ]
 

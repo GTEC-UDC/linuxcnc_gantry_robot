@@ -1,4 +1,5 @@
 import argparse
+import logging
 from typing import Any, Optional
 
 import matplotlib.axes as mpl_axes
@@ -146,6 +147,8 @@ def plot_errors_scatter(
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+
     parser = argparse.ArgumentParser(
         description="Analyze gantry errors from Optitrack and Gantry data",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,

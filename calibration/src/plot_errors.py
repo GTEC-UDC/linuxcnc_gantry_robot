@@ -7,8 +7,10 @@ from typing import Literal, Optional
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
+import numpy as np
 from argutils import parse_limit
 from data import CalibrationConfig, CalibrationParams, get_processed_data
+from scipy.signal import savgol_filter
 
 
 def plot_errors(
@@ -23,6 +25,8 @@ def plot_errors(
     position_limit: Optional[tuple[float, float]] = None,
     error_limit: Optional[tuple[float, float]] = None,
     abs_error_limit: Optional[tuple[float, float]] = None,
+    show_acceleration: bool = False,
+    accel_window: int = 51,
 ) -> tuple[mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes]:
     """Plot gantry and OptiTrack position and error data.
 
@@ -80,6 +84,31 @@ def plot_errors(
     # String separator for the gantry coordinates
     sep = ".CALIBRATED." if correct else "."
 
+    # Compute acceleration from gantry positions (mm/s²) using a Savitzky-Golay
+    # filter to suppress noise amplification from double differentiation.
+    if show_acceleration:
+        dt = float(df["time"].diff().median())
+        for coord in ["X", "Y", "Z"]:
+            pos = df[f"GAN{sep}{coord}"].copy()
+            nan_mask = pos.isna().to_numpy()
+
+            pos_filled = (
+                pos.interpolate(method="linear", limit_area="inside")
+                .ffill()
+                .bfill()
+                .to_numpy(dtype=float)
+            )
+
+            acc = savgol_filter(
+                pos_filled, window_length=accel_window, polyorder=3, deriv=2, delta=dt
+            )
+
+            acc[nan_mask] = np.nan
+            df["GAN.ACC." + coord] = acc
+        df["GAN.ACC.Abs"] = np.sqrt(
+            df["GAN.ACC.X"] ** 2 + df["GAN.ACC.Y"] ** 2 + df["GAN.ACC.Z"] ** 2
+        )
+
     # Select the time column based on the time unit
     time_data = df["time"] if time_unit == "s" else df["frame"]
 
@@ -99,6 +128,25 @@ def plot_errors(
     ax_abs_err.plot(
         time_data, df[f"GAN.ERR{sep}Abs"], "k-", linewidth=0.5, label="Absolute Error"
     )
+
+    # Overlay acceleration on each error subplot
+    if show_acceleration:
+        for ax, coord, acc_label in [
+            (ax_x_err, "X", "X Accel"),
+            (ax_y_err, "Y", "Y Accel"),
+            (ax_z_err, "Z", "Z Accel"),
+            (ax_abs_err, "Abs", "|Accel|"),
+        ]:
+            ax_twin = ax.twinx()
+            ax_twin.plot(
+                time_data,
+                df["GAN.ACC." + coord],
+                color="tab:purple",
+                linewidth=1,
+                label=acc_label,
+            )
+            ax_twin.set_ylabel("Acc. (mm/s²)")
+            ax_twin.tick_params(axis="y")
 
     # Set labels
     ax_x_err.set_ylabel("X Error (mm)")
@@ -216,6 +264,20 @@ def main():
         help="Y-axis limit for absolute error plot as 'min,max' (mm)",
     )
 
+    parser.add_argument(
+        "--acceleration",
+        action=argparse.BooleanOptionalAction,
+        default=False,
+        help="Overlay gantry acceleration on each error subplot (right y-axis)",
+    )
+
+    parser.add_argument(
+        "--accel-window",
+        type=int,
+        default=51,
+        help="Savitzky-Golay window length for acceleration smoothing; must be odd",
+    )
+
     args = parser.parse_args()
 
     plot_errors(
@@ -230,6 +292,8 @@ def main():
         position_limit=args.poslim,
         error_limit=args.errlim,
         abs_error_limit=args.abserrlim,
+        show_acceleration=args.acceleration,
+        accel_window=args.accel_window,
     )
 
 

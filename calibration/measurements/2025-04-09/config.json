@@ -17,19 +17,18 @@
       "method": "Powell",
       "tolerance": 1e-9,
       "display": true
+    },
+    "reject_samples": {
+      "enabled": true,
+      "sigma": 5.0,
+      "margin_s": 0.25,
+      "iterations": 2
+    },
+    "skip_samples": {
+      "enabled": true,
+      "ranges": [
+        [0, 3500]
+      ]
     }
-  },
-  "skip_frames": {
-    "enabled": true,
-    "ranges": [
-      [0, 3500],
-      [8800, 9200],
-      [24170,24320],
-      [28750, 29550],
-      [35720, 36000],
-      [55900, 56050],
-      [57870, 58000],
-      [62600, 62920]
-    ]
   }
 } 

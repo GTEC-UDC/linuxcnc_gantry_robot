@@ -19,7 +19,7 @@ def plot_errors(
     config_file: str = "config.json",
     calibration_file: str = "calibration.json",
     correct: bool = True,
-    skip_frames: bool = True,
+    skip_samples: bool = True,
     time_unit: Literal["s", "frames"] = "s",
     time_limit: Optional[tuple[float, float]] = None,
     position_limit: Optional[tuple[float, float]] = None,
@@ -57,7 +57,8 @@ def plot_errors(
 
     # Override the configuration with the provided arguments
     config.correction.enabled = correct
-    config.skip_frames.enabled = skip_frames
+    config.correction.skip_samples.enabled = skip_samples
+    config.correction.reject_samples.enabled = skip_samples
 
     # Get the processed data
     df, _, _ = get_processed_data(
@@ -222,10 +223,10 @@ def main():
     )
 
     parser.add_argument(
-        "--skip-frames",
+        "--skip-samples",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Enable skipping the frames set in the configuration file",
+        help="Enable the sample exclusions of the configuration file",
     )
 
     parser.add_argument(
@@ -286,7 +287,7 @@ def main():
         config_file=args.config,
         calibration_file=args.calibration,
         correct=args.correct,
-        skip_frames=args.skip_frames,
+        skip_samples=args.skip_samples,
         time_unit=args.time_unit,
         time_limit=args.time_limit,
         position_limit=args.poslim,

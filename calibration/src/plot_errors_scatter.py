@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from argutils import parse_limit
+from matplotlib.ticker import MultipleLocator
 from data import CalibrationConfig, CalibrationParams, get_processed_data
 
 
@@ -16,13 +17,16 @@ def plot_errors_scatter(
     config_file: str = "config.json",
     calibration_file: str = "calibration.json",
     correct: bool = True,
-    skip_frames: bool = True,
+    skip_samples: bool = True,
     ylim_x: Optional[tuple[float, float]] = None,
     ylim_y: Optional[tuple[float, float]] = None,
     ylim_z: Optional[tuple[float, float]] = None,
     plot_fit: bool = True,
     color_cross: bool = False,
     color_map: Optional[dict[str, str]] = None,
+    xtick_step_x: Optional[float] = None,
+    xtick_step_y: Optional[float] = None,
+    xtick_step_z: Optional[float] = None,
     cmap: str = "viridis",
     save: Optional[str] = None,
     dpi: int = 200,
@@ -40,6 +44,11 @@ def plot_errors_scatter(
 
     # Per-row vertical limits, one per error component (None = autoscale)
     ylim_map = {"X": ylim_x, "Y": ylim_y, "Z": ylim_z}
+
+    # Per-axis horizontal tick spacing, keyed by the position letter shown on
+    # the horizontal axis (None = automatic). The same spacing is reused on the
+    # colorbar, which always encodes an in-plane (X or Y) axis.
+    xtick_step_map = {"X": xtick_step_x, "Y": xtick_step_y, "Z": xtick_step_z}
 
     # In-plane cross axis used to color each position column (the other
     # in-plane axis for the X/Y columns; Y for the short vertical Z column)
@@ -59,7 +68,8 @@ def plot_errors_scatter(
         calibration_params = CalibrationParams.model_validate_json(f.read())
 
     # Override the skip frames parameter
-    config.skip_frames.enabled = skip_frames
+    config.correction.skip_samples.enabled = skip_samples
+    config.correction.reject_samples.enabled = skip_samples
 
     df, _, _ = get_processed_data(
         gantry_file,
@@ -126,11 +136,14 @@ def plot_errors_scatter(
                 ax.plot(x, p(x), label=legend_str, **fit_style)
                 ax.legend()
 
+            if (step := xtick_step_map[pos[-1]]) is not None:
+                ax.xaxis.set_major_locator(MultipleLocator(step))
+
     # One colorbar per column, labeled with the cross axis it encodes
     if color_cross:
         for i, pos in enumerate(positions):
             color_letter = color_map[pos[-1]]
-            fig.colorbar(
+            cbar = fig.colorbar(
                 col_mappable[i],
                 ax=col_axes[i],
                 location="bottom",
@@ -138,6 +151,9 @@ def plot_errors_scatter(
                 pad=0.02,
                 label=f"{color_letter} (mm)",
             )
+            # Horizontal colorbar: ticks live on its x-axis
+            if (step := xtick_step_map[color_letter]) is not None:
+                cbar.ax.xaxis.set_major_locator(MultipleLocator(step))
 
     if save is not None:
         plt.savefig(save, dpi=dpi, bbox_inches="tight")
@@ -190,10 +206,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--skip-frames",
+        "--skip-samples",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Enable skipping the frames set in the configuration file",
+        help="Enable the sample exclusions of the configuration file",
     )
 
     parser.add_argument(
@@ -219,6 +235,27 @@ if __name__ == "__main__":
         "--ylim-z",
         type=parse_limit,
         help="Y-axis limit for the error Z row as 'min,max' (mm)",
+    )
+
+    parser.add_argument(
+        "--xtick-step-x",
+        type=float,
+        default=None,
+        help="Horizontal tick spacing where X is on the axis/colorbar (mm)",
+    )
+
+    parser.add_argument(
+        "--xtick-step-y",
+        type=float,
+        default=None,
+        help="Horizontal tick spacing where Y is on the axis/colorbar (mm)",
+    )
+
+    parser.add_argument(
+        "--xtick-step-z",
+        type=float,
+        default=None,
+        help="Horizontal tick spacing where Z is on the axis (mm)",
     )
 
     parser.add_argument(
@@ -263,6 +300,13 @@ if __name__ == "__main__":
         help="Override the font family (e.g. 'STIX Two Text')",
     )
 
+    parser.add_argument(
+        "--fontsize",
+        type=float,
+        default=None,
+        help="Override the base font size in points",
+    )
+
     args = parser.parse_args()
 
     scatter_style = (
@@ -273,6 +317,8 @@ if __name__ == "__main__":
 
     if args.font is not None:
         plt.rcParams["font.family"] = args.font
+    if args.fontsize is not None:
+        plt.rcParams["font.size"] = args.fontsize
 
     # Create scatter plots of position errors
     df, _ = plot_errors_scatter(
@@ -281,12 +327,15 @@ if __name__ == "__main__":
         config_file=args.config,
         calibration_file=args.calibration,
         correct=args.correct,
-        skip_frames=args.skip_frames,
+        skip_samples=args.skip_samples,
         ylim_x=args.ylim_x,
         ylim_y=args.ylim_y,
         ylim_z=args.ylim_z,
         plot_fit=args.plot_fit,
         color_cross=args.color_cross,
+        xtick_step_x=args.xtick_step_x,
+        xtick_step_y=args.xtick_step_y,
+        xtick_step_z=args.xtick_step_z,
         cmap=args.cmap,
         save=args.save,
         dpi=args.dpi,

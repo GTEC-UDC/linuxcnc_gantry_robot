@@ -17,7 +17,7 @@ def plot_errors_probability(
     optitrack_file: str = "take_optitrack.csv",
     config_file: str = "config.json",
     calibration_file: str = "calibration.json",
-    skip_frames: bool = True,
+    skip_samples: bool = True,
     cumulative: bool = True,
     bins: int = 200,
     xyz_limits: tuple[float, float] = (-15, 15),
@@ -40,7 +40,8 @@ def plot_errors_probability(
         calibration_params = CalibrationParams.model_validate_json(f.read())
 
     # Override the skip frames parameter
-    config.skip_frames.enabled = skip_frames
+    config.correction.skip_samples.enabled = skip_samples
+    config.correction.reject_samples.enabled = skip_samples
 
     # Ensure the correction is enabled
     assert (
@@ -224,10 +225,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--skip-frames",
+        "--skip-samples",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Enable skipping the frames set in the configuration file",
+        help="Enable the sample exclusions of the configuration file",
     )
 
     parser.add_argument(
@@ -346,7 +347,7 @@ if __name__ == "__main__":
         optitrack_file=args.optitrack,
         config_file=args.config,
         calibration_file=args.calibration,
-        skip_frames=args.skip_frames,
+        skip_samples=args.skip_samples,
         cumulative=args.cumulative,
         bins=args.bins,
         xyz_limits=args.xyzlim,

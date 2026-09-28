@@ -239,16 +239,17 @@ The contents of the configuration file used for the `2025-04-09` measurement are
       "method": "Powell",
       "tolerance": 1e-9,
       "display": true
+    },
+    "reject_samples": {
+      "enabled": true,
+      "sigma": 5.0,
+      "margin_s": 0.25,
+      "iterations": 2
+    },
+    "skip_samples": {
+      "enabled": false,
+      "ranges": []
     }
-  },
-  "skip_frames": {
-    "enabled": true,
-    "ranges": [
-      [8800, 9200],
-      [28750, 29550],
-      [55900, 56050],
-      [57870, 58000]
-    ]
   }
 }
 ```
@@ -269,7 +270,13 @@ Some important considerations:
 
 - The `max_rotation` parameter is the maximum rotation allowed in the optimization for all axes. If not specified or if this value is too large the optimization may not converge to the optimal value.
 
-- The `skip_frames` parameter is a list of frame ranges to skip. The frame ranges are defined as a list of tuples, where each tuple contains the start and end frame of the range. The frame ranges are used to exclude frames with poor tracking quality.
+- The `reject_samples` section of the `correction` discards the samples in which OptiTrack did not track the rigid body properly, whose recorded position is therefore wrong. They are found through the residual of the correction model: the model is fitted, and every sample whose 3D residual exceeds `sigma` robust standard deviations from the median is rejected, together with the `margin_s` seconds on either side of it, which covers the ramps at the edges of a dropout. The fit is then repeated, `iterations` times in total.
+
+  The spread is measured with the [median absolute deviation](https://en.wikipedia.org/wiki/Median_absolute_deviation) rather than with the standard deviation, because the standard deviation is itself inflated by the very samples we are looking for, which raises the threshold until they pass it. The MAD is scaled by 1.4826 so that it matches the standard deviation for Gaussian data and `sigma` keeps its usual meaning.
+
+- The `skip_samples` section of the `correction` is a list of sample ranges to exclude by hand, given as tuples with the first and last index of each range. It is superseded by `reject_samples` and disabled by default, and remains for captures that need a specific interval out.
+
+- Samples removed by either mechanism are dropped from the returned data as well, so the statistics and the figures are computed over the same samples as the fit.
 
 ### Run the calibration
 

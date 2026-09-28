@@ -1,5 +1,4 @@
 import argparse
-from typing import cast
 
 import pandas as pd
 from data import CalibrationConfig, CalibrationParams, get_processed_data
@@ -15,21 +14,16 @@ def print_summary(df: pd.DataFrame) -> None:
         err_cols = [f"{err_prefix}{c}" for c in ["X", "Y", "Z", "Abs"]]
         if df[err_cols].notna().to_numpy().any():
             print(f"\nStatistical Summary ({label}):")
-            print(df[err_cols].describe())
+            print(df[err_cols].describe(percentiles=[0.25, 0.5, 0.75, 0.9, 0.95]))
 
     for label, pos_prefix, err_prefix in SETS:
-        pos_cols = [f"{pos_prefix}{c}" for c in ["X", "Y", "Z"]]
         err_cols = [f"{err_prefix}{c}" for c in ["X", "Y", "Z"]]
         if df[err_cols].notna().to_numpy().any():
-            print(f"\nR-squared values ({label}):")
-            for pos in pos_cols:
-                for err in err_cols:
-                    mask = df.loc[:, [pos, err]].notna().all(axis=1)
-                    if mask.any():
-                        correlation = cast(
-                            float, df.loc[mask, [pos, err]].corr().iloc[0, 1]
-                        )
-                        print(f"  {pos} vs {err}: {correlation**2:.4f}")
+            print(f"\nError correlation ({label}):")
+            print(df[err_cols].corr())
+
+            print(f"\nError covariance ({label}):")
+            print(df[err_cols].cov())
 
 
 if __name__ == "__main__":
@@ -69,10 +63,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--skip-frames",
+        "--skip-samples",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Enable skipping the frames set in the configuration file",
+        help="Enable the sample exclusions of the configuration file",
     )
 
     args = parser.parse_args()
@@ -83,7 +77,8 @@ if __name__ == "__main__":
     with open(args.calibration, "r") as f:
         calibration_params = CalibrationParams.model_validate_json(f.read())
 
-    config.skip_frames.enabled = args.skip_frames
+    config.correction.skip_samples.enabled = args.skip_samples
+    config.correction.reject_samples.enabled = args.skip_samples
 
     df, _, _ = get_processed_data(
         args.gantry,

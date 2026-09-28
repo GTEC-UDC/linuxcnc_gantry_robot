@@ -19,7 +19,7 @@ def plot_movement(
     trail_before_samples: int = 2000,
     error_after_samples: int = 2000,
     error_before_samples: int = 2000,
-    skip_frames: bool = True,
+    skip_samples: bool = True,
     correct: bool = True,
     xlim: Optional[tuple[float, float]] = None,
     ylim: Optional[tuple[float, float]] = None,
@@ -36,7 +36,7 @@ def plot_movement(
         trail_before_samples: Number of previous samples to show for the trails
         error_after_samples: Number of previous samples to show for the errors
         error_before_samples: Number of previous samples to show for the errors
-        skip_frames: Whether to skip the frames set in the configuration file
+        skip_samples: Whether to apply the sample exclusions of the configuration file
         correct: Whether to correct the gantry position
         xlim: Optional tuple of (min, max) for the x-axis
         ylim: Optional tuple of (min, max) for the y-axis
@@ -50,7 +50,8 @@ def plot_movement(
         calibration_params = CalibrationParams.model_validate_json(f.read())
 
     # Override the skip frames parameter
-    config.skip_frames.enabled = skip_frames
+    config.correction.skip_samples.enabled = skip_samples
+    config.correction.reject_samples.enabled = skip_samples
 
     # Load and process the data
     df, _, num_markers = get_processed_data(
@@ -323,10 +324,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--skip-frames",
+        "--skip-samples",
         action=argparse.BooleanOptionalAction,
         default=True,
-        help="Enable skipping the frames set in the configuration file",
+        help="Enable the sample exclusions of the configuration file",
     )
 
     default_axis_limits = {
@@ -352,7 +353,7 @@ if __name__ == "__main__":
         calibration_file=args.calibration,
         trail_after_samples=args.trail_after,
         trail_before_samples=args.trail_before,
-        skip_frames=args.skip_frames,
+        skip_samples=args.skip_samples,
         correct=args.correct,
         xlim=args.xlim,
         ylim=args.ylim,

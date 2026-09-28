@@ -19,6 +19,9 @@ from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
+# Center about which the rotations of the alignment are applied
+ROTATION_CENTER = (0.0, 0.0, 1500.0)
+
 
 def load_gantry_data(filename: str) -> pd.DataFrame:
     """Load gantry position data from a CSV file.
@@ -214,6 +217,123 @@ def get_calibration_matrices(x) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     return A, B, c
 
 
+def coord_align(
+    x,
+    df: pd.DataFrame,
+    rotation_center: tuple[float, float, float] = ROTATION_CENTER,
+    time_col: str = "time",
+    x_cols: Optional[list[str]] = None,
+    y_cols: Optional[list[str]] = None,
+    z_cols: Optional[list[str]] = None,
+) -> pd.DataFrame:
+    """Bring OptiTrack coordinates into the gantry frame.
+
+    The alignment shifts the time base, rotates about ``rotation_center`` and
+    translates, with ``x`` holding (dt, rx, ry, rz, tx, ty, tz). It acts on the
+    columns x/y/z unless ``x_cols``, ``y_cols`` and ``z_cols`` name others, as
+    needed when the frame carries several sets of coordinates.
+    """
+    x_cols = ["x"] if x_cols is None else x_cols
+    y_cols = ["y"] if y_cols is None else y_cols
+    z_cols = ["z"] if z_cols is None else z_cols
+
+    return coord_transform(
+        df,
+        [
+            TransformShiftT(x[0], time_col, x_cols, y_cols, z_cols),
+            TransformRotate("x", x[1], rotation_center, x_cols, y_cols, z_cols),
+            TransformRotate("y", x[2], rotation_center, x_cols, y_cols, z_cols),
+            TransformRotate("z", x[3], rotation_center, x_cols, y_cols, z_cols),
+            TransformShiftXYZ(x[4], x[5], x[6], x_cols, y_cols, z_cols),
+        ],
+    )
+
+
+def coord_calibrate(x, df: pd.DataFrame) -> pd.DataFrame:
+    """Apply the correction model to gantry coordinates, given its parameters."""
+    A, B, c = get_calibration_matrices(x)
+    return coord_matrix_transform2(df, A, B, c)
+
+
+def design_matrix(gantry: np.ndarray) -> np.ndarray:
+    """Design matrix of the correction model for a set of gantry positions.
+
+    The columns are (x, y, z, x**2, y**2, 1), so the least squares solution
+    against the OptiTrack positions holds A.T in its first three rows, the
+    non-zero part of B.T in the next two, and c in the last one.
+    """
+    return np.column_stack([gantry, gantry[:, 0:2] ** 2, np.ones(len(gantry))])
+
+
+def reject_samples(
+    gantry: np.ndarray,
+    optitrack: np.ndarray,
+    time: np.ndarray,
+    sigma: float = 5.0,
+    margin_s: float = 0.25,
+    iterations: int = 2,
+) -> np.ndarray:
+    """Samples of the correction fit to keep, found by iterated outlier rejection.
+
+    Fits the model, measures the 3D residual, and rejects every sample farther than
+    ``sigma`` robust standard deviations from its median. The fit is then repeated
+    on what is left. Each rejected sample takes with it the ``margin_s`` seconds on
+    either side of it, which covers the entry and exit ramps of a tracking dropout,
+    already corrupted while still below the threshold.
+
+    The spread is measured with the median absolute deviation
+    (https://en.wikipedia.org/wiki/Median_absolute_deviation) rather than the
+    standard deviation, because the standard deviation is itself inflated by the
+    very samples we are looking for, which raises the threshold until they pass it.
+    The 1.4826 factor makes the MAD match the standard deviation for Gaussian data,
+    so ``sigma`` keeps its usual meaning.
+
+    The samples must be free of NaN and ordered in time.
+    Returns the mask of the samples to keep.
+    """
+    design = design_matrix(gantry)
+    keep = np.ones(len(gantry), dtype=bool)
+
+    for _ in range(max(iterations, 1)):
+        coef, _, _, _ = np.linalg.lstsq(design[keep], optitrack[keep], rcond=None)
+        residual = np.linalg.norm(design @ coef - optitrack, axis=1)
+        median = np.median(residual)
+        spread = np.median(np.abs(residual - median)) * 1.4826
+        rejected = residual >= median + sigma * spread
+
+        if margin_s > 0 and rejected.any():
+            # Each rejected sample widens into the interval of samples within
+            # margin_s of it, and the mask is the union of those intervals. Every
+            # interval contributes one +1 and one -1 to the edge count, so the
+            # running sum gives how many of them cover each sample.
+            start = np.searchsorted(time, time[rejected] - margin_s, side="left")
+            end = np.searchsorted(time, time[rejected] + margin_s, side="right")
+            edges = np.zeros(len(time) + 1, dtype=int)
+            np.add.at(edges, start, 1)
+            np.add.at(edges, end, -1)
+            rejected = np.cumsum(edges[:-1]) > 0
+
+        keep = ~rejected
+
+    return keep
+
+
+def interp_columns(t: np.ndarray, t_src: np.ndarray, values: np.ndarray) -> np.ndarray:
+    """Resample the columns of ``values``, taken at ``t_src``, onto the times ``t``.
+
+    ``values`` has one row per sample of ``t_src`` and any number of columns,
+    each interpolated independently. Times outside the range covered by
+    ``t_src`` are returned as NaN.
+    """
+    values = np.asarray(values)
+    return np.column_stack(
+        [
+            np.interp(t, t_src, values[:, i], left=np.nan, right=np.nan)
+            for i in range(values.shape[1])
+        ]
+    )
+
+
 # Objective to minimize when fitting the alignment/correction parameters
 Objective = Literal["mse", "mean_distance"]
 
@@ -247,9 +367,23 @@ class CalibrationAlignmentConfig(BaseModel):
     enabled: bool = True
     init_params: Optional[list[float]] = None
     max_rotation: Optional[float] = np.pi / 32
-    rotation_center: tuple[float, float, float] = (0, 0, 1500)
+    rotation_center: tuple[float, float, float] = ROTATION_CENTER
     objective: Objective = "mse"
     minimize_options: MinimizeOptions = Field(default_factory=MinimizeOptions)
+
+
+class RejectSamplesConfig(BaseModel):
+    # Automatic rejection of the samples. See reject_samples().
+    enabled: bool = True
+    sigma: float = 5.0
+    margin_s: float = 0.25
+    iterations: int = 2
+
+
+class SkipSamplesConfig(BaseModel):
+    # Sample ranges to exclude from the correction fit.
+    enabled: bool = False
+    ranges: list[tuple[int, int]] = Field(default_factory=list)
 
 
 class CalibrationCorrectionConfig(BaseModel):
@@ -257,11 +391,8 @@ class CalibrationCorrectionConfig(BaseModel):
     init_params: Optional[list[float]] = None
     objective: Objective = "mse"
     minimize_options: MinimizeOptions = Field(default_factory=MinimizeOptions)
-
-
-class SkipFramesConfig(BaseModel):
-    enabled: bool = True
-    ranges: list[tuple[int, int]] = Field(default_factory=list)
+    reject_samples: RejectSamplesConfig = Field(default_factory=RejectSamplesConfig)
+    skip_samples: SkipSamplesConfig = Field(default_factory=SkipSamplesConfig)
 
 
 class CalibrationConfig(BaseModel):
@@ -271,7 +402,6 @@ class CalibrationConfig(BaseModel):
     correction: CalibrationCorrectionConfig = Field(
         default_factory=CalibrationCorrectionConfig
     )
-    skip_frames: SkipFramesConfig = Field(default_factory=SkipFramesConfig)
 
 
 class CalibrationParams(BaseModel):
@@ -321,35 +451,18 @@ def get_processed_data(
     capture_start_time = metadata_o["Capture Start Time"].timestamp()
 
     df = df_o.copy()
-    t_o = df_o["time"]
-    t_g = df_g["time"] - capture_start_time
-
-    df["GAN.X"] = np.interp(t_o, t_g, df_g["x"], left=np.nan, right=np.nan)
-    df["GAN.Y"] = np.interp(t_o, t_g, df_g["y"], left=np.nan, right=np.nan)
-    df["GAN.Z"] = np.interp(t_o, t_g, df_g["z"], left=np.nan, right=np.nan)
+    gan = interp_columns(
+        df_o["time"].to_numpy(),
+        df_g["time"].to_numpy() - capture_start_time,
+        df_g[["x", "y", "z"]].to_numpy(),
+    )
+    df["GAN.X"], df["GAN.Y"], df["GAN.Z"] = gan[:, 0], gan[:, 1], gan[:, 2]
 
     # -------------------------------------------------------------------------
     # Align the OptiTrack data with the gantry data
     # -------------------------------------------------------------------------
 
-    # Function to align the OptiTrack coordinates with the gantry coordinates
-    def coord_align(
-        x,
-        df: pd.DataFrame,
-        rotation_center: tuple[float, float, float] = config.alignment.rotation_center,
-        time_col="time",
-        **kwargs,
-    ) -> pd.DataFrame:
-        return coord_transform(
-            df,
-            [
-                TransformShiftT(x[0], time_col, **kwargs),
-                TransformRotate("x", x[1], rotation_center, **kwargs),
-                TransformRotate("y", x[2], rotation_center, **kwargs),
-                TransformRotate("z", x[3], rotation_center, **kwargs),
-                TransformShiftXYZ(x[4], x[5], x[6], **kwargs),
-            ],
-        )
+    rotation_center = config.alignment.rotation_center
 
     alignment_params_array: Optional[np.ndarray] = None
     if config.alignment.enabled and calibration_params.alignment is not None:
@@ -389,7 +502,9 @@ def get_processed_data(
 
         logger.info("Aligning OptiTrack data with gantry data...")
         res = scp.optimize.minimize(  # type: ignore[call-overload]
-            fun=lambda x: objective_fn(df_g_xyz, coord_align(x, df_o_xyz)),
+            fun=lambda x: objective_fn(
+                df_g_xyz, coord_align(x, df_o_xyz, rotation_center)
+            ),
             x0=x0,
             bounds=bounds,
             tol=min_opts.tolerance,
@@ -401,40 +516,83 @@ def get_processed_data(
         alignment_params_array = res.x
         logger.info("Alignment completed. Parameters: %s", alignment_params_array)
 
-        df_o_aligned = coord_align(res.x, df_o_xyz)
+        df_o_aligned = coord_align(res.x, df_o_xyz, rotation_center)
         mean_dist_err = coord_mean_distance(df_g_xyz, df_o_aligned)
         mean_sq_err = coord_mse(df_g_xyz, df_o_aligned)
 
         logger.info("Alignment mean distance error: %f", mean_dist_err)
         logger.info("Alignment mean square error: %f", mean_sq_err)
 
-    # Transform all the OptiTrack coordinates in the dataframe
-    cols_params = {
-        f"{axis.lower()}_cols": [
-            col
-            for col in df.columns
-            if col.startswith(f"M.{axis}") or col.startswith(f"RB.{axis}")
-        ]
-        for axis in ["X", "Y", "Z"]
-    }
-
     if alignment_params_array is not None:
-        df = coord_align(alignment_params_array, df, **cols_params)  # type: ignore
+        # Transform all the OptiTrack coordinates in the dataframe
+        cols_params = {
+            f"{axis.lower()}_cols": [
+                col
+                for col in df.columns
+                if col.startswith(f"M.{axis}") or col.startswith(f"RB.{axis}")
+            ]
+            for axis in ["X", "Y", "Z"]
+        }
+
+        df = coord_align(
+            alignment_params_array,
+            df,
+            rotation_center,
+            x_cols=cols_params["x_cols"],
+            y_cols=cols_params["y_cols"],
+            z_cols=cols_params["z_cols"],
+        )
 
     # -------------------------------------------------------------------------
-    # Skip frames
+    # Skip samples
     #
-    # This step is used to remove frames with poor tracking quality by setting
-    # their coordinate values to NaN. The frame ranges are specified as indices
-    # in the gantry data. This step is done after alignment to ensure we don't
-    # remove non-aligned data points.
+    # This step removes hand-picked ranges of samples by setting their coordinate
+    # values to NaN, which keeps them out of the correction fit and out of
+    # everything derived from it. The ranges are indices of this dataframe, which
+    # holds one row per sample. It is done after alignment so we don't remove
+    # non-aligned data points.
     # -------------------------------------------------------------------------
 
-    if config.skip_frames.enabled:
-        coord_cols = [col for col in df.columns if col not in ("time", "frame")]
-        for start, end in config.skip_frames.ranges:
-            logger.info("Skipping frames %d to %d", start, end)
+    coord_cols = [col for col in df.columns if col not in ("time", "frame")]
+
+    if config.correction.skip_samples.enabled:
+        for start, end in config.correction.skip_samples.ranges:
+            logger.info("Skipping samples %d to %d", start, end)
             df.loc[start:end, coord_cols] = np.nan
+
+    # -------------------------------------------------------------------------
+    # Reject samples
+    #
+    # Reject samples automatically. OptiTrack samples with a large error are
+    # found through the residual of the correction model and are removed from
+    # the record.
+    # -------------------------------------------------------------------------
+
+    if config.correction.enabled and config.correction.reject_samples.enabled:
+        mat_g_xyz = df[["GAN.X", "GAN.Y", "GAN.Z"]].to_numpy()
+        mat_o_xyz = df[["RB.X", "RB.Y", "RB.Z"]].to_numpy()
+        mat_t = df["time"].to_numpy()
+        valid = ~(np.isnan(mat_g_xyz).any(axis=1) | np.isnan(mat_o_xyz).any(axis=1))
+        valid = cast(np.typing.NDArray[np.bool], valid)
+
+        reject_opts = config.correction.reject_samples
+        keep = reject_samples(
+            mat_g_xyz[valid],
+            mat_o_xyz[valid],
+            mat_t[valid],
+            sigma=reject_opts.sigma,
+            margin_s=reject_opts.margin_s,
+            iterations=reject_opts.iterations,
+        )
+
+        logger.info(
+            "Rejected %d of %d samples (%.2f %%)",
+            int((~keep).sum()),
+            len(keep),
+            100 * (~keep).mean(),
+        )
+
+        df.loc[df.index[valid][~keep], coord_cols] = np.nan
 
     # -------------------------------------------------------------------------
     # Calculate and apply non-linear coordinate transformation to correct the
@@ -456,11 +614,6 @@ def get_processed_data(
 
     correction_params_array: Optional[np.ndarray] = None
 
-    # Function to calibrate the gantry data based on an array of params
-    def coord_calibrate(x, df: pd.DataFrame) -> pd.DataFrame:
-        A, B, c = get_calibration_matrices(x)
-        return coord_matrix_transform2(df, A, B, c)
-
     if config.correction.enabled and calibration_params.correction is not None:
         correction_params_array = np.array(calibration_params.correction)
     elif config.correction.enabled:
@@ -479,13 +632,11 @@ def get_processed_data(
             mat_g_xyz = df_g_xyz[["x", "y", "z"]].to_numpy()
             mat_o_xyz = df_o_xyz[["x", "y", "z"]].to_numpy()
 
-            mask = ~(np.isnan(mat_g_xyz).any(axis=1) | np.isnan(mat_o_xyz).any(axis=1))
-            mat_g_xyz, mat_o_xyz = mat_g_xyz[mask], mat_o_xyz[mask]
+            valid = ~(np.isnan(mat_g_xyz).any(axis=1) | np.isnan(mat_o_xyz).any(axis=1))
+            mat_g_xyz, mat_o_xyz = mat_g_xyz[valid], mat_o_xyz[valid]
 
-            mat_a = np.column_stack(
-                [mat_g_xyz, mat_g_xyz[:, 0:2] ** 2, np.ones(len(mat_g_xyz))]
-            )
-            mat_x, _, _, _ = np.linalg.lstsq(mat_a, mat_o_xyz)
+            mat_d = design_matrix(mat_g_xyz)
+            mat_x, _, _, _ = np.linalg.lstsq(mat_d, mat_o_xyz)
 
             correction_params_array = np.concatenate(
                 [mat_x[:3].T.flatten(), mat_x[3:5].T.flatten(), mat_x[5]]

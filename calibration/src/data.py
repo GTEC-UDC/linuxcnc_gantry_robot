@@ -1,6 +1,7 @@
 import logging
 import re
 from datetime import datetime
+from pathlib import Path
 from typing import Any, Literal, cast
 
 import numpy as np
@@ -23,11 +24,11 @@ logger = logging.getLogger(__name__)
 ROTATION_CENTER = (0.0, 0.0, 1500.0)
 
 
-def load_gantry_data(filename: str) -> pd.DataFrame:
+def load_gantry_data(filename: str | Path) -> pd.DataFrame:
     """Load gantry position data from a CSV file.
 
     Args:
-        filename (str): Path to the CSV file containing gantry data.
+        filename (str | Path): Path to the CSV file containing gantry data.
 
     Returns:
         pd.DataFrame: DataFrame containing the gantry position data.
@@ -35,7 +36,7 @@ def load_gantry_data(filename: str) -> pd.DataFrame:
     return cast(pd.DataFrame, pd.read_csv(filename))
 
 
-def load_optitrack_metadata(filename: str) -> dict[str, Any]:
+def load_optitrack_metadata(filename: str | Path) -> dict[str, Any]:
     """Load and parse OptiTrack metadata from a CSV file.
 
     This function reads the first line of an OptiTrack CSV file and parses the metadata
@@ -43,7 +44,7 @@ def load_optitrack_metadata(filename: str) -> dict[str, Any]:
     frames, and capture start time.
 
     Args:
-        filename (str): Path to the OptiTrack CSV file.
+        filename (str | Path): Path to the OptiTrack CSV file.
 
     Returns:
         dict[str, Any]: Dictionary containing parsed metadata with the following keys:
@@ -87,7 +88,7 @@ def load_optitrack_metadata(filename: str) -> dict[str, Any]:
 
 
 def load_optitrack_data(
-    filename: str, rigid_body_name: str | None = None
+    filename: str | Path, rigid_body_name: str | None = None
 ) -> tuple[pd.DataFrame, int]:
     """Load and process OptiTrack motion capture data from a CSV file.
 
@@ -95,7 +96,7 @@ def load_optitrack_data(
     between raw and rigid body markers, and computes various statistics.
 
     Args:
-        filename (str): Path to the OptiTrack CSV file.
+        filename (str | Path): Path to the OptiTrack CSV file.
         rigid_body_name (Optional[str], optional): Name of the rigid body to process.
             If None, uses the first rigid body found in the data. Defaults to None.
 
@@ -410,8 +411,8 @@ class CalibrationParams(BaseModel):
 
 
 def get_processed_data(
-    gantry_filename: str,
-    optitrack_filename: str,
+    gantry_filename: str | Path,
+    optitrack_filename: str | Path,
     config: CalibrationConfig | None = None,
     calibration_params: CalibrationParams | None = None,
 ) -> tuple[pd.DataFrame, CalibrationParams, int]:
@@ -422,8 +423,8 @@ def get_processed_data(
     corrects misalignments between the gantry and the OptiTrack system.
 
     Args:
-        gantry_filename (str): Path to the gantry data CSV file.
-        optitrack_filename (str): Path to the OptiTrack data CSV file.
+        gantry_filename (str | Path): Path to the gantry data CSV file.
+        optitrack_filename (str | Path): Path to the OptiTrack data CSV file.
         config (CalibrationConfig, optional): Configuration for the data
             processing. If None an empty CalibrationConfig object is created.
             Defaults to None.

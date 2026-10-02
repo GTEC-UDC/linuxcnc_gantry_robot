@@ -28,6 +28,7 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from data import CalibrationConfig, CalibrationParams, get_processed_data
+from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
 from estimate_calibration_clock_drift import GAN_COLS, RB_COLS, rms3d
 
 # Each variant is a list of the terms its design matrix holds, on top of the linear
@@ -150,10 +151,10 @@ if __name__ == "__main__":
         description="Compare alternatives to the correction model on the calibration capture",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("--optitrack", type=Path, default="take_optitrack.csv")
-    parser.add_argument("--gantry", type=Path, default="take_gantry.csv")
-    parser.add_argument("--config", type=Path, default="config.json")
-    parser.add_argument("--calibration", type=Path, default="calibration.json")
+    parser.add_argument("--optitrack", type=Path, default=OPTITRACK_FILE)
+    parser.add_argument("--gantry", type=Path, default=GANTRY_FILE)
+    parser.add_argument("--config", type=Path, default=CONFIG_FILE)
+    parser.add_argument("--calibration", type=Path, default=CALIBRATION_FILE)
     parser.add_argument(
         "--grid",
         type=int,

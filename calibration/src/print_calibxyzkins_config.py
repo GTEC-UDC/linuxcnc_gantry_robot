@@ -1,6 +1,8 @@
 import argparse
+from pathlib import Path
 
 from data import CalibrationParams, get_calibration_matrices
+from defaults import CALIBRATION_FILE
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -11,8 +13,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--calibration",
         help="Path to save the calibration parameters file",
-        type=str,
-        default="calibration.json",
+        type=Path,
+        default=CALIBRATION_FILE,
     )
 
     args = parser.parse_args()

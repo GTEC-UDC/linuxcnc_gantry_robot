@@ -1,19 +1,21 @@
 import argparse
 import logging
 import os
+from pathlib import Path
 from typing import Literal
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
 from argutils import parse_limit
 from data import CalibrationConfig, CalibrationParams, get_processed_data
+from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
 
 
 def plot_marker_errors(
-    gantry_file: str = "take_gantry.csv",
-    optitrack_file: str = "take_optitrack.csv",
-    config_file: str = "config.json",
-    calibration_file: str = "calibration.json",
+    gantry_file: str | Path = GANTRY_FILE,
+    optitrack_file: str | Path = OPTITRACK_FILE,
+    config_file: str | Path = CONFIG_FILE,
+    calibration_file: str | Path = CALIBRATION_FILE,
     correct: bool = True,
     skip_samples: bool = True,
     time_unit: Literal["s", "frames"] = "s",
@@ -130,29 +132,29 @@ def main():
 
     parser.add_argument(
         "--optitrack",
-        type=str,
-        default="take_optitrack.csv",
+        type=Path,
+        default=OPTITRACK_FILE,
         help="Path to the CSV file with the OptiTrack movement data",
     )
 
     parser.add_argument(
         "--gantry",
-        type=str,
-        default="take_gantry.csv",
+        type=Path,
+        default=GANTRY_FILE,
         help="Path to the CSV file with the gantry movement data",
     )
 
     parser.add_argument(
         "--config",
-        type=str,
-        default="config.json",
+        type=Path,
+        default=CONFIG_FILE,
         help="Path to the calibration configuration file",
     )
 
     parser.add_argument(
         "--calibration",
-        type=str,
-        default="calibration.json",
+        type=Path,
+        default=CALIBRATION_FILE,
         help="Path to the calibration parameters file",
     )
 

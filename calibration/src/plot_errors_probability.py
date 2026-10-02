@@ -1,22 +1,24 @@
 # Plot the errors between the rigid body markers and the raw markers
 import argparse
 import logging
+from pathlib import Path
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
 import numpy as np
 from argutils import parse_limit
 from data import CalibrationConfig, CalibrationParams, get_processed_data
+from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
 from matplotlib.ticker import MultipleLocator
 from matplotlib.typing import LegendLocType
 from scipy import stats
 
 
 def plot_errors_probability(
-    gantry_file: str = "take_gantry.csv",
-    optitrack_file: str = "take_optitrack.csv",
-    config_file: str = "config.json",
-    calibration_file: str = "calibration.json",
+    gantry_file: str | Path = GANTRY_FILE,
+    optitrack_file: str | Path = OPTITRACK_FILE,
+    config_file: str | Path = CONFIG_FILE,
+    calibration_file: str | Path = CALIBRATION_FILE,
     skip_samples: bool = True,
     cumulative: bool = True,
     bins: int = 200,
@@ -198,29 +200,29 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--optitrack",
-        type=str,
-        default="take_optitrack.csv",
+        type=Path,
+        default=OPTITRACK_FILE,
         help="Path to the CSV file with the OptiTrack movement data",
     )
 
     parser.add_argument(
         "--gantry",
-        type=str,
-        default="take_gantry.csv",
+        type=Path,
+        default=GANTRY_FILE,
         help="Path to CSV file with the gantry movement data",
     )
 
     parser.add_argument(
         "--calibration",
-        type=str,
-        default="calibration.json",
+        type=Path,
+        default=CALIBRATION_FILE,
         help="Path to calibration parameters file",
     )
 
     parser.add_argument(
         "--config",
-        type=str,
-        default="config.json",
+        type=Path,
+        default=CONFIG_FILE,
         help="Path to the calibration configuration file",
     )
 

@@ -23,6 +23,7 @@ every candidate pair, so only the timing is left for (dt, drift) to explain.
 """
 
 import argparse
+from pathlib import Path
 from typing import cast
 
 import matplotlib.pyplot as plt
@@ -31,6 +32,7 @@ import numpy.typing as npt
 import pandas as pd
 import scipy as scp
 from data import CalibrationConfig, CalibrationParams, get_processed_data
+from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
 from scipy.signal import savgol_filter
 
 # Columns holding the aligned OptiTrack position and the commanded gantry position
@@ -337,29 +339,29 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--optitrack",
-        type=str,
-        default="take_optitrack.csv",
+        type=Path,
+        default=OPTITRACK_FILE,
         help="Path to Optitrack CSV file",
     )
 
     parser.add_argument(
         "--gantry",
-        type=str,
-        default="take_gantry.csv",
+        type=Path,
+        default=GANTRY_FILE,
         help="Path to Gantry CSV file",
     )
 
     parser.add_argument(
         "--config",
-        type=str,
-        default="config.json",
+        type=Path,
+        default=CONFIG_FILE,
         help="Path to the calibration configuration file",
     )
 
     parser.add_argument(
         "--calibration",
-        type=str,
-        default="calibration.json",
+        type=Path,
+        default=CALIBRATION_FILE,
         help="Path to the calibration parameters file",
     )
 

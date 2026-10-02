@@ -1,16 +1,18 @@
 import argparse
+from pathlib import Path
 from typing import cast
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
 from argutils import parse_limit
 from data import load_optitrack_data
+from defaults import OPTITRACK_FILE
 from mpl_toolkits.mplot3d import axes3d
 from multipoint_player import MultiPointPlayer
 
 
 def plot_movement_optitrack(
-    optitrack_file: str,
+    optitrack_file: str | Path,
     trail_after_samples: int = 0,
     trail_before_samples: int = 2000,
     xlim: tuple[float, float] | None = None,
@@ -127,8 +129,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data",
         help="Path to the CSV file with the OptiTrack movement data",
-        type=str,
-        default="take_optitrack.csv",
+        type=Path,
+        default=OPTITRACK_FILE,
     )
 
     parser.add_argument(

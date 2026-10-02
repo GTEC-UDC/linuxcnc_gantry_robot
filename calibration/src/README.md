@@ -175,20 +175,18 @@ The OptiTrack data is the CSV exported from the OptiTrack Motive software. The f
 
 ## Usage Examples
 
-We will use the measurement `2025-04-09` (located in `../measurements/2025-04-09/`) to explain the code functionality. To execute the code it is recommended to change the working directory to the measurement directory:
+We will use the measurement `2025-04-09` (located in `../measurements/2025-04-09/`) to explain the code functionality. By default the scripts use the files of this measurement (`take_gantry.csv`, `take_optitrack.csv`, `config.json`, and `calibration.json`). The default paths are defined in `defaults.py`.
 
-```bash
-cd ../measurements/2025-04-09/
-```
+To use the files of another measurement, specify them by command line arguments (run a script with `--help` to see its arguments).
 
-This way the scripts will be able to find the data files without needing to specify them by command line arguments.
+The only exception is the `run_calibration.py` script, which writes the calibration file. By default, it looks for the files in the working directory (see the Run the calibration section below).
 
 ### Gantry and OptiTrack Path Visualization
 
 The raw gantry and OptiTrack data can be visualized using the `plot_movement_gantry.py` and `plot_movement_optitrack.py` scripts, respectively. For example, to visualize the OptiTrack data, run:
 
 ```bash
-python ../../src/plot_movement_optitrack.py
+python plot_movement_optitrack.py
 ```
 
 It will open a window with the OptiTrack data visualization. The image below shows the OptiTrack data visualization.
@@ -280,13 +278,14 @@ Some important considerations:
 
 ### Run the calibration
 
-To execute the calibration execute the `run_calibration.py` script:
+To execute the calibration execute the `run_calibration.py` script from the measurement directory:
 
 ```bash
+cd ../measurements/2025-04-09/
 python ../../src/run_calibration.py
 ```
 
-When you run the calibration script, the computed parameters (both alignment and correction) are saved in a `calibration.json` file, which is then used by the plotting and analysis scripts.
+By default, `run_calibration.py` reads the data and configuration files from the working directory and saves the alignment and correction parameters in a `calibration.json` file in the working directory. If the calibration file already exists, the script asks for confirmation before running the calibration again.
 
 The contents of the calibration file used for the `2025-04-09` measurement are the following:
 
@@ -385,7 +384,7 @@ setp calibxyzkins.calib-c.z 4.55518685
 The gantry and calibrated OptiTrack path can be visualized using the `plot_movement.py` script:
 
 ```bash
-python ../../src/plot_movement.py
+python plot_movement.py
 ```
 
 Note that the script accepts the `--no-correct` flag to show the OptiTrack position without applying the correction transformation.
@@ -413,7 +412,7 @@ i/o: Jump to start/end
 The positioning errors between gantry and OptiTrack data over time can be plotted using the `plot_errors.py` script:
 
 ```bash
-python ../../src/plot_errors.py
+python plot_errors.py
 ```
 
 The script accepts the option `--time-unit` to specify the time unit of the x-axis. The available options are `s` (seconds) and `frames`. The default is `s` (seconds). The `frames` options can be used to check the ranges of frames with poor tracking quality, then they can be skipped by setting them in the configuration file.
@@ -433,7 +432,7 @@ The image below shows the positioning errors over time when applying the correct
 Positioning errors scatter plots between gantry and OptiTrack data can be plotted using the `plot_errors_scatter.py` script:
 
 ```bash
-python ../../src/plot_errors_scatter.py
+python plot_errors_scatter.py
 ```
 
 The script also accepts the `--no-correct` flag to show the OptiTrack position without applying the correction transformation.
@@ -451,7 +450,7 @@ The image below shows the positioning errors scatter plots when applying the cor
 The positioning errors probability distribution can be plotted using the `plot_errors_probability.py` script:
 
 ```bash
-python ../../src/plot_errors_probability.py
+python plot_errors_probability.py
 ```
 
 By default the script plots the probability distribution of the positioning errors for the x, y, and z axes. The image below shows the obtained probability distributions.

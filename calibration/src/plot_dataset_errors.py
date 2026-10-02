@@ -22,6 +22,7 @@ from pathlib import Path
 
 import numpy as np
 import validate_dataset as vd
+from defaults import CALIBRATION_FILE, DATASET_DIR
 
 logger = logging.getLogger("plot_dataset_errors")
 
@@ -112,10 +113,10 @@ def parse_args():
         description=__doc__,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    p.add_argument("--dataset-dir", type=Path, default=vd.DATASET_DIR,
+    p.add_argument("--dataset-dir", type=Path, default=DATASET_DIR,
                    help="dataset directory (GANTRY_MEASUREMENTS + "
                         "OPTITRACK_MEASUREMENTS_CSV)")
-    p.add_argument("--calib", type=Path, default=vd.CALIBRATION_FILE,
+    p.add_argument("--calib", type=Path, default=CALIBRATION_FILE,
                    help="JSON file with the fixed correction parameters")
     p.add_argument("--takes", nargs="+", default=vd.TAKES,
                    help="takes to plot")

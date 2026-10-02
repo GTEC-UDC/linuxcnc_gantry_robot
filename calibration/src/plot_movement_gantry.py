@@ -1,15 +1,17 @@
 import argparse
+from pathlib import Path
 from typing import cast
 
 import matplotlib.pyplot as plt
 from argutils import parse_limit
 from data import load_gantry_data
+from defaults import GANTRY_FILE
 from mpl_toolkits.mplot3d import axes3d
 from point_player import PointPlayer
 
 
 def plot_movement_gantry(
-    gantry_file: str,
+    gantry_file: str | Path,
     trail_after_samples: int = 0,
     trail_before_samples: int = 2000,
     xlim: tuple[float, float] | None = None,
@@ -63,8 +65,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--data",
         help="Path to the CSV file with the gantry movement data",
-        type=str,
-        default="take_gantry.csv",
+        type=Path,
+        default=GANTRY_FILE,
     )
 
     parser.add_argument(

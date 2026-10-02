@@ -40,14 +40,9 @@ import numpy as np
 import scipy as scp
 import validate_dataset as vd
 from data import coord_align, load_optitrack_metadata
+from defaults import CALIBRATION_FILE, DATASET_DIR
 
 logger = logging.getLogger("estimate_dataset_drift")
-
-SRC = Path(__file__).resolve().parent
-DATASET_DIR = SRC.parents[2] / "roboloc-g-dataset-code/data/roboloc-g"
-CALIBRATION_FILE = (
-    SRC.parents[1] / "calibration/measurements/2025-04-09/calibration.json"
-)
 
 BOUND_MS = 200.0  # bound of the offset search, wide enough for any residual offset
 BOUND_PPM = 300.0  # bound of the drift search

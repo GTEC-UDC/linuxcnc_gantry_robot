@@ -1,5 +1,6 @@
 import argparse
 import logging
+from pathlib import Path
 from typing import Any
 
 import matplotlib.axes as mpl_axes
@@ -8,6 +9,7 @@ import numpy as np
 import pandas as pd
 from argutils import parse_limit
 from data import CalibrationConfig, CalibrationParams, get_processed_data
+from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
 from matplotlib.ticker import MultipleLocator
 
 DEFAULT_STYLE = {"alpha": 0.25, "s": 2, "lw": 0}
@@ -15,10 +17,10 @@ DEFAULT_FIT_STYLE = {"color": "r", "linestyle": "--", "alpha": 0.8}
 
 
 def plot_errors_scatter(
-    gantry_file: str = "take_gantry.csv",
-    optitrack_file: str = "take_optitrack.csv",
-    config_file: str = "config.json",
-    calibration_file: str = "calibration.json",
+    gantry_file: str | Path = GANTRY_FILE,
+    optitrack_file: str | Path = OPTITRACK_FILE,
+    config_file: str | Path = CONFIG_FILE,
+    calibration_file: str | Path = CALIBRATION_FILE,
     correct: bool = True,
     skip_samples: bool = True,
     ylim_x: tuple[float, float] | None = None,
@@ -178,29 +180,29 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--optitrack",
-        type=str,
-        default="take_optitrack.csv",
+        type=Path,
+        default=OPTITRACK_FILE,
         help="Path to Optitrack CSV file",
     )
 
     parser.add_argument(
         "--gantry",
-        type=str,
-        default="take_gantry.csv",
+        type=Path,
+        default=GANTRY_FILE,
         help="Path to Gantry CSV file",
     )
 
     parser.add_argument(
         "--config",
-        type=str,
-        default="config.json",
+        type=Path,
+        default=CONFIG_FILE,
         help="Path to the calibration configuration file",
     )
 
     parser.add_argument(
         "--calibration",
-        type=str,
-        default="calibration.json",
+        type=Path,
+        default=CALIBRATION_FILE,
         help="Path to the calibration parameters file",
     )
 

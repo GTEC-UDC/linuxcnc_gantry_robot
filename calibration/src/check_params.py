@@ -1,10 +1,12 @@
 import argparse
 import logging
 import sys
+from pathlib import Path
 
 import numpy as np
 import scipy as scp
 from data import CalibrationParams, get_calibration_matrices
+from defaults import CALIBRATION_FILE
 
 logger = logging.getLogger(__name__)
 
@@ -145,8 +147,8 @@ def main():
     parser.add_argument(
         "--calibration",
         help="Path to the calibration parameters file",
-        type=str,
-        default="calibration.json",
+        type=Path,
+        default=CALIBRATION_FILE,
     )
 
     parser.add_argument(

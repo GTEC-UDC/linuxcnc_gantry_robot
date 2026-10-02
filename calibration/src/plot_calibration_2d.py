@@ -1,9 +1,11 @@
 import argparse
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 from data import CalibrationParams, get_calibration_matrices
+from defaults import CALIBRATION_FILE
 from matplotlib.widgets import Button, Slider
 
 
@@ -184,8 +186,8 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--calibration",
-        type=str,
-        default="calibration.json",
+        type=Path,
+        default=CALIBRATION_FILE,
         help="Path to calibration parameters file",
     )
 

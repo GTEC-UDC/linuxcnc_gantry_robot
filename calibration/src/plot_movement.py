@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 from typing import cast
 
 import matplotlib.axes as mpl_axes
@@ -6,15 +7,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from argutils import parse_limit
 from data import CalibrationConfig, CalibrationParams, get_processed_data
+from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
 from mpl_toolkits.mplot3d import axes3d
 from multipoint_player import MultiPointPlayer
 
 
 def plot_movement(
-    gantry_file: str,
-    optitrack_file: str,
-    config_file: str,
-    calibration_file: str,
+    gantry_file: str | Path,
+    optitrack_file: str | Path,
+    config_file: str | Path,
+    calibration_file: str | Path,
     trail_after_samples: int = 0,
     trail_before_samples: int = 2000,
     error_after_samples: int = 2000,
@@ -277,29 +279,29 @@ if __name__ == "__main__":
     parser.add_argument(
         "--gantry",
         help="Path to the CSV file with the gantry movement data",
-        type=str,
-        default="take_gantry.csv",
+        type=Path,
+        default=GANTRY_FILE,
     )
 
     parser.add_argument(
         "--optitrack",
         help="Path to the CSV file with the OptiTrack movement data",
-        type=str,
-        default="take_optitrack.csv",
+        type=Path,
+        default=OPTITRACK_FILE,
     )
 
     parser.add_argument(
         "--config",
-        type=str,
-        default="config.json",
+        type=Path,
+        default=CONFIG_FILE,
         help="Path to the calibration configuration file",
     )
 
     parser.add_argument(
         "--calibration",
         help="Path to the calibration parameters file",
-        type=str,
-        default="calibration.json",
+        type=Path,
+        default=CALIBRATION_FILE,
     )
 
     parser.add_argument(

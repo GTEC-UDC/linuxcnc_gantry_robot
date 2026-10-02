@@ -50,16 +50,12 @@ from data import (
     load_optitrack_data,
     load_optitrack_metadata,
 )
+from defaults import CALIBRATION_FILE, DATASET_DIR
 
 logger = logging.getLogger("validate_dataset")
 
-SRC = Path(__file__).resolve().parent
-DATASET_DIR = SRC.parents[2] / "roboloc-g-dataset-code/data/roboloc-g"
 OPTITRACK_DIR = DATASET_DIR / "OPTITRACK_MEASUREMENTS_CSV"
 GROUND_TRUTH_DIR = DATASET_DIR / "GROUND_TRUTH"
-CALIBRATION_FILE = (
-    SRC.parents[1] / "calibration/measurements/2025-04-09/calibration.json"
-)
 
 # Internal parameters of the alignment fit (not exposed: never needed tuning)
 ROT_CENTER = (0.0, 0.0, 1500.0)

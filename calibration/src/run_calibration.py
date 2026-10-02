@@ -3,7 +3,7 @@ import logging
 import os
 import sys
 
-from data import get_processed_data, CalibrationConfig, CalibrationParams
+from data import CalibrationConfig, CalibrationParams, get_processed_data
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

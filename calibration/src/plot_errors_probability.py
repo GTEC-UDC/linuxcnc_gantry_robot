@@ -1,14 +1,13 @@
 # Plot the errors between the rigid body markers and the raw markers
 import argparse
 import logging
-from typing import Optional
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
 import numpy as np
 from argutils import parse_limit
-from matplotlib.ticker import MultipleLocator
 from data import CalibrationConfig, CalibrationParams, get_processed_data
+from matplotlib.ticker import MultipleLocator
 from scipy import stats
 
 
@@ -22,15 +21,15 @@ def plot_errors_probability(
     bins: int = 200,
     xyz_limits: tuple[float, float] = (-15, 15),
     abs_limits: tuple[float, float] = (0, 20),
-    y_limits: Optional[tuple[float, float]] = None,
-    xyz_xtick_step: Optional[float] = None,
-    abs_xtick_step: Optional[float] = None,
-    ytick_step: Optional[float] = None,
+    y_limits: tuple[float, float] | None = None,
+    xyz_xtick_step: float | None = None,
+    abs_xtick_step: float | None = None,
+    ytick_step: float | None = None,
     plot_fit: bool = False,
     linewidth: float = 1.5,
     figsize: tuple[float, float] = (8.0, 6.0),
     legend_loc: str = "outside upper center",
-    save: Optional[str] = None,
+    save: str | None = None,
     dpi: int = 200,
 ) -> list[mpl_axes.Axes]:
     with open(config_file, "r") as f:

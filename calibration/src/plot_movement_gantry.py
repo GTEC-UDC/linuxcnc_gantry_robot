@@ -1,11 +1,10 @@
 import argparse
-from typing import Optional, cast
+from typing import cast
 
 import matplotlib.pyplot as plt
-import mpl_toolkits.mplot3d.axes3d as axes3d
-
 from argutils import parse_limit
 from data import load_gantry_data
+from mpl_toolkits.mplot3d import axes3d
 from point_player import PointPlayer
 
 
@@ -13,9 +12,9 @@ def plot_movement_gantry(
     gantry_file: str,
     trail_after_samples: int = 0,
     trail_before_samples: int = 2000,
-    xlim: Optional[tuple[float, float]] = None,
-    ylim: Optional[tuple[float, float]] = None,
-    zlim: Optional[tuple[float, float]] = None,
+    xlim: tuple[float, float] | None = None,
+    ylim: tuple[float, float] | None = None,
+    zlim: tuple[float, float] | None = None,
 ) -> None:
     df = load_gantry_data(gantry_file)
 

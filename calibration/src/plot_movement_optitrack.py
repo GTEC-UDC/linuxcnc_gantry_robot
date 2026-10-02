@@ -1,11 +1,11 @@
 import argparse
-from typing import Optional, cast
+from typing import cast
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
-import mpl_toolkits.mplot3d.axes3d as axes3d
 from argutils import parse_limit
 from data import load_optitrack_data
+from mpl_toolkits.mplot3d import axes3d
 from multipoint_player import MultiPointPlayer
 
 
@@ -13,9 +13,9 @@ def plot_movement_optitrack(
     optitrack_file: str,
     trail_after_samples: int = 0,
     trail_before_samples: int = 2000,
-    xlim: Optional[tuple[float, float]] = None,
-    ylim: Optional[tuple[float, float]] = None,
-    zlim: Optional[tuple[float, float]] = None,
+    xlim: tuple[float, float] | None = None,
+    ylim: tuple[float, float] | None = None,
+    zlim: tuple[float, float] | None = None,
 ) -> mpl_axes.Axes:
     """Plot OptiTrack movement data in 3D.
 

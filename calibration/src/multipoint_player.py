@@ -1,21 +1,20 @@
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from typing import Any, Optional, cast
+from typing import Any, cast
 
-from matplotlib.figure import SubFigure
-import mpl_toolkits.mplot3d.art3d as art3d
-import mpl_toolkits.mplot3d.axes3d as axes3d
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from matplotlib.artist import Artist
+from matplotlib.figure import SubFigure
+from mpl_toolkits.mplot3d import art3d, axes3d
 from player import Player, PlayerFrameData
 
 
 def get_title_str(
-    frame_idx: Optional[int],
-    time: Optional[float],
-    speedup: Optional[int],
+    frame_idx: int | None,
+    time: float | None,
+    speedup: int | None,
     paused: bool,
 ) -> str:
     title_str = "Gantry Movement Animation -- "
@@ -66,11 +65,11 @@ class MultiPointPlayer(Player[MultiPointFrameData]):
         ],
         trail_after_samples: list[int] | int = [],
         trail_before_samples: list[int] | int = [],
-        xlim: Optional[tuple[float, float]] = None,
-        ylim: Optional[tuple[float, float]] = None,
-        zlim: Optional[tuple[float, float]] = None,
-        init_cb: Optional[Callable[[], Iterable[Artist]]] = None,
-        update_cb: Optional[Callable[[MultiPointFrameData], Iterable[Artist]]] = None,
+        xlim: tuple[float, float] | None = None,
+        ylim: tuple[float, float] | None = None,
+        zlim: tuple[float, float] | None = None,
+        init_cb: Callable[[], Iterable[Artist]] | None = None,
+        update_cb: Callable[[MultiPointFrameData], Iterable[Artist]] | None = None,
         **kwargs,
     ):
         self.ax = ax
@@ -208,7 +207,7 @@ class MultiPointPlayer(Player[MultiPointFrameData]):
             trails,
         )
 
-    def set_title(self, frame_data: Optional[MultiPointFrameData] = None) -> Artist:
+    def set_title(self, frame_data: MultiPointFrameData | None = None) -> Artist:
         frame_time = frame_data.frame_time if frame_data else None
         frame_idx = frame_data.frame_idx if frame_data else None
         title_str = get_title_str(frame_idx, frame_time, self.play_speed, not self.run)
@@ -237,7 +236,7 @@ class MultiPointPlayer(Player[MultiPointFrameData]):
 
         return ret
 
-    def update(self, frame_data: Optional[MultiPointFrameData]):
+    def update(self, frame_data: MultiPointFrameData | None):
         title = self.set_title(frame_data)
         ret = [title]
 

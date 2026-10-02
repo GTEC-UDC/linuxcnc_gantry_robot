@@ -3,7 +3,6 @@ import time
 from abc import ABC, abstractmethod
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import Optional
 
 from matplotlib.animation import FuncAnimation
 from matplotlib.artist import Artist
@@ -200,10 +199,10 @@ i/o: Jump to start/end
 
     # Animation update function
     @abstractmethod
-    def update(self, frame_data: Optional[T]) -> Iterable[Artist]: ...
+    def update(self, frame_data: T | None) -> Iterable[Artist]: ...
 
-    def generate_frames_real_time(self) -> Iterator[Optional[T]]:
-        frame_data: Optional[T] = None
+    def generate_frames_real_time(self) -> Iterator[T | None]:
+        frame_data: T | None = None
         last_time = time.time()  # Last update time
         start_time = self.get_start_frame_time()
         end_time = self.get_end_frame_time()
@@ -244,7 +243,7 @@ i/o: Jump to start/end
                 frame_data = self.get_frame_data(self.frame_idx)
                 yield frame_data
 
-    def generate_frames_non_real_time(self) -> Iterator[Optional[T]]:
+    def generate_frames_non_real_time(self) -> Iterator[T | None]:
         # set frame_idx and elapsed_time to the start of the video
         self.go_to_start()
 
@@ -269,7 +268,7 @@ i/o: Jump to start/end
                 else:
                     break
 
-    def generate_frames(self) -> Iterator[Optional[T]]:
+    def generate_frames(self) -> Iterator[T | None]:
         if self.real_time:
             yield from self.generate_frames_real_time()
         else:

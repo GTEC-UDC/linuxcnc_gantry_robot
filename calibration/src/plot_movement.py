@@ -1,12 +1,12 @@
 import argparse
-from typing import Optional, cast
+from typing import cast
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
-import mpl_toolkits.mplot3d.axes3d as axes3d
 import numpy as np
 from argutils import parse_limit
 from data import CalibrationConfig, CalibrationParams, get_processed_data
+from mpl_toolkits.mplot3d import axes3d
 from multipoint_player import MultiPointPlayer
 
 
@@ -21,9 +21,9 @@ def plot_movement(
     error_before_samples: int = 2000,
     skip_samples: bool = True,
     correct: bool = True,
-    xlim: Optional[tuple[float, float]] = None,
-    ylim: Optional[tuple[float, float]] = None,
-    zlim: Optional[tuple[float, float]] = None,
+    xlim: tuple[float, float] | None = None,
+    ylim: tuple[float, float] | None = None,
+    zlim: tuple[float, float] | None = None,
 ) -> mpl_axes.Axes:
     """Plot gantry and OptiTrack movement data in 3D.
 

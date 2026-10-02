@@ -1,14 +1,14 @@
 import argparse
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from argutils import parse_limit
-from matplotlib.ticker import MultipleLocator
 from data import CalibrationConfig, CalibrationParams, get_processed_data
+from matplotlib.ticker import MultipleLocator
 
 
 def plot_errors_scatter(
@@ -18,17 +18,17 @@ def plot_errors_scatter(
     calibration_file: str = "calibration.json",
     correct: bool = True,
     skip_samples: bool = True,
-    ylim_x: Optional[tuple[float, float]] = None,
-    ylim_y: Optional[tuple[float, float]] = None,
-    ylim_z: Optional[tuple[float, float]] = None,
+    ylim_x: tuple[float, float] | None = None,
+    ylim_y: tuple[float, float] | None = None,
+    ylim_z: tuple[float, float] | None = None,
     plot_fit: bool = True,
     color_cross: bool = False,
-    color_map: Optional[dict[str, str]] = None,
-    xtick_step_x: Optional[float] = None,
-    xtick_step_y: Optional[float] = None,
-    xtick_step_z: Optional[float] = None,
+    color_map: dict[str, str] | None = None,
+    xtick_step_x: float | None = None,
+    xtick_step_y: float | None = None,
+    xtick_step_z: float | None = None,
     cmap: str = "viridis",
-    save: Optional[str] = None,
+    save: str | None = None,
     dpi: int = 200,
     figsize: tuple[float, float] = (10.0, 6.0),
     style: dict[str, Any] = {"alpha": 0.25, "s": 2, "lw": 0},

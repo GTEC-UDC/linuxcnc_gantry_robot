@@ -3,7 +3,7 @@
 import argparse
 import logging
 import os
-from typing import Literal, Optional
+from typing import Literal
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
@@ -21,10 +21,10 @@ def plot_errors(
     correct: bool = True,
     skip_samples: bool = True,
     time_unit: Literal["s", "frames"] = "s",
-    time_limit: Optional[tuple[float, float]] = None,
-    position_limit: Optional[tuple[float, float]] = None,
-    error_limit: Optional[tuple[float, float]] = None,
-    abs_error_limit: Optional[tuple[float, float]] = None,
+    time_limit: tuple[float, float] | None = None,
+    position_limit: tuple[float, float] | None = None,
+    error_limit: tuple[float, float] | None = None,
+    abs_error_limit: tuple[float, float] | None = None,
     show_acceleration: bool = False,
     accel_window: int = 51,
 ) -> tuple[mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes, mpl_axes.Axes]:

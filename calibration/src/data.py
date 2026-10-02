@@ -1,7 +1,7 @@
 import logging
 import re
 from datetime import datetime
-from typing import Any, Literal, Optional, cast
+from typing import Any, Literal, cast
 
 import numpy as np
 import pandas as pd
@@ -87,7 +87,7 @@ def load_optitrack_metadata(filename: str) -> dict[str, Any]:
 
 
 def load_optitrack_data(
-    filename: str, rigid_body_name: Optional[str] = None
+    filename: str, rigid_body_name: str | None = None
 ) -> tuple[pd.DataFrame, int]:
     """Load and process OptiTrack motion capture data from a CSV file.
 
@@ -222,9 +222,9 @@ def coord_align(
     df: pd.DataFrame,
     rotation_center: tuple[float, float, float] = ROTATION_CENTER,
     time_col: str = "time",
-    x_cols: Optional[list[str]] = None,
-    y_cols: Optional[list[str]] = None,
-    z_cols: Optional[list[str]] = None,
+    x_cols: list[str] | None = None,
+    y_cols: list[str] | None = None,
+    z_cols: list[str] | None = None,
 ) -> pd.DataFrame:
     """Bring OptiTrack coordinates into the gantry frame.
 
@@ -365,8 +365,8 @@ class MinimizeOptions(BaseModel):
 
 class CalibrationAlignmentConfig(BaseModel):
     enabled: bool = True
-    init_params: Optional[list[float]] = None
-    max_rotation: Optional[float] = np.pi / 32
+    init_params: list[float] | None = None
+    max_rotation: float | None = np.pi / 32
     rotation_center: tuple[float, float, float] = ROTATION_CENTER
     objective: Objective = "mse"
     minimize_options: MinimizeOptions = Field(default_factory=MinimizeOptions)
@@ -388,7 +388,7 @@ class SkipSamplesConfig(BaseModel):
 
 class CalibrationCorrectionConfig(BaseModel):
     enabled: bool = True
-    init_params: Optional[list[float]] = None
+    init_params: list[float] | None = None
     objective: Objective = "mse"
     minimize_options: MinimizeOptions = Field(default_factory=MinimizeOptions)
     reject_samples: RejectSamplesConfig = Field(default_factory=RejectSamplesConfig)
@@ -405,8 +405,8 @@ class CalibrationConfig(BaseModel):
 
 
 class CalibrationParams(BaseModel):
-    alignment: Optional[list[float]] = None
-    correction: Optional[list[float]] = None
+    alignment: list[float] | None = None
+    correction: list[float] | None = None
 
 
 def get_processed_data(
@@ -464,7 +464,7 @@ def get_processed_data(
 
     rotation_center = config.alignment.rotation_center
 
-    alignment_params_array: Optional[np.ndarray] = None
+    alignment_params_array: np.ndarray | None = None
     if config.alignment.enabled and calibration_params.alignment is not None:
         alignment_params_array = np.array(calibration_params.alignment)
     elif config.alignment.enabled:
@@ -482,7 +482,7 @@ def get_processed_data(
         else:
             x0 = np.zeros(7)
 
-        bounds: Optional[list[tuple[float | None, float | None]]] = None
+        bounds: list[tuple[float | None, float | None]] | None = None
 
         if max_rotation := config.alignment.max_rotation:
             bounds = [(None, None) for _ in range(len(x0))]
@@ -612,7 +612,7 @@ def get_processed_data(
     # The parameters are the elements of the matrices A and B, and vector c.
     # -------------------------------------------------------------------------
 
-    correction_params_array: Optional[np.ndarray] = None
+    correction_params_array: np.ndarray | None = None
 
     if config.correction.enabled and calibration_params.correction is not None:
         correction_params_array = np.array(calibration_params.correction)
@@ -705,7 +705,7 @@ def get_processed_data(
     # Create the CalibrationParams object to return
     # -------------------------------------------------------------------------
 
-    def np_to_list(x: Optional[np.ndarray]) -> Optional[list[float]]:
+    def np_to_list(x: np.ndarray | None) -> list[float] | None:
         return x.tolist() if x is not None else None
 
     calibration_params = CalibrationParams(

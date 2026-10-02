@@ -1,12 +1,10 @@
 import argparse
 import logging
 import sys
-from typing import Optional
-
-from data import get_calibration_matrices, CalibrationParams
 
 import numpy as np
 import scipy as scp
+from data import CalibrationParams, get_calibration_matrices
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +19,8 @@ def forward_kinematics(
 def inverse_kinematics(
     pos: np.ndarray,
     params: tuple[np.ndarray, np.ndarray, np.ndarray],
-    x0: Optional[np.ndarray] = None,
-    bounds: Optional[tuple[np.ndarray, np.ndarray]] = None,
+    x0: np.ndarray | None = None,
+    bounds: tuple[np.ndarray, np.ndarray] | None = None,
     max_iter: int = 10,
     tol: float = 1e-3,
 ) -> np.ndarray:

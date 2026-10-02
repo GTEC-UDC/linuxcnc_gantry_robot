@@ -1,21 +1,20 @@
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
-from typing import Any, Optional, cast
+from typing import Any, cast
 
-import mpl_toolkits.mplot3d.art3d as art3d
-import mpl_toolkits.mplot3d.axes3d as axes3d
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from matplotlib.artist import Artist
 from matplotlib.figure import SubFigure
+from mpl_toolkits.mplot3d import art3d, axes3d
 from player import Player, PlayerFrameData
 
 
 def get_title_str(
-    frame_idx: Optional[int],
-    time: Optional[float],
-    speedup: Optional[int],
+    frame_idx: int | None,
+    time: float | None,
+    speedup: int | None,
     paused: bool,
 ) -> str:
     title_str = "Gantry Movement Animation -- "
@@ -38,13 +37,10 @@ def get_title_str(
 @dataclass
 class PointFrameData(PlayerFrameData):
     pos: tuple[float, float, float]
-    trail: Optional[
-        tuple[
-            npt.NDArray[np.float64],
-            npt.NDArray[np.float64],
-            npt.NDArray[np.float64],
-        ]
-    ]
+    trail: (
+        tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.float64]]
+        | None
+    )
 
 
 class PointPlayer(Player[PointFrameData]):
@@ -64,10 +60,10 @@ class PointPlayer(Player[PointFrameData]):
             "linestyle": "-",
             "alpha": 0.25,
         },
-        trail_after_samples: Optional[int] = None,
-        trail_before_samples: Optional[int] = None,
-        init_cb: Optional[Callable[[], Iterable[Artist]]] = None,
-        update_cb: Optional[Callable[[PointFrameData], Iterable[Artist]]] = None,
+        trail_after_samples: int | None = None,
+        trail_before_samples: int | None = None,
+        init_cb: Callable[[], Iterable[Artist]] | None = None,
+        update_cb: Callable[[PointFrameData], Iterable[Artist]] | None = None,
         **kwargs,
     ):
         self.ax = ax
@@ -141,7 +137,7 @@ class PointPlayer(Player[PointFrameData]):
             trail,
         )
 
-    def set_title(self, frame_data: Optional[PointFrameData] = None) -> Artist:
+    def set_title(self, frame_data: PointFrameData | None = None) -> Artist:
         frame_time = frame_data.frame_time if frame_data else None
         frame_idx = frame_data.frame_idx if frame_data else None
         title_str = get_title_str(frame_idx, frame_time, self.play_speed, not self.run)
@@ -163,7 +159,7 @@ class PointPlayer(Player[PointFrameData]):
 
         return ret
 
-    def update(self, frame_data: Optional[PointFrameData]):
+    def update(self, frame_data: PointFrameData | None):
         title = self.set_title(frame_data)
 
         if frame_data is None:

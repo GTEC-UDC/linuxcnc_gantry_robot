@@ -10,6 +10,9 @@ from argutils import parse_limit
 from data import CalibrationConfig, CalibrationParams, get_processed_data
 from matplotlib.ticker import MultipleLocator
 
+DEFAULT_STYLE = {"alpha": 0.25, "s": 2, "lw": 0}
+DEFAULT_FIT_STYLE = {"color": "r", "linestyle": "--", "alpha": 0.8}
+
 
 def plot_errors_scatter(
     gantry_file: str = "take_gantry.csv",
@@ -31,12 +34,15 @@ def plot_errors_scatter(
     save: str | None = None,
     dpi: int = 200,
     figsize: tuple[float, float] = (10.0, 6.0),
-    style: dict[str, Any] = {"alpha": 0.25, "s": 2, "lw": 0},
-    fit_style: dict[str, Any] = {"color": "r", "linestyle": "--", "alpha": 0.8},
+    style: dict[str, Any] | None = None,
+    fit_style: dict[str, Any] | None = None,
 ) -> tuple[pd.DataFrame, list[mpl_axes.Axes]]:
     """
     Plot pairwise scatter plots between gantry position and positioning errors.
     """
+    style = DEFAULT_STYLE if style is None else style
+    fit_style = DEFAULT_FIT_STYLE if fit_style is None else fit_style
+
     sep = ".CALIBRATED." if correct else "."
     errors = [f"GAN.ERR{sep}X", f"GAN.ERR{sep}Y", f"GAN.ERR{sep}Z"]
     positions = [f"GAN{sep}X", f"GAN{sep}Y", f"GAN{sep}Z"]

@@ -47,24 +47,24 @@ class MultiPointFrameData(PlayerFrameData):
     trails: list[POINTS_SEQ_TYPE]
 
 
+DEFAULT_POINTS_STYLES = [{"color": "r", "marker": "o", "markersize": 5}]
+DEFAULT_TRAIL_STYLES = [{"color": "b", "linestyle": "-", "alpha": 0.25}]
+
+
 class MultiPointPlayer(Player[MultiPointFrameData]):
     def __init__(
         self,
         ax: axes3d.Axes3D,
         df: pd.DataFrame,
         time_col: str = "time",
-        point_cols: list[tuple[str, str, str]] = [("x", "y", "z")],
-        points_styles: list[dict[str, Any]] = [
-            {"color": "r", "marker": "o", "markersize": 5}
-        ],
-        marker_cols: list[list[tuple[str, str, str]]] = [],
-        marker_styles: list[dict[str, Any]] = [],
-        trail_cols: list[tuple[str, str, str]] = [("x", "y", "z")],
-        trail_styles: list[dict[str, Any]] = [
-            {"color": "b", "linestyle": "-", "alpha": 0.25}
-        ],
-        trail_after_samples: list[int] | int = [],
-        trail_before_samples: list[int] | int = [],
+        point_cols: list[tuple[str, str, str]] | None = None,
+        points_styles: list[dict[str, Any]] | None = None,
+        marker_cols: list[list[tuple[str, str, str]]] | None = None,
+        marker_styles: list[dict[str, Any]] | None = None,
+        trail_cols: list[tuple[str, str, str]] | None = None,
+        trail_styles: list[dict[str, Any]] | None = None,
+        trail_after_samples: list[int] | int = 0,
+        trail_before_samples: list[int] | int = 0,
         xlim: tuple[float, float] | None = None,
         ylim: tuple[float, float] | None = None,
         zlim: tuple[float, float] | None = None,
@@ -75,12 +75,16 @@ class MultiPointPlayer(Player[MultiPointFrameData]):
         self.ax = ax
         self.df = df
         self.time_col = time_col
-        self.point_cols = point_cols
-        self.points_styles = points_styles
-        self.marker_cols = marker_cols
-        self.marker_styles = marker_styles
-        self.trail_cols = trail_cols
-        self.trail_styles = trail_styles
+        self.point_cols = [("x", "y", "z")] if point_cols is None else point_cols
+        self.points_styles = (
+            list(DEFAULT_POINTS_STYLES) if points_styles is None else points_styles
+        )
+        self.marker_cols = [] if marker_cols is None else marker_cols
+        self.marker_styles = [] if marker_styles is None else marker_styles
+        self.trail_cols = [("x", "y", "z")] if trail_cols is None else trail_cols
+        self.trail_styles = (
+            list(DEFAULT_TRAIL_STYLES) if trail_styles is None else trail_styles
+        )
         self.init_cb = init_cb
         self.update_cb = update_cb
 

@@ -10,8 +10,8 @@ import pandas as pd
 def coord_sq_error(
     df: pd.DataFrame,
     df_other: pd.DataFrame,
-    df_cols: list[str] = ["x", "y", "z"],
-    df_other_cols: list[str] = ["x", "y", "z"],
+    df_cols: list[str] | None = None,
+    df_other_cols: list[str] | None = None,
     time_col: str = "time",
 ) -> npt.NDArray[np.float64]:
     """Per-sample squared Euclidean distance between two dataframes' coordinates.
@@ -19,6 +19,9 @@ def coord_sq_error(
     df_other is linearly interpolated onto df's time stamps; samples outside the
     interpolation range are NaN.
     """
+    df_cols = ["x", "y", "z"] if df_cols is None else df_cols
+    df_other_cols = ["x", "y", "z"] if df_other_cols is None else df_other_cols
+
     assert (
         len(df_cols) == len(df_other_cols) == 3
     ), "df_cols and df_other_cols must have 3 elements"
@@ -47,11 +50,14 @@ def coord_sq_error(
 def coord_mse(
     df: pd.DataFrame,
     df_other: pd.DataFrame,
-    df_cols: list[str] = ["x", "y", "z"],
-    df_other_cols: list[str] = ["x", "y", "z"],
+    df_cols: list[str] | None = None,
+    df_other_cols: list[str] | None = None,
     time_col: str = "time",
 ) -> float:
     """Mean squared error (mean of the per-sample squared 3D distances)."""
+    df_cols = ["x", "y", "z"] if df_cols is None else df_cols
+    df_other_cols = ["x", "y", "z"] if df_other_cols is None else df_other_cols
+
     err = coord_sq_error(df, df_other, df_cols, df_other_cols, time_col)
     result = float(np.nanmean(err))
 
@@ -65,11 +71,14 @@ def coord_mse(
 def coord_mean_distance(
     df: pd.DataFrame,
     df_other: pd.DataFrame,
-    df_cols: list[str] = ["x", "y", "z"],
-    df_other_cols: list[str] = ["x", "y", "z"],
+    df_cols: list[str] | None = None,
+    df_other_cols: list[str] | None = None,
     time_col: str = "time",
 ) -> float:
     """Mean Euclidean distance (mean per-sample 3D position error)."""
+    df_cols = ["x", "y", "z"] if df_cols is None else df_cols
+    df_other_cols = ["x", "y", "z"] if df_other_cols is None else df_other_cols
+
     err = coord_sq_error(df, df_other, df_cols, df_other_cols, time_col)
     result = float(np.nanmean(np.sqrt(err)))
 
@@ -85,11 +94,15 @@ def coord_shift_xyz(
     x_shift: float = 0,
     y_shift: float = 0,
     z_shift: float = 0,
-    x_cols: list[str] = ["x"],
-    y_cols: list[str] = ["y"],
-    z_cols: list[str] = ["z"],
+    x_cols: list[str] | None = None,
+    y_cols: list[str] | None = None,
+    z_cols: list[str] | None = None,
 ) -> pd.DataFrame:
     """Shift by x, y, z the coordinates of a dataframe."""
+    x_cols = ["x"] if x_cols is None else x_cols
+    y_cols = ["y"] if y_cols is None else y_cols
+    z_cols = ["z"] if z_cols is None else z_cols
+
     assert (
         len(x_cols) == len(y_cols) == len(z_cols)
     ), "x_cols, y_cols, and z_cols must have the same length"
@@ -108,11 +121,14 @@ def coord_rotate(
     axis: str,
     angle: float,
     center: tuple[float, float, float] = (0, 0, 0),
-    x_cols: list[str] = ["x"],
-    y_cols: list[str] = ["y"],
-    z_cols: list[str] = ["z"],
+    x_cols: list[str] | None = None,
+    y_cols: list[str] | None = None,
+    z_cols: list[str] | None = None,
 ) -> pd.DataFrame:
     """Rotate by axis the coordinates of a dataframe by a given angle."""
+    x_cols = ["x"] if x_cols is None else x_cols
+    y_cols = ["y"] if y_cols is None else y_cols
+    z_cols = ["z"] if z_cols is None else z_cols
 
     assert len(center) == 3, "center must have 3 elements: x, y, z"
 
@@ -148,11 +164,14 @@ def coord_rotate_seq(
     df: pd.DataFrame,
     angles: list[tuple[str, float]],
     center: tuple[float, float, float] = (0, 0, 0),
-    x_cols: list[str] = ["x"],
-    y_cols: list[str] = ["y"],
-    z_cols: list[str] = ["z"],
+    x_cols: list[str] | None = None,
+    y_cols: list[str] | None = None,
+    z_cols: list[str] | None = None,
 ) -> pd.DataFrame:
     """Perform a sequence of rotations on the coordinates of a dataframe."""
+    x_cols = ["x"] if x_cols is None else x_cols
+    y_cols = ["y"] if y_cols is None else y_cols
+    z_cols = ["z"] if z_cols is None else z_cols
 
     assert len(center) == 3, "center must have 3 elements: x, y, z"
 
@@ -174,13 +193,17 @@ def coord_shift_t(
     df: pd.DataFrame,
     t_shift: float,
     time_col: str = "time",
-    x_cols: list[str] = ["x"],
-    y_cols: list[str] = ["y"],
-    z_cols: list[str] = ["z"],
+    x_cols: list[str] | None = None,
+    y_cols: list[str] | None = None,
+    z_cols: list[str] | None = None,
 ) -> pd.DataFrame:
     """Shift by time the coordinates of a dataframe."""
     if t_shift == 0.0:
         return df
+
+    x_cols = ["x"] if x_cols is None else x_cols
+    y_cols = ["y"] if y_cols is None else y_cols
+    z_cols = ["z"] if z_cols is None else z_cols
 
     assert (
         len(x_cols) == len(y_cols) == len(z_cols)
@@ -202,11 +225,15 @@ def coord_matrix_transform(
     df: pd.DataFrame,
     matrix: npt.NDArray[np.float64],
     array: npt.NDArray[np.float64],
-    x_cols: list[str] = ["x"],
-    y_cols: list[str] = ["y"],
-    z_cols: list[str] = ["z"],
+    x_cols: list[str] | None = None,
+    y_cols: list[str] | None = None,
+    z_cols: list[str] | None = None,
 ) -> pd.DataFrame:
     """Transform the coordinates of a dataframe with a transformation matrix."""
+    x_cols = ["x"] if x_cols is None else x_cols
+    y_cols = ["y"] if y_cols is None else y_cols
+    z_cols = ["z"] if z_cols is None else z_cols
+
     assert (
         len(x_cols) == len(y_cols) == len(z_cols)
     ), "x_cols, y_cols, and z_cols must have the same length"
@@ -227,14 +254,18 @@ def coord_matrix_transform2(
     matrix1: npt.NDArray[np.float64],
     matrix2: npt.NDArray[np.float64],
     array: npt.NDArray[np.float64],
-    x_cols: list[str] = ["x"],
-    y_cols: list[str] = ["y"],
-    z_cols: list[str] = ["z"],
+    x_cols: list[str] | None = None,
+    y_cols: list[str] | None = None,
+    z_cols: list[str] | None = None,
 ) -> pd.DataFrame:
     """
     Transform the coordinates of a dataframe with first and second order
     transformation matrices.
     """
+    x_cols = ["x"] if x_cols is None else x_cols
+    y_cols = ["y"] if y_cols is None else y_cols
+    z_cols = ["z"] if z_cols is None else z_cols
+
     assert (
         len(x_cols) == len(y_cols) == len(z_cols)
     ), "x_cols, y_cols, and z_cols must have the same length"

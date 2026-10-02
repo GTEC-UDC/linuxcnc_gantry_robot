@@ -412,8 +412,8 @@ class CalibrationParams(BaseModel):
 def get_processed_data(
     gantry_filename: str,
     optitrack_filename: str,
-    config: CalibrationConfig = Field(default_factory=CalibrationConfig),
-    calibration_params: CalibrationParams = Field(default_factory=CalibrationParams),
+    config: CalibrationConfig | None = None,
+    calibration_params: CalibrationParams | None = None,
 ) -> tuple[pd.DataFrame, CalibrationParams, int]:
     """Align and calibrate the gantry and OptiTrack data.
 
@@ -424,10 +424,11 @@ def get_processed_data(
     Args:
         gantry_filename (str): Path to the gantry data CSV file.
         optitrack_filename (str): Path to the OptiTrack data CSV file.
-        config (DataProcessingConfig, optional): Configuration for the data
-            processing. Defaults to an empty DataProcessingConfig object.
+        config (CalibrationConfig, optional): Configuration for the data
+            processing. If None an empty CalibrationConfig object is created.
+            Defaults to None.
         calibration_params (CalibrationParams, optional): Calibration parameters.
-            Defaults to an empty CalibrationParams object.
+            If None an empty CalibrationParams object is created. Defaults to None.
 
     Returns:
         tuple[pd.DataFrame, CalibrationParams, int]: A tuple containing:
@@ -435,6 +436,9 @@ def get_processed_data(
             - Calibration parameters
             - Number of markers detected
     """
+    config = config or CalibrationConfig()
+    calibration_params = calibration_params or CalibrationParams()
+
     # -------------------------------------------------------------------------
     # Load the Gantry and the OptiTrack data
     # -------------------------------------------------------------------------

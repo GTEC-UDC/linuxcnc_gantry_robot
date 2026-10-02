@@ -43,33 +43,45 @@ class PointFrameData(PlayerFrameData):
     )
 
 
+DEFAULT_POINT_PLOT_STYLE = {
+    "color": "r",
+    "marker": "o",
+    "markersize": 5,
+}
+
+DEFAULT_TRAIL_PLOT_STYLE = {
+    "color": "b",
+    "linestyle": "-",
+    "alpha": 0.25,
+}
+
+
 class PointPlayer(Player[PointFrameData]):
     def __init__(
         self,
         ax: axes3d.Axes3D,
         df: pd.DataFrame,
         time_col: str = "time",
-        coord_cols: list[str] = ["x", "y", "z"],
-        point_plot_style: dict[str, Any] = {
-            "color": "r",
-            "marker": "o",
-            "markersize": 5,
-        },
-        trail_plot_style: dict[str, Any] = {
-            "color": "b",
-            "linestyle": "-",
-            "alpha": 0.25,
-        },
+        coord_cols: list[str] | None = None,
+        point_plot_style: dict[str, Any] | None = None,
+        trail_plot_style: dict[str, Any] | None = None,
         trail_after_samples: int | None = None,
         trail_before_samples: int | None = None,
         init_cb: Callable[[], Iterable[Artist]] | None = None,
         update_cb: Callable[[PointFrameData], Iterable[Artist]] | None = None,
         **kwargs,
     ):
+        point_plot_style = (
+            DEFAULT_POINT_PLOT_STYLE if point_plot_style is None else point_plot_style
+        )
+        trail_plot_style = (
+            DEFAULT_TRAIL_PLOT_STYLE if trail_plot_style is None else trail_plot_style
+        )
+
         self.ax = ax
         self.df = df
         self.time_col = time_col
-        self.coord_cols = coord_cols
+        self.coord_cols = coord_cols or ["x", "y", "z"]
         self.trail_after_samples = trail_after_samples
         self.trail_before_samples = trail_before_samples
         self.init_cb = init_cb

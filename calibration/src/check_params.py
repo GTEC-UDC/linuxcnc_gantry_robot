@@ -89,18 +89,19 @@ def get_joint_bounds(
     min_joints = np.zeros(3)
     max_joints = np.zeros(3)
 
+    # Function to minimize
+    def f_opt(pos: np.ndarray, j_idx: int, opt_factor: int) -> float:
+        joints = inverse_kinematics(pos, params, max_iter=20, tol=1e-9)
+        return joints[j_idx] * opt_factor
+
     for j_idx in range(3):
         for opt_idx, opt_factor in enumerate([1, -1]):  # Minimize and maximize
-            # Function to minimize
-            def f_opt(pos: np.ndarray) -> float:
-                joints = inverse_kinematics(pos, params, max_iter=20, tol=1e-9)
-                return joints[j_idx] * opt_factor
-
             logger.info(f"Finding joint {j_idx} {'min' if opt_idx == 0 else 'max'}...")
 
             res = scp.optimize.minimize(
                 fun=f_opt,
                 x0=axis_bounds[0] if opt_idx == 0 else axis_bounds[1],
+                args=(j_idx, opt_factor),
                 bounds=[(axis_bounds[0][i], axis_bounds[1][i]) for i in range(3)],
                 callback=lambda intermediate_result: logger.info(
                     "fval: %s", intermediate_result.fun

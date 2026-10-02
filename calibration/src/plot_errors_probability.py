@@ -8,6 +8,7 @@ import numpy as np
 from argutils import parse_limit
 from data import CalibrationConfig, CalibrationParams, get_processed_data
 from matplotlib.ticker import MultipleLocator
+from matplotlib.typing import LegendLocType
 from scipy import stats
 
 
@@ -28,7 +29,7 @@ def plot_errors_probability(
     plot_fit: bool = False,
     linewidth: float = 1.5,
     figsize: tuple[float, float] = (8.0, 6.0),
-    legend_loc: str = "outside upper center",
+    legend_loc: LegendLocType = "outside upper center",
     save: str | None = None,
     dpi: int = 200,
 ) -> list[mpl_axes.Axes]:

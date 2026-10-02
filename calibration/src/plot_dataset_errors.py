@@ -154,7 +154,7 @@ def main():
 
     # let overrides reach validate_dataset's module globals
     vd.DATASET_DIR = args.dataset_dir
-    vd.GANTRY_DIR = args.dataset_dir / "GANTRY_MEASUREMENTS"
+    vd.GROUND_TRUTH_DIR = args.dataset_dir / "GROUND_TRUTH"
     vd.OPTITRACK_DIR = args.dataset_dir / "OPTITRACK_MEASUREMENTS_CSV"
     vd.DROPOUT_MM = args.dropout_mm
     vd.SKIP_INITIAL_S = args.skip_initial_s
@@ -163,7 +163,7 @@ def main():
         corr_params = np.array(json.load(f)["correction"])
 
     for take in args.takes:
-        t, err, valid, excluded = compute_errors(take, corr_params, args.target)
+        t, err, _, excluded = compute_errors(take, corr_params, args.target)
 
         if args.x_axis == "samples":
             x = np.arange(len(t), dtype=float)

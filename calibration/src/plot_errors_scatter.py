@@ -348,4 +348,3 @@ if __name__ == "__main__":
         figsize=args.figsize,
         style=scatter_style,
     )
-

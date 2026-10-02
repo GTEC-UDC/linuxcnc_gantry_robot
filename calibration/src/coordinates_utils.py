@@ -284,8 +284,6 @@ def coord_matrix_transform2(
 
 @dataclass
 class Transform(ABC):
-    pass
-
     @abstractmethod
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         pass

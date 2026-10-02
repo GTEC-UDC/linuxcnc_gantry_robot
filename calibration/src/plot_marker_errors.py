@@ -71,7 +71,7 @@ def plot_marker_errors(
     if not (show_centroid or show_markers or show_marker_mean):
         raise ValueError("At least one series must be enabled.")
 
-    fig, ax = plt.subplots(figsize=(10, 4))
+    _, ax = plt.subplots(figsize=(10, 4))
     ax.grid(True)
 
     time_data = df["time"] if time_unit == "s" else df["frame"]

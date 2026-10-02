@@ -81,7 +81,7 @@ def load_optitrack_metadata(filename: str) -> dict[str, Any]:
         + ("PM" if take_name.endswith("PM") else "AM")
     )
     date_format = "%Y-%m-%d %I.%M.%S.%f %p"
-    metadata["Capture Start Time"] = datetime.strptime(capture_date_str, date_format)
+    metadata["Capture Start Time"] = datetime.strptime(capture_date_str, date_format)  # noqa: DTZ007
 
     return metadata
 
@@ -533,7 +533,7 @@ def get_processed_data(
             f"{axis.lower()}_cols": [
                 col
                 for col in df.columns
-                if col.startswith(f"M.{axis}") or col.startswith(f"RB.{axis}")
+                if col.startswith((f"M.{axis}", f"RB.{axis}"))
             ]
             for axis in ["X", "Y", "Z"]
         }

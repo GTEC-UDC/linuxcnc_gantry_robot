@@ -70,11 +70,13 @@ class Player[T: PlayerFrameData](FuncAnimation, ABC):
     def start(self):
         self.run = True
         if not self.draw_on_pause:
+            assert self.event_source is not None, "event_source is None"
             self.event_source.start()
 
     def stop(self):
         self.run = False
         if not self.draw_on_pause:
+            assert self.event_source is not None, "event_source is None"
             self.event_source.stop()
 
     def go_to_frame(self, frame_idx: int):

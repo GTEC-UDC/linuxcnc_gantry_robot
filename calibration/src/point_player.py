@@ -103,7 +103,7 @@ class PointPlayer(Player[PointFrameData]):
         )
 
         if isinstance(ax.figure, SubFigure):
-            raise ValueError("The player cannot be created in a subfigure")
+            raise TypeError("The player cannot be created in a subfigure")
 
         super().__init__(ax.figure, **kwargs)
 

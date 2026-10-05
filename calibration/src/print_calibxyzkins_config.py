@@ -1,7 +1,8 @@
 import argparse
 from pathlib import Path
 
-from data import CalibrationParams, get_calibration_matrices
+import numpy as np
+from data import load_correction_params
 from defaults import CALIBRATION_FILE
 
 if __name__ == "__main__":
@@ -19,10 +20,19 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    with open(args.calibration, "r") as f:
-        calibration_params = CalibrationParams.model_validate_json(f.read())
+    params = load_correction_params(args.calibration)
 
-    A, B, c = get_calibration_matrices(calibration_params.correction)
+    # The calibxyzkins module implements the model up to the second degree, with
+    # the matrix A for the linear terms and the matrix B for the squares
+    if params.degree > 2:
+        parser.error(
+            f"The correction model of {args.calibration} is of degree "
+            f"{params.degree}, and the calibxyzkins module supports up to degree 2"
+        )
+
+    A = np.array(params.A[0])
+    B = np.array(params.A[1]) if params.degree == 2 else np.zeros((3, 3))
+    c = np.array(params.c)
 
     coords = ["x", "y", "z"]
 

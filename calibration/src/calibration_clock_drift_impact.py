@@ -13,9 +13,12 @@ import numpy.typing as npt
 import pandas as pd
 import scipy as scp
 from data import (
+    DEFAULT_DEGREE,
     CalibrationConfig,
     CalibrationParams,
-    design_matrix,
+    CorrectionParams,
+    Degree,
+    fit_correction_params,
     get_processed_data,
 )
 from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
@@ -30,25 +33,26 @@ def fit_correction(
     drift: float,
     t_ref: float,
     correct: bool = True,
-) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64], npt.NDArray[np.bool_]]:
+    degree: Degree = DEFAULT_DEGREE,
+) -> tuple[CorrectionParams, npt.NDArray[np.float64], npt.NDArray[np.bool_]]:
     """Re-fit the correction with the OptiTrack time base warped by (dt, drift).
 
-    Returns the fitted coefficients, the residual of the corrected positions, and the
+    Returns the fitted parameters, the residual of the corrected positions, and the
     mask of the samples that survived the warping. Without ``correct``, no correction
-    is fit, and the residual is the raw discrepancy between the gantry and OptiTrack
-    positions, so the drift cannot be absorbed into any free parameter.
+    is fit, the parameters are those of the identity, and the residual is the raw
+    discrepancy between the gantry and OptiTrack positions, so the drift cannot be
+    absorbed into any free parameter.
     """
     warped = time_shifted(time, optitrack, dt, drift, t_ref)
     mask = cast(npt.NDArray[np.bool_], ~np.isnan(warped).any(axis=1))
     if correct:
-        design = design_matrix(gantry[mask])
-        coef, _, _, _ = np.linalg.lstsq(design, warped[mask], rcond=None)
-        coef = cast(npt.NDArray[np.float64], coef)
-        residual = design @ coef - warped[mask]
+        params = fit_correction_params(gantry[mask], warped[mask], degree)
     else:
-        coef = cast(npt.NDArray[np.float64], np.eye(3))
-        residual = gantry[mask] - warped[mask]
-    return coef, residual, mask
+        params = CorrectionParams.model_validate(
+            {"c": np.zeros(3).tolist(), "A": [np.eye(3).tolist()]}
+        )
+    residual = params.apply(gantry[mask]) - warped[mask]
+    return params, residual, mask
 
 
 def fit_offset(
@@ -58,11 +62,14 @@ def fit_offset(
     drift: float,
     t_ref: float,
     correct: bool = True,
+    degree: Degree = DEFAULT_DEGREE,
 ) -> float:
     """Best time offset for a given drift, so the scan is not biased by a fixed one."""
     res = scp.optimize.minimize_scalar(
         lambda dt: rms3d(
-            fit_correction(time, gantry, optitrack, dt, drift, t_ref, correct)[1]
+            fit_correction(
+                time, gantry, optitrack, dt, drift, t_ref, correct, degree
+            )[1]
         ),
         bounds=(-0.3, 0.3),
         method="bounded",
@@ -106,6 +113,7 @@ def main(args: argparse.Namespace) -> None:
     gantry = data[GAN_COLS].to_numpy()
     t_ref = float(time.mean())
     span = time[-1] - time[0]
+    degree = config.correction.degree
 
     speed_all = np.linalg.norm(np.gradient(gantry, time, axis=0), axis=1)
     speed = float(np.median(speed_all[speed_all > 20]))
@@ -127,8 +135,10 @@ def main(args: argparse.Namespace) -> None:
     best_drift, best_rms = 0.0, np.inf
     for drift_ppm in grid:
         drift = drift_ppm * 1e-6
-        dt = fit_offset(time, gantry, optitrack, drift, t_ref, args.correct)
-        err = fit_correction(time, gantry, optitrack, dt, drift, t_ref, args.correct)[1]
+        dt = fit_offset(time, gantry, optitrack, drift, t_ref, args.correct, degree)
+        err = fit_correction(
+            time, gantry, optitrack, dt, drift, t_ref, args.correct, degree
+        )[1]
         sigma = err.std(axis=0, ddof=1)
         print(
             f"  {drift_ppm:+9.1f} {dt * 1e3:+8.2f} {rms3d(err):10.3f}   "
@@ -140,7 +150,7 @@ def main(args: argparse.Namespace) -> None:
     res = scp.optimize.minimize(
         lambda x: rms3d(
             fit_correction(
-                time, gantry, optitrack, x[0], x[1] * 1e-6, t_ref, args.correct
+                time, gantry, optitrack, x[0], x[1] * 1e-6, t_ref, args.correct, degree
             )[1]
         ),
         x0=np.array([0.0, best_drift]),
@@ -160,24 +170,23 @@ def main(args: argparse.Namespace) -> None:
     # ---------------------------------------------------------------------
 
     drift = (args.drift if args.drift is not None else drift_fit) * 1e-6
-    dt = fit_offset(time, gantry, optitrack, drift, t_ref, args.correct)
+    dt = fit_offset(time, gantry, optitrack, drift, t_ref, args.correct, degree)
     print(
         f"\nsolution with a drift of {drift * 1e6:+.2f} ppm (offset {dt * 1e3:+.2f} ms)"
     )
 
-    coef_ref, err_ref, _ = fit_correction(
-        time, gantry, optitrack, 0.0, 0.0, t_ref, args.correct
+    params_ref, err_ref, _ = fit_correction(
+        time, gantry, optitrack, 0.0, 0.0, t_ref, args.correct, degree
     )
-    coef_drift, err_drift, _ = fit_correction(
-        time, gantry, optitrack, dt, drift, t_ref, args.correct
+    params_drift, err_drift, _ = fit_correction(
+        time, gantry, optitrack, dt, drift, t_ref, args.correct, degree
     )
 
     describe("without the drift", err_ref)
     describe("with the drift", err_drift)
 
     # Difference between the two forward maps over the positions actually visited
-    design = design_matrix(gantry) if args.correct else gantry
-    diff = design @ coef_ref - design @ coef_drift
+    diff = params_ref.apply(gantry) - params_drift.apply(gantry)
     print("  difference between the two forward maps over the capture")
     print(
         f"    per-axis RMS    {np.sqrt((diff**2).mean(axis=0))[0]:.3f} "

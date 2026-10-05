@@ -31,7 +31,6 @@ Run (from this directory, using the local venv):
 """
 
 import argparse
-import json
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -39,7 +38,7 @@ from pathlib import Path
 import numpy as np
 import scipy as scp
 import validate_dataset as vd
-from data import coord_align, load_optitrack_metadata
+from data import coord_align, load_correction_params, load_optitrack_metadata
 from defaults import CALIBRATION_FILE, DATASET_DIR
 
 logger = logging.getLogger("estimate_dataset_drift")
@@ -246,8 +245,7 @@ def main():
     vd.GROUND_TRUTH_DIR = vd.DATASET_DIR / "GROUND_TRUTH"
     vd.TAKES = args.takes
 
-    with open(args.calib) as f:
-        corr_params = np.array(json.load(f)["correction"])
+    corr_params = load_correction_params(args.calib)
 
     # One frame for the whole campaign, averaged over the takes and held fixed
     frame = vd.fit_single_alignment("all", corr_params, "corrected")

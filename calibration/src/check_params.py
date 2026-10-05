@@ -5,36 +5,38 @@ from pathlib import Path
 
 import numpy as np
 import scipy as scp
-from data import CalibrationParams, get_calibration_matrices
+from data import CorrectionParams, load_correction_params
 from defaults import CALIBRATION_FILE
 
 logger = logging.getLogger(__name__)
 
 
 def forward_kinematics(
-    joint_values: np.ndarray, params: tuple[np.ndarray, np.ndarray, np.ndarray]
+    joint_values: np.ndarray, params: CorrectionParams
 ) -> np.ndarray:
-    A, B, c = params
-    return joint_values @ A + joint_values**2 @ B + c
+    return params.apply(joint_values)
 
 
 def inverse_kinematics(
     pos: np.ndarray,
-    params: tuple[np.ndarray, np.ndarray, np.ndarray],
+    params: CorrectionParams,
     x0: np.ndarray | None = None,
     bounds: tuple[np.ndarray, np.ndarray] | None = None,
     max_iter: int = 10,
     tol: float = 1e-3,
 ) -> np.ndarray:
-    A, B, c = params
+    matrices = np.array(params.A)
 
     # Function to minimize
     def f_opt(x: np.ndarray) -> np.ndarray:
-        return A @ x + B @ x**2 + c - pos
+        return params.apply(x) - pos
 
-    # Jacobian
+    # Jacobian: sum of k * A_k @ diag(x)**(k - 1)
     def J(x: np.ndarray) -> np.ndarray:
-        return A + 2 * x * B
+        jacobian = np.zeros((3, 3))
+        for k, mat in enumerate(matrices, start=1):
+            jacobian += k * mat * x ** (k - 1)
+        return jacobian
 
     x = x0 if x0 is not None else pos
 
@@ -68,12 +70,17 @@ def inverse_kinematics(
 
 def check_J_inv(
     bounds: tuple[np.ndarray, np.ndarray],
-    params: tuple[np.ndarray, np.ndarray, np.ndarray],
+    params: CorrectionParams,
 ) -> bool:
-    A, B, _ = params
+    matrices = np.array(params.A)
     max_abs_x = np.max(np.abs(np.array([bounds[0], bounds[1]])), axis=0)
 
-    D = 2 * np.linalg.inv(A) @ B * max_abs_x
+    # Bound of the entries of the matrix
+    # inv(A_1) @ sum of k * A_k @ diag(x)**(k - 1), for k from 2 to the degree
+    inv_a1 = np.linalg.inv(matrices[0])
+    D = np.zeros((3, 3))
+    for k, mat in enumerate(matrices[1:], start=2):
+        D += k * np.abs(inv_a1 @ mat) * max_abs_x ** (k - 1)
 
     norm_1 = np.linalg.norm(D, 1)
     norm_inf = np.linalg.norm(D, np.inf)
@@ -85,7 +92,7 @@ def check_J_inv(
 
 
 def get_joint_bounds(
-    params: tuple[np.ndarray, np.ndarray, np.ndarray],
+    params: CorrectionParams,
     axis_bounds: tuple[np.ndarray, np.ndarray],
 ) -> tuple[np.ndarray, np.ndarray]:
     min_joints = np.zeros(3)
@@ -124,7 +131,7 @@ def get_joint_bounds(
 
 
 def check_joint_bounds(
-    params: tuple[np.ndarray, np.ndarray, np.ndarray],
+    params: CorrectionParams,
     axis_bounds: tuple[np.ndarray, np.ndarray],
     joint_bounds: tuple[np.ndarray, np.ndarray],
 ) -> bool:
@@ -189,10 +196,7 @@ def main():
 
     args = parser.parse_args()
 
-    with open(args.calibration, "r") as f:
-        calibration_params = CalibrationParams.model_validate_json(f.read())
-
-    params = get_calibration_matrices(calibration_params.correction)
+    params = load_correction_params(args.calibration)
 
     # Check J invertibility on the joint space
     if not check_J_inv(

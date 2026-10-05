@@ -3,7 +3,7 @@
 Out-of-sample validation of the gantry kinematic correction on the RoboLoc-G
 (July 2025) campaign.
 
-The correction parameters (A, B, c) fitted on the calibration capture are
+The correction parameters fitted on the calibration capture are
 applied to the July gantry trajectories, and the result is compared against the
 OptiTrack "Grua" rigid body. Two figures are reported:
 
@@ -12,7 +12,7 @@ OptiTrack "Grua" rigid body. Two figures are reported:
 
 Each comparison is aligned against its OWN target. This matters: the correction
 displaces the gantry by mean(correct(p) - p), which is ~0 over the calibration
-workspace (least squares balances c against the linear/quadratic terms) but
+workspace (least squares balances c against the other terms of the model) but
 ~2.3 mm over the July trajectories. Reusing the uncorrected frame for the AFTER
 residual would inject that offset as a bias and understate the correction.
 
@@ -34,7 +34,6 @@ Run (from this directory, using the local venv):
 """
 
 import argparse
-import json
 import logging
 import time
 from pathlib import Path
@@ -47,6 +46,7 @@ from data import (
     coord_align,
     coord_calibrate,
     interp_columns,
+    load_correction_params,
     load_optitrack_data,
     load_optitrack_metadata,
 )
@@ -119,7 +119,7 @@ def load_take(take, corr_params, body=FRAME_BODY):
 
     The reference for a mobile body is the gantry platform plus its fixed offset
     (the dataset's eq:mobile-position). The correction is applied to the
-    PLATFORM and the offset added afterwards, because correct() is quadratic and
+    PLATFORM and the offset added afterwards, because correct() is nonlinear and
     correct(p + o) != correct(p) + o.
 
     Returns (df_rb, tgt_before, tgt_after, valid), the OptiTrack track of `body`
@@ -402,8 +402,7 @@ def main():
         else (args.sensitivity_thresholds or SENS_THRESHOLDS)
     )
 
-    with open(CALIBRATION_FILE) as f:
-        corr_params = np.array(json.load(f)["correction"])
+    corr_params = load_correction_params(CALIBRATION_FILE)
 
     single = not args.per_take_alignment
     mode = (

@@ -3,32 +3,14 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import numpy.typing as npt
-from data import CalibrationParams, get_calibration_matrices
+from data import CorrectionParams, load_correction_params
 from defaults import CALIBRATION_FILE
 from matplotlib.widgets import Button, Slider
 
 
-def coord_transform(
-    data: npt.NDArray[np.float64],
-    matrix1: npt.NDArray[np.float64],
-    matrix2: npt.NDArray[np.float64],
-    array: npt.NDArray[np.float64],
-) -> npt.NDArray[np.float64]:
-    """
-    Transform coordinates with first and second order transformation matrices.
-    """
-    return data @ matrix1.T + data**2 @ matrix2.T + array
-
-
 class TransformationPlotter:
-    def __init__(self, matrix1: np.ndarray, matrix2: np.ndarray, array: np.ndarray):
-        assert matrix1.shape == (3, 3)
-        assert matrix2.shape == (3, 3)
-        assert array.shape == (3,)
-        self.matrix1 = matrix1
-        self.matrix2 = matrix2
-        self.array = array
+    def __init__(self, params: CorrectionParams):
+        self.params = params
 
         self.fig, (self.ax1, self.ax2) = plt.subplots(1, 2, figsize=(14, 7))
         plt.subplots_adjust(bottom=0.3)  # Make room for sliders
@@ -131,9 +113,7 @@ class TransformationPlotter:
         coords = np.vstack(coord_arrays).transpose()
 
         # Apply transformation
-        coords_transformed = coord_transform(
-            coords, self.matrix1, self.matrix2, self.array
-        )
+        coords_transformed = self.params.apply(coords)
 
         # Get current coordinate index
         curr_idx = self.coord_indices[self.current_coord]
@@ -193,9 +173,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    with open(args.calibration, "r") as f:
-        calibration_params = CalibrationParams.model_validate_json(f.read())
-
-    matrix1, matrix2, array = get_calibration_matrices(calibration_params.correction)
-
-    plotter = TransformationPlotter(matrix1, matrix2, array)
+    plotter = TransformationPlotter(load_correction_params(args.calibration))

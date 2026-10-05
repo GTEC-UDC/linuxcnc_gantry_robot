@@ -45,17 +45,38 @@ Analysis of scatter plots of the positioning errors (see "Plot Positioning Error
 - **X-axis position affects errors in the Y-axis**
 - **Z-axis position affects errors in X and Y axes**
 
-These systematic deviations can be corrected by applying a coordinate transformation when controlling the gantry robot. For this we consider a general coordinate transformation with both first-order and second-order components:
+These systematic deviations can be corrected by applying a coordinate transformation when controlling the gantry robot. For this we consider a polynomial transformation of degree $n$ without cross terms:
 
 $$
 \begin{bmatrix}
 x' \\ y' \\ z'
 \end{bmatrix} =
+\mathbf{c} + \sum_{k=1}^{n} \mathbf{A}_k
+\begin{bmatrix}
+x^k \\ y^k \\ z^k
+\end{bmatrix}
+$$
+
+where $x, y, z$ are the aligned OptiTrack position coordinates (the actual position of the gantry robot), $x', y', z'$ are the corrected position coordinates (the target position for the gantry robot), and $\mathbf{c}$ and $\mathbf{A}_1, \dots, \mathbf{A}_n$ are the vector and the $3 \times 3$ matrices that need to be optimized.
+
+This transformation consists of:
+
+1. Vector $\mathbf{c}$: Constant offset.
+2. Matrix $\mathbf{A}_1$: Linear transformation that handles scaling, rotation, and shear.
+3. Matrices $\mathbf{A}_2, \dots, \mathbf{A}_n$: Higher-order terms that correct non-linear distortions.
+
+The highest power of each coordinate is set with the `degree` setting, which holds one value per coordinate, in the order $x, y, z$. The degree $n$ of the transformation is the largest of the three, and the column of $\mathbf{A}_k$ of a coordinate whose highest power is below $k$ is zero. The default is `[2, 2, 1]`, i.e., a second-order transformation in $x$ and $y$ that is linear in $z$:
+
+$$
+\begin{bmatrix}
+x' \\ y' \\ z'
+\end{bmatrix} =
+\mathbf{c} +
 \underbrace{
 \begin{bmatrix}
 a_{11} & a_{12} & a_{13} \\ a_{21} & a_{22} & a_{23} \\ a_{31} & a_{32} & a_{33}
 \end{bmatrix}
-}_{\normalsize \mathbf{A}}
+}_{\normalsize \mathbf{A}_1}
 \begin{bmatrix}
 x \\ y \\ z
 \end{bmatrix} +
@@ -63,34 +84,23 @@ x \\ y \\ z
 \begin{bmatrix}
 b_{11} & b_{12} & 0 \\ b_{21} & b_{22} & 0 \\ b_{31} & b_{32} & 0
 \end{bmatrix}
-}_{\normalsize \mathbf{B}}
+}_{\normalsize \mathbf{A}_2}
 \begin{bmatrix}
 x^2 \\ y^2 \\ z^2
-\end{bmatrix} +
-\underbrace{
-\begin{bmatrix}
-c_1 \\ c_2 \\ c_3
 \end{bmatrix}
-}_{\normalsize \mathbf{c}}
 $$
 
-where $x, y, z$ are the aligned OptiTrack position coordinates (the actual position of the gantry robot), $x', y', z'$ are the corrected position coordinates (the target position for the gantry control), and $\mathbf{A}, \mathbf{B}, \mathbf{c}$ are the transformation matrices and vector that need to be optimized.
+**Note**: The powers of $z$ above the first are left out by default because in our measurements the Z-axis only shows a linear distortion.
 
-**Note**: The third column of the second-order matrix $\mathbf{B}$ is set to zero because the Z-axis measurement interval is small, making the $z^2$ term unreliable if $z$ is extrapolated.
-
-This transformation consists of:
-
-1. Matrix $\mathbf{A}$: Linear transformation that handles scaling, rotation, and shear.
-2. Matrix $\mathbf{B}$: Quadratic transformation that corrects non-linear distortions.
-3. Vector $\mathbf{c}$: Constant offset.
-
-The correction parameters are found by minimizing the error between the corrected OptiTrack positions and the gantry positions, with the objective selectable via the `objective` setting. Because the transformation is linear in $\mathbf{A}, \mathbf{B}, \mathbf{c}$, the mean squared error (`mse`, the default) is minimized with `numpy.linalg.lstsq`, while the mean Euclidean distance (`mean_distance`) is minimized iteratively with `scipy.optimize.minimize` (Powell method by default).
+The correction parameters are found by minimizing the error between the corrected OptiTrack positions and the gantry positions, with the objective selectable via the `objective` setting. Because the transformation is linear in $\mathbf{c}$ and $\mathbf{A}_k$, the mean squared error (`mse`, the default) is minimized with `numpy.linalg.lstsq`, while the mean Euclidean distance (`mean_distance`) is minimized iteratively with `scipy.optimize.minimize` (using the Powell method by default).
 
 ## Parameters Validation
 
 The `calibxyzkins` module of LinuxCNC included in this repository uses the Newton-Raphson algorithm to solve the inverse kinematics problem: given desired axes positions $x', y', z'$, it finds the corresponding joint positions $x, y, z$ that satisfy the transformation equation:
 
-$$\mathbf{f}(x, y, z) = \mathbf{A} \begin{bmatrix} x \\ y \\ z \end{bmatrix} + \mathbf{B} \begin{bmatrix} x^2 \\ y^2 \\ z^2 \end{bmatrix} + \mathbf{c} = \begin{bmatrix} x' \\ y' \\ z' \end{bmatrix}$$
+$$\mathbf{f}(x, y, z) = \mathbf{c} + \sum_{k=1}^{n} \mathbf{A}_k \begin{bmatrix} x^k \\ y^k \\ z^k \end{bmatrix} = \begin{bmatrix} x' \\ y' \\ z' \end{bmatrix}$$
+
+**Note**: The `calibxyzkins` module implements the transformation up to the second degree. The `check_params.py` script accepts any degree.
 
 To ensure the calibration parameters are valid we include the `check_params.py` script, which performs the following validation tests:
 
@@ -98,7 +108,7 @@ To ensure the calibration parameters are valid we include the `check_params.py` 
 
 The Newton-Raphson method requires computing the Jacobian matrix of the transformation function:
 
-$$\mathbf{J} = \frac{\partial \mathbf{f}}{\partial [x, y, z]} = \mathbf{A} + 2 \cdot \text{diag}(x, y, z) \cdot \mathbf{B}$$
+$$\mathbf{J} = \frac{\partial \mathbf{f}}{\partial [x, y, z]} = \sum_{k=1}^{n} k \cdot \mathbf{A}_k \cdot \text{diag}(x, y, z)^{k-1}$$
 
 The Jacobian matrix must be invertible throughout the robot's workspace. This is tested using an approach based on the Neumann series.
 
@@ -108,12 +118,12 @@ For a matrix of the form $\mathbf{X} + \mathbf{Y} = \mathbf{X}(\mathbf{I} + \mat
 
 Applying this to our Jacobian:
 
-- $\mathbf{X} = \mathbf{A}$
-- $\mathbf{Y} = 2 \cdot \text{diag}(x, y, z) \cdot \mathbf{B}$
+- $\mathbf{X} = \mathbf{A}_1$
+- $\mathbf{Y} = \sum_{k=2}^{n} k \cdot \mathbf{A}_k \cdot \text{diag}(x, y, z)^{k-1}$
 
-Therefore, the Jacobian $\mathbf{J}$ is invertible if $\mathbf{A}$ is invertible and $\|2 \cdot \mathbf{A}^{-1} \cdot \text{diag}(x, y, z) \cdot \mathbf{B}\| < 1$ for the maximum absolute values of $x, y, z$ in the joint space bounds.
+Therefore, the Jacobian $\mathbf{J}$ is invertible if $\mathbf{A}_1$ is invertible and $\|\mathbf{A}_1^{-1} \mathbf{Y}\| < 1$ for every $x, y, z$ in the joint space bounds.
 
-This condition is checked in the `check_params.py` script using both the 1-norm and infinity-norm.
+The entry in row $i$ and column $j$ of $\mathbf{A}_1^{-1} \mathbf{Y}$ depends only on the coordinate of column $j$, so its absolute value is at most $\sum_{k=2}^{n} k \cdot |[\mathbf{A}_1^{-1} \mathbf{A}_k]_{ij}| \cdot \hat{x}_j^{k-1}$, where $\hat{x}_j$ is the maximum absolute value of that coordinate in the joint space bounds. The `check_params.py` script computes the matrix of these bounds and checks that its 1-norm or its infinity-norm is below one, which is sufficient for the condition to hold.
 
 ### 2. Bounds Test
 
@@ -232,6 +242,7 @@ The contents of the configuration file used for the `2025-04-09` measurement are
   },
   "correction": {
     "enabled": true,
+    "degree": [2, 2, 1],
     "objective": "mse",
     "minimize_options": {
       "method": "Powell",
@@ -268,6 +279,8 @@ Some important considerations:
 
 - The `max_rotation` parameter is the maximum rotation allowed in the optimization for all axes. If not specified or if this value is too large the optimization may not converge to the optimal value.
 
+- The `degree` parameter of the `correction` section is the highest power of the x, y, and z coordinates in the correction transformation (see the Correction step above). If not specified, `[2, 2, 1]` is used. The same degree is used to reject samples.
+
 - The `reject_samples` section of the `correction` discards the samples in which OptiTrack did not track the rigid body properly, whose recorded position is therefore wrong. They are found through the residual of the correction model: the model is fitted, and every sample whose 3D residual exceeds `sigma` robust standard deviations from the median is rejected, together with the `margin_s` seconds on either side of it, which covers the ramps at the edges of a dropout. The fit is then repeated, `iterations` times in total.
 
   The spread is measured with the [median absolute deviation](https://en.wikipedia.org/wiki/Median_absolute_deviation) rather than with the standard deviation, because the standard deviation is itself inflated by the very samples we are looking for, which raises the threshold until they pass it. The MAD is scaled by 1.4826 so that it matches the standard deviation for Gaussian data and `sigma` keeps its usual meaning.
@@ -287,39 +300,64 @@ python ../../src/run_calibration.py
 
 By default, `run_calibration.py` reads the data and configuration files from the working directory and saves the alignment and correction parameters in a `calibration.json` file in the working directory. If the calibration file already exists, the script asks for confirmation before running the calibration again.
 
+The calibration file holds the alignment parameters and the correction parameters. The latter are the vector `c` and the list `A` of the matrices of the correction transformation, one per power, so the degree of the transformation is the number of matrices.
+
 The contents of the calibration file used for the `2025-04-09` measurement are the following:
 
 ```json
 {
   "alignment": [
-    2569.064951390571,
-    2431.945890597083,
-    -2445.8453677141842,
-    0.01621568645263669,
-    -0.0019764080563279946,
-    -1.627993124493423,
-    48.529188401692736
+    48.52745729399666,
+    0.016175827503803426,
+    -0.0018425560967050194,
+    -1.628010853628567,
+    2431.9697235860212,
+    2435.0073627995334,
+    -2447.4246000238945
   ],
-  "correction": [
-    0.9990369632649009,
-    -0.0023705036806220222,
-    -0.0010354716462371396,
-    0.003519113620152516,
-    1.0024657909515957,
-    -0.004752129098771147,
-    0.012339767658019774,
-    0.003979069253835251,
-    1.0001914458552963,
-    2.205888871025789e-7,
-    3.122118199676554e-7,
-    2.3016495733564933e-7,
-    -8.883515393297157e-7,
-    -4.6904454317380076e-8,
-    9.733292477941651e-7,
-    9.648396195409736,
-    0.8905471886524144,
-    4.555186849749805
-  ]
+  "correction": {
+    "c": [
+      9.469754903244176,
+      0.7893417004610263,
+      4.441213433588775
+    ],
+    "A": [
+      [
+        [
+          0.9993465435227057,
+          0.003474619114848027,
+          0.011929021651173644
+        ],
+        [
+          -0.002562034471363536,
+          1.002652561131878,
+          0.00390656227550219
+        ],
+        [
+          -0.0009123188866136348,
+          -0.0050078288059499905,
+          1.0000972713908884
+        ]
+      ],
+      [
+        [
+          1.7830751644894062e-7,
+          -8.71439644943985e-7,
+          0.0
+        ],
+        [
+          3.3829264892584096e-7,
+          -7.466492966335342e-8,
+          0.0
+        ],
+        [
+          2.0706585848058913e-7,
+          9.942841151144621e-7,
+          0.0
+        ]
+      ]
+    ]
+  }
 }
 ```
 
@@ -348,7 +386,7 @@ The `calibxyzkins` module included in this repository can be used to calibrate t
 python print_calibxyzkins_config.py
 ```
 
-Which will output the following HAL configuration:
+The module implements the correction transformation up to the second degree, so the script fails for calibration files of a higher degree. Otherwise, it will output the following HAL configuration:
 
 ```text
 # Calibration matrix A

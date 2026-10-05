@@ -16,12 +16,12 @@ Run (from this directory, using the local venv):
     .venv/bin/python plot_dataset_errors.py --help
 """
 import argparse
-import json
 import logging
 from pathlib import Path
 
 import numpy as np
 import validate_dataset as vd
+from data import load_correction_params
 from defaults import CALIBRATION_FILE, DATASET_DIR
 
 logger = logging.getLogger("plot_dataset_errors")
@@ -160,8 +160,7 @@ def main():
     vd.DROPOUT_MM = args.dropout_mm
     vd.SKIP_INITIAL_S = args.skip_initial_s
 
-    with open(args.calib) as f:
-        corr_params = np.array(json.load(f)["correction"])
+    corr_params = load_correction_params(args.calib)
 
     for take in args.takes:
         t, err, _, excluded = compute_errors(take, corr_params, args.target)

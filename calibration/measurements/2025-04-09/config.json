@@ -12,6 +12,7 @@
   },
   "correction": {
     "enabled": true,
+    "degree": [3, 3, 1],
     "objective": "mse",
     "minimize_options": {
       "method": "Powell",

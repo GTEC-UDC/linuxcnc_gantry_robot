@@ -2,7 +2,14 @@
 
 This directory contains Python scripts and utilities for analyzing and calibrating the gantry robot system. The system integrates OptiTrack motion capture data with gantry robot position data to perform error analysis and calibration.
 
-**important**: It is assumed that the gantry data is the commanded position of the gantry robot and the OptiTrack data is the actual position of the gantry robot. After the calibration is complete it can be evaluated with several scripts, which correct the OptiTrack data with the calibration parameters and compare the obtained positions with the reference gantry data.
+**Important**: It is assumed that the gantry data is the commanded position of the gantry robot and the OptiTrack data is the actual position of the gantry robot.
+
+The scripts apply the alignment and correction as follows:
+
+- The **alignment** transforms the OptiTrack data to the coordinate system of the gantry.
+- The **correction** is applied to the gantry data. The corrected gantry positions are then compared with the aligned OptiTrack positions.
+
+The correction is applied to the gantry data because we are interested in the actual position of the gantry robot, and the correction model approximates it from the commanded position.
 
 ## System Overview
 
@@ -10,8 +17,8 @@ The system consists of several scripts to process and analyze the data:
 
 1. **Raw Data Visualization**: `plot_movement_gantry.py` and `plot_movement_optitrack.py` scripts to visualize the raw gantry and OptiTrack data before calibration.
 2. **Calibration**: `run_calibration.py` is the script that processes the raw data, performing the following steps:
-   - **Alignment**: Temporal and spatial alignment of OptiTrack and gantry robot coordinate systems using translation, rotation, and time shift transformations.
-   - **Correction**: Non-orthogonal and non-linear transformation of the OptiTrack data to correct errors intrinsic to the gantry robot.
+   - **Alignment**: Temporal and spatial transformation of the OptiTrack data to the gantry coordinate system, using translation, rotation, and time shift transformations.
+   - **Correction**: Polynomial transformation of the gantry data, which approximates the actual position of the gantry robot.
 
 3. **Analysis**: Various scripts for plotting and analyzing the gantry and OptiTrack data, which can be executed after the calibration is complete:
    - `check_params.py`: Check the calibration parameters.
@@ -20,19 +27,32 @@ The system consists of several scripts to process and analyze the data:
    - `plot_errors.py`: Plot positioning errors over time.
    - `plot_errors_scatter.py`: Plot positioning errors scatter plots.
    - `plot_errors_probability.py`: Plot positioning errors probability distributions.
+   - `print_errors_summary.py`: Print a statistical summary of the positioning errors.
+   - `plot_marker_errors.py`: Plot the OptiTrack marker residuals and the centroid error.
+   - `plot_calibration_2d.py` and `plot_calibration_3d.py`: Plot the correction transformation.
+   - `compare_correction_models.py`: Compare correction models with different terms.
+
+4. **Clock drift**: Scripts to estimate the clock drift between the gantry and OptiTrack in the calibration measurement:
+   - `estimate_calibration_clock_drift.py`: Estimate the time offset and the clock drift.
+   - `calibration_clock_drift_impact.py`: Check the effect of a clock drift on the calibration.
+
+5. **Validation with the RoboLoc-G dataset**: Scripts that apply the correction to the takes of the RoboLoc-G dataset, which were not used in the calibration:
+   - `validate_dataset.py`: Compare the OptiTrack and gantry positions of the dataset, before and after the correction.
+   - `plot_dataset_errors.py`: Plot the error between OptiTrack and the gantry over time for each take.
+   - `estimate_dataset_clock_drift.py`: Estimate the clock drift between the gantry and OptiTrack in the dataset.
 
 After the calibration is performed, the calibration parameters can be used to correct the gantry position data with the `calibxyzkins` module of LinuxCNC included in this repository.
 
 ## Calibration Process
 
-The calibration process performs two steps: **alignment** and **correction**.
+The calibration process performs two steps: **alignment** and **correction**. The alignment is applied to the OptiTrack data and the correction to the gantry data.
 
 ### Step 1: Alignment
 
-First, the OptiTrack data must be aligned with the gantry data to account for differences in coordinate systems and timing. This alignment process involves finding the following parameters:
+First, the OptiTrack data is transformed to the coordinate system of the gantry, to account for differences in coordinate systems and timing. This alignment process involves finding the following parameters:
 
 - **Translation**: Shifts in X, Y, and Z axes
-- **Rotation**: Rotations around X, Y, and Z axes. By default the rotation center is `(2500, 2500, -750)`, but it may be changed.
+- **Rotation**: Rotations around X, Y, and Z axes. By default the rotation center is `(0, 0, 1500)`.
 - **Time Shift**: Temporal alignment to account for timing differences.
 
 The alignment parameters are found using numerical optimization with the `scipy.optimize.minimize` function (Powell method by default). The objective to minimize is selectable via the `objective` setting: the mean squared error (`mse`, the default) or the mean Euclidean distance (`mean_distance`) between the gantry and the aligned OptiTrack positions.
@@ -45,7 +65,7 @@ Analysis of scatter plots of the positioning errors (see "Plot Positioning Error
 - **X-axis position affects errors in the Y-axis**
 - **Z-axis position affects errors in X and Y axes**
 
-These systematic deviations can be corrected by applying a coordinate transformation when controlling the gantry robot. For this we consider a polynomial transformation of degree $n$ without cross terms:
+These systematic deviations can be modeled with a coordinate transformation of the gantry positions, which gives an approximation of the actual position of the gantry robot. For this we consider a polynomial transformation of degree $n$ without cross terms:
 
 $$
 \begin{bmatrix}
@@ -57,7 +77,7 @@ x^k \\ y^k \\ z^k
 \end{bmatrix}
 $$
 
-where $x, y, z$ are the aligned OptiTrack position coordinates (the actual position of the gantry robot), $x', y', z'$ are the corrected position coordinates (the target position for the gantry robot), and $\mathbf{c}$ and $\mathbf{A}_1, \dots, \mathbf{A}_n$ are the vector and the $3 \times 3$ matrices that need to be optimized.
+where $x, y, z$ are the gantry position coordinates (the commanded position of the gantry robot), $x', y', z'$ are the corrected position coordinates (the actual position of the gantry robot), and $\mathbf{c}$ and $\mathbf{A}_1, \dots, \mathbf{A}_n$ are the vector and the $3 \times 3$ matrices that need to be optimized.
 
 This transformation consists of:
 
@@ -92,7 +112,7 @@ $$
 
 **Note**: The powers of $z$ above the first are left out by default because in our measurements the Z-axis only shows a linear distortion.
 
-The correction parameters are found by minimizing the error between the corrected OptiTrack positions and the gantry positions, with the objective selectable via the `objective` setting. Because the transformation is linear in $\mathbf{c}$ and $\mathbf{A}_k$, the mean squared error (`mse`, the default) is minimized with `numpy.linalg.lstsq`, while the mean Euclidean distance (`mean_distance`) is minimized iteratively with `scipy.optimize.minimize` (using the Powell method by default).
+The correction parameters are found by minimizing the error between the corrected gantry positions and the aligned OptiTrack positions, with the objective selectable via the `objective` setting. Because the transformation is linear in $\mathbf{c}$ and $\mathbf{A}_k$, the mean squared error (`mse`, the default) is minimized with `numpy.linalg.lstsq`, while the mean Euclidean distance (`mean_distance`) is minimized iteratively with `scipy.optimize.minimize` (using the Powell method by default).
 
 ## Parameters Validation
 
@@ -230,9 +250,9 @@ The contents of the configuration file used for the `2025-04-09` measurement are
 ```json
 {
   "alignment": {
-    "init_params": [2500, 2500, -2500, 0, 0, -1.5707963267948966, 50],
-    "max_rotation": 0.098174770424681,
-    "rotation_center": [2500, 2500, -750],
+    "init_params": [50, 0, 0, -1.5707963267948966, 2500, 2500, -2500],
+    "max_rotation": null,
+    "rotation_center": [0, 0, 1500],
     "objective": "mse",
     "minimize_options": {
       "method": "Powell",
@@ -256,8 +276,10 @@ The contents of the configuration file used for the `2025-04-09` measurement are
       "iterations": 2
     },
     "skip_samples": {
-      "enabled": false,
-      "ranges": []
+      "enabled": true,
+      "ranges": [
+        [0, 3500]
+      ]
     }
   }
 }
@@ -265,19 +287,19 @@ The contents of the configuration file used for the `2025-04-09` measurement are
 
 Some important considerations:
 
-- The initialization parameters in the `init_params` field of the `alignment` section are the initial values for the optimization of the calibration alignment step. If not specified, default values of 0 are used. The parameters are the following, in the order they are used in the optimization (see the `get_processed_data` function in `data.py`):
+- The initialization parameters in the `init_params` field of the `alignment` section are the initial values for the optimization of the calibration alignment step. If not specified, default values of 0 are used. The parameters are the following, in the order they are used in the optimization (see the `coord_align` function in `data.py`):
 
-  - `x_shift`: Translation along the x-axis in mm
-  - `y_shift`: Translation along the y-axis in mm
-  - `z_shift`: Translation along the z-axis in mm
+  - `time_shift`: Time shift in seconds
   - `x_rotation`: Rotation around the x-axis in radians
   - `y_rotation`: Rotation around the y-axis in radians
   - `z_rotation`: Rotation around the z-axis in radians
-  - `time_shift`: Time shift in seconds
+  - `x_shift`: Translation along the x-axis in mm
+  - `y_shift`: Translation along the y-axis in mm
+  - `z_shift`: Translation along the z-axis in mm
 
   Important: These parameters may be needed to be set manually for the optimization to converge to the optimal value.
 
-- The `max_rotation` parameter is the maximum rotation allowed in the optimization for all axes. If not specified or if this value is too large the optimization may not converge to the optimal value.
+- The `max_rotation` parameter is the maximum rotation, in radians, that the optimization can apply around each axis from its initial value. If not specified, $\pi/32$ is used. With `null` the rotations are not limited. If the rotations are not limited or the value is too large, the optimization may not converge to the optimal value.
 
 - The `degree` parameter of the `correction` section is the highest power of the x, y, and z coordinates in the correction transformation (see the Correction step above). If not specified, `[2, 2, 1]` is used. The same degree is used to reject samples.
 
@@ -285,7 +307,7 @@ Some important considerations:
 
   The spread is measured with the [median absolute deviation](https://en.wikipedia.org/wiki/Median_absolute_deviation) rather than with the standard deviation, because the standard deviation is itself inflated by the very samples we are looking for, which raises the threshold until they pass it. The MAD is scaled by 1.4826 so that it matches the standard deviation for Gaussian data and `sigma` keeps its usual meaning.
 
-- The `skip_samples` section of the `correction` is a list of sample ranges to exclude by hand, given as tuples with the first and last index of each range. It is superseded by `reject_samples` and disabled by default, and remains for captures that need a specific interval out.
+- The `skip_samples` section of the `correction` is a list of sample ranges to exclude by hand, given as tuples with the first and last index of each range. It is superseded by `reject_samples` and disabled by default, and remains for captures that need a specific interval out. In the `2025-04-09` measurement it excludes the samples 0 to 3500.
 
 - Samples removed by either mechanism are dropped from the returned data as well, so the statistics and the figures are computed over the same samples as the fit.
 
@@ -392,8 +414,8 @@ The script accepts the following parameters to customize the joints and axes bou
 
 - `--axis-min`: The minimum value of the X, Y, and Z axes.
 - `--axis-max`: The maximum value of the X, Y, and Z axes.
-- `--joint-min`: The minimum value of the X, Y, and Z joints.
-- `--joint-max`: The maximum value of the X, Y, and Z joints.
+- `--joints-min`: The minimum value of the X, Y, and Z joints.
+- `--joints-max`: The maximum value of the X, Y, and Z joints.
 
 ### LinuxCNC Configuration for the `calibxyzkins` module
 
@@ -403,7 +425,7 @@ The `calibxyzkins` module included in this repository can be used to calibrate t
 python print_calibxyzkins_config.py
 ```
 
-The module implements the correction transformation up to the second degree, so the script fails for calibration files of a higher degree. Otherwise, it will output the following HAL configuration:
+The module implements the correction transformation up to the second degree, so the script fails for calibration files of a higher degree, such as the one of the `2025-04-09` measurement. For a calibration file of the second degree, it outputs a HAL configuration like the following:
 
 ```text
 # Calibration matrix A
@@ -434,19 +456,19 @@ setp calibxyzkins.calib-c.y 0.8905471887
 setp calibxyzkins.calib-c.z 4.55518685
 ```
 
-### Gantry and Calibrated OptiTrack Path Visualization
+### Corrected Gantry and OptiTrack Path Visualization
 
-The gantry and calibrated OptiTrack path can be visualized using the `plot_movement.py` script:
+The corrected gantry path and the aligned OptiTrack path can be visualized using the `plot_movement.py` script:
 
 ```bash
 python plot_movement.py
 ```
 
-Note that the script accepts the `--no-correct` flag to show the OptiTrack position without applying the correction transformation.
+Note that the script accepts the `--no-correct` flag to show the gantry position without applying the correction transformation.
 
-The image below shows the gantry and calibrated OptiTrack path visualization.
+The image below shows the corrected gantry and OptiTrack path visualization.
 
-![Gantry and calibrated OptiTrack path visualization](assets/plot_movement.png)
+![Corrected gantry and OptiTrack path visualization](assets/plot_movement.png)
 
 As in the case of the raw data visualization scripts, you can use the keyboard to control the playback of the data. The available controls are shown when the script is executed:
 
@@ -472,13 +494,13 @@ python plot_errors.py
 
 The script accepts the option `--time-unit` to specify the time unit of the x-axis. The available options are `s` (seconds) and `frames`. The default is `s` (seconds). The `frames` options can be used to check the ranges of frames with poor tracking quality, then they can be skipped by setting them in the configuration file.
 
-The script also accepts the `--no-correct` flag to show the OptiTrack position without applying the correction transformation.
+The script also accepts the `--no-correct` flag to show the errors without applying the correction transformation to the gantry position.
 
-The image below shows the positioning errors over time with the `--no-correct` flag, i.e., without applying the correction transformation to the OptiTrack position.
+The image below shows the positioning errors over time with the `--no-correct` flag, i.e., without applying the correction transformation to the gantry position.
 
 ![Positioning errors over time](assets/plot_errors_no_correct.png)
 
-The image below shows the positioning errors over time when applying the correction transformation to the OptiTrack position.
+The image below shows the positioning errors over time when applying the correction transformation to the gantry position.
 
 ![Positioning errors over time](assets/plot_errors.png)
 
@@ -490,13 +512,13 @@ Positioning errors scatter plots between gantry and OptiTrack data can be plotte
 python plot_errors_scatter.py
 ```
 
-The script also accepts the `--no-correct` flag to show the OptiTrack position without applying the correction transformation.
+The script also accepts the `--no-correct` flag to show the errors without applying the correction transformation to the gantry position.
 
-The image below shows the positioning errors scatter plots with the `--no-correct` flag, i.e., without applying the correction transformation to the OptiTrack position.
+The image below shows the positioning errors scatter plots with the `--no-correct` flag, i.e., without applying the correction transformation to the gantry position.
 
 ![Positioning errors scatter plots](assets/plot_errors_scatter_no_correct.png)
 
-The image below shows the positioning errors scatter plots when applying the correction transformation to the OptiTrack position.
+The image below shows the positioning errors scatter plots when applying the correction transformation to the gantry position.
 
 ![Positioning errors scatter plots](assets/plot_errors_scatter.png)
 

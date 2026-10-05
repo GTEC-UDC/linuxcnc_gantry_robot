@@ -1,36 +1,38 @@
-#!/usr/bin/env python3
-"""
-Out-of-sample validation of the gantry kinematic correction on the RoboLoc-G
-(July 2025) campaign.
+"""Check the correction model of the gantry with the RoboLoc-G dataset.
 
-The correction parameters fitted on the calibration capture are
-applied to the July gantry trajectories, and the result is compared against the
-OptiTrack "Grua" rigid body. Two figures are reported:
+The correction model is fitted with the calibration capture. This script checks
+how well it works with the RoboLoc-G dataset.
 
-    BEFORE : residual between OptiTrack and the UNCORRECTED gantry
-    AFTER  : residual between OptiTrack and the CORRECTED gantry
+For each take of the RoboLoc-G dataset, the positions measured by OptiTrack are
+compared with the commanded positions of the gantry. This is done twice:
 
-Each comparison is aligned against its OWN target. This matters: the correction
-displaces the gantry by mean(correct(p) - p), which is ~0 over the calibration
-workspace (least squares balances c against the other terms of the model) but
-~2.3 mm over the July trajectories. Reusing the uncorrected frame for the AFTER
-residual would inject that offset as a bias and understate the correction.
+- "before": with the commanded gantry positions.
+- "after": with the commanded gantry positions corrected with the model, which
+  should give approximately the "real" gantry positions.
 
-Note the correction acts on the GANTRY coordinates, which are already in the
-gantry frame, so applying it needs no alignment; the alignment is what brings
-OptiTrack into that frame. They act on different data.
+The difference between the two results is what the correction improves.
 
-By default a SINGLE alignment is used per comparison, averaged over all takes
-(the convention of the published dataset, and the one comparable to the
-in-sample calibration figure). --per-take-alignment fits one alignment per take
-instead, which additionally removes the take-to-take frame variation and is
-useful as a diagnostic.
+First the OptiTrack positions are aligned with the gantry ones: they are shifted
+in time, rotated and translated. The alignment is defined by an array of time
+shift, Euler angle rotations in X, Y, Z, and displacements in X, Y, Z: (dt, rx,
+ry, rz, tx, ty, tz).
 
-Read-only: it does not modify the dataset, the pipeline, or the paper.
+The "before" alignment is fitted with the recorded gantry positions. The "after"
+alignment with the corrected ones.
 
-Run (from this directory, using the local venv):
-    .venv/bin/python validate_dataset.py [options]
-    .venv/bin/python validate_dataset.py --help
+By default, the same two alignments are used with all the takes. They are fitted
+with each take separately and then averaged. With --per-take-alignment, each
+take uses the alignments fitted with it.
+
+The alignments are always fitted with the rigid body of the z-axis platform of
+the gantry ("Grua"), and then they are used with the other rigid bodies too.
+
+Note that the following samples are excluded by default:
+
+- The first seconds of each take (--skip-initial-s). The RoboLoc-G data missed
+  some data at the start, so the first seconds are excluded.
+- The samples in which OptiTrack is farther than a threshold from the gantry
+  (--dropout-mm). They are considered tracking errors of OptiTrack.
 """
 
 import argparse
@@ -58,73 +60,88 @@ from defaults import CALIBRATION_FILE, DATASET_DIR
 
 logger = logging.getLogger("validate_dataset")
 
+# Folders of the dataset with the OptiTrack recordings and with the gantry positions
 OPTITRACK_DIR = DATASET_DIR / "OPTITRACK_MEASUREMENTS_CSV"
 GROUND_TRUTH_DIR = DATASET_DIR / "GROUND_TRUTH"
 
-# Internal parameters of the alignment fit (not exposed: never needed tuning)
+# Settings of the alignment fit
 ROT_CENTER = (0.0, 0.0, 1500.0)
-Z_ROT_GUESS = -1.6520  # rad, ~ -94.66 deg, initial guess for the fit
-MAX_ROT = 0.15  # rad, bound around the init for each rotation
+Z_ROT_GUESS = -1.6520  # rad (-94.66 degrees), initial guess of the rotation about z
+MAX_ROT = 0.15  # rad, max rotation for the alignment optimization
 
-# Defaults (overridable from the command line, see parse_args)
+# Default values of the command line options (see parse_args)
 TAKES = ["circle", "random1", "random2", "zigzag1", "zigzag2", "zigzag3", "zigzag4"]
-BODIES = ["Grua", "UWB_tag", "FTM_tag", "Feet"]
-FRAME_BODY = "Grua"  # the frame is always estimated from the platform
-DROPOUT_MM = 15.0  # mm, 3D-residual glitch-rejection threshold
-SKIP_INITIAL_S = 6.0  # s, drop the approach transient at the take start
-SENS_THRESHOLDS = [1e9, 200, 100, 50, 30, 20, 15]  # mm, sensitivity sweep (after)
+BODIES = ["Grua", "UWB_tag", "FTM_tag", "Feet"]  # rigid bodies tracked by OptiTrack
+FRAME_BODY = "Grua"  # rigid body of the gantry, used to fit the alignments
+DROPOUT_MM = 15.0  # mm, samples farther than this from the gantry are left out
+SKIP_INITIAL_S = 6.0  # s, time at the start of each take that is left out
+SENS_THRESHOLDS = [1e9, 200, 100, 50, 30, 20, 15]  # mm, see --sensitivity-thresholds
+
+XYZ = ["x", "y", "z"]
 
 FloatArray = npt.NDArray[np.float64]
 BoolArray = npt.NDArray[np.bool_]
 
-# Gantry positions an alignment is fitted against
+# Gantry positions to compare
 Target = Literal["corrected", "uncorrected"]
 
 
 class AlignmentResult(TypedDict):
-    """Residual of one rigid body of a take under a given alignment."""
+    """Result of the residuals of one OptiTrack rigid body of a take."""
 
     rmse: float
     median: float
     p95: float
-    n: int  # samples the figures are computed on
-    n_drop: int  # valid samples excluded as glitches
-    params: list[float]  # alignment (dt, rx, ry, rz, tx, ty, tz)
-    resid: FloatArray  # 3D residual of the samples kept
-    rvec: FloatArray  # residual vector of the samples kept, one row per sample
-    rmax: float
-    r_all: FloatArray  # 3D residual of every sample of the take
-    valid: BoolArray  # samples of the take that were candidates to be kept
+    n: int  # number of samples
+    n_drop: int  # number of samples excluded as tracking errors
+    params: list[float]  # alignment used (dt, rx, ry, rz, tx, ty, tz)
+    resid: FloatArray  # residual of the samples kept (3D distance)
+    rvec: FloatArray  # residual of the samples kept (one x, y ,z row per sample)
+    rmax: float  # largest residual of the samples kept
+    r_all: FloatArray  # residual of all the samples of the take (3D distance)
+    valid: BoolArray  # bool array indicating samples kept
 
 
 class TakeResult(TypedDict):
-    """Residuals of the rigid bodies of a take."""
+    """Results of the rigid bodies of a take."""
 
     take: str
+    # One result per rigid body and comparison.
     # Keyed by (body, "before" or "after")
     bodies: dict[tuple[str, str], AlignmentResult]
 
 
 def fit_alignment(
-    df_rb: pd.DataFrame, df_target: pd.DataFrame, mask: BoolArray | None = None
+    optitrack: pd.DataFrame, gantry: pd.DataFrame, mask: BoolArray | None = None
 ) -> FloatArray:
-    """Fit the 7-param rigid alignment mapping df_rb (opti) onto df_target (gantry)."""
-    rb = df_rb if mask is None else df_rb[mask].reset_index(drop=True)
-    tg = df_target if mask is None else df_target[mask].reset_index(drop=True)
+    """Find the rigid alignment that maps OptiTrack onto the gantry.
 
-    # analytic translation init given the z-rotation guess
+    ``optitrack`` and ``gantry`` have the columns time, x, y and z, and one row
+    per sample. Only the samples selected by ``mask`` are used, or all of them
+    if it is None.
+
+    Returns the 7 parameters of the alignment: (dt, rx, ry, rz, tx, ty, tz).
+    """
+    if mask is not None:
+        optitrack = optitrack[mask].reset_index(drop=True)
+        gantry = gantry[mask].reset_index(drop=True)
+
+    # Initial values of the parameters: no time shift, the known rotation about z,
+    # and the translation that makes the mean positions coincide after rotating
     x0 = np.array([0.0, 0.0, 0.0, Z_ROT_GUESS, 0.0, 0.0, 0.0])
-    rot0 = coord_align(x0, rb, ROT_CENTER)
-    d = tg[["x", "y", "z"]].to_numpy() - rot0[["x", "y", "z"]].to_numpy()
-    x0[4:7] = np.nanmean(d, axis=0)
+    rotated = coord_align(x0, optitrack, ROT_CENTER)
+    x0[4:7] = np.nanmean(gantry[XYZ].to_numpy() - rotated[XYZ].to_numpy(), axis=0)
 
+    # Each rotation can move at most MAX_ROT from its initial value
     bounds = [(None, None)] * 7
     bounds[1] = (x0[1] - MAX_ROT, x0[1] + MAX_ROT)
     bounds[2] = (x0[2] - MAX_ROT, x0[2] + MAX_ROT)
     bounds[3] = (x0[3] - MAX_ROT, x0[3] + MAX_ROT)
 
+    # Search for the parameters that minimize the mean squared distance between
+    # the gantry positions and the aligned OptiTrack positions
     res = scp.optimize.minimize(
-        fun=lambda x: coord_mse(tg, coord_align(x, rb, ROT_CENTER)),
+        fun=lambda x: coord_mse(gantry, coord_align(x, optitrack, ROT_CENTER)),
         x0=x0,
         bounds=bounds,
         tol=1e-9,
@@ -134,220 +151,322 @@ def fit_alignment(
     return res.x
 
 
-def residual_vec(
-    df_rb: pd.DataFrame, df_target: pd.DataFrame, params: npt.ArrayLike
+def fit_alignment_without_tracking_errors(
+    optitrack: pd.DataFrame, gantry: pd.DataFrame, valid: BoolArray
 ) -> FloatArray:
-    aligned = coord_align(params, df_rb, ROT_CENTER)
-    return aligned[["x", "y", "z"]].to_numpy() - df_target[["x", "y", "z"]].to_numpy()
+    """Fit an alignment discarding the tracking errors of OptiTrack.
+
+    The alignment is fitted twice. The first time it uses all the valid
+    samples. The second time it excludes the samples that are at DROPOUT_MM
+    or more from the gantry. These samples are considered tracking
+    errors of the OptiTrack.
+
+    Returns the 7 parameters of the second alignment.
+    """
+    first = fit_alignment(optitrack, gantry, mask=valid)
+    residual = residual_3d(optitrack, gantry, first)
+    keep = valid & (residual < DROPOUT_MM) & ~np.isnan(residual)
+    return fit_alignment(optitrack, gantry, mask=keep)
+
+
+def residual_vec(
+    optitrack: pd.DataFrame, gantry: pd.DataFrame, alignment: npt.ArrayLike
+) -> FloatArray:
+    """Aligned OptiTrack positions minus the gantry positions.
+
+    Returns one row per sample, with the difference in x, y and z, in mm.
+    """
+    aligned = coord_align(alignment, optitrack, ROT_CENTER)
+    return aligned[XYZ].to_numpy() - gantry[XYZ].to_numpy()
 
 
 def residual_3d(
-    df_rb: pd.DataFrame, df_target: pd.DataFrame, params: npt.ArrayLike
+    optitrack: pd.DataFrame, gantry: pd.DataFrame, alignment: npt.ArrayLike
 ) -> FloatArray:
-    return np.sqrt(np.sum(residual_vec(df_rb, df_target, params) ** 2, axis=1))
+    """Distance between the aligned OptiTrack positions and the gantry ones.
+
+    Returns one value per sample, in mm.
+    """
+    difference = residual_vec(optitrack, gantry, alignment)
+    return np.sqrt(np.sum(difference**2, axis=1))
 
 
-def stats(res: FloatArray, mask: BoolArray) -> tuple[float, float, float, int]:
-    r = res[mask]
-    r = r[~np.isnan(r)]
-    rmse = float(np.sqrt(np.mean(r**2)))
-    return rmse, float(np.median(r)), float(np.percentile(r, 95)), len(r)
+def stats(residual: FloatArray, mask: BoolArray) -> tuple[float, float, float, int]:
+    """Statistics of the residual of the samples selected by ``mask``.
+
+    Returns the root mean square, the median, the 95th percentile and the number
+    of samples.
+    """
+    selected = residual[mask]
+    selected = selected[~np.isnan(selected)]
+    rmse = float(np.sqrt(np.mean(selected**2)))
+    median = float(np.median(selected))
+    p95 = float(np.percentile(selected, 95))
+    return rmse, median, p95, len(selected)
 
 
 def load_take(
-    take: str, corr_params: CorrectionModel, body: str = FRAME_BODY
+    take: str, model: CorrectionModel, body: str = FRAME_BODY
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, BoolArray]:
-    """Load one rigid body of a take and build its (un)corrected references.
+    """Load the positions of a rigid body in a take.
 
-    The reference for a mobile body is the gantry platform plus its fixed offset
-    (the dataset's eq:mobile-position). The correction is applied to the
-    PLATFORM and the offset added afterwards, because correct() is nonlinear and
-    correct(p + o) != correct(p) + o.
+    Returns:
 
-    Returns (df_rb, tgt_before, tgt_after, valid), the OptiTrack track of `body`
-    and its uncorrected/corrected references, in gantry coordinates and
-    time-indexed to the OptiTrack samples.
+    - The positions of the body measured by OptiTrack. They are in the OptiTrack
+      coordinate system.
+    - The positions of the body in the gantry coordinate system, before the
+      correction.
+    - The positions of the body in the gantry coordinate system, after
+      correcting them with ``model``.
+    - Bool array indicating the valid samples.
+
+    The positions are dataframes with columns time, x, y and z. The time is
+    seconds from the start of the OptiTrack capture. The x, y, z coordinates are
+    in mm.
+
+    The gantry records the position of the z-axis platform. The other bodies are
+    mounted at a fixed offset from the z-axis platform, so their positions are
+    obtained adding their offset to the z-axis platform position. The correction
+    is applied to the z-axis platform position, and the offset is added afterwards.
     """
-    opti_csv = OPTITRACK_DIR / f"{take}_optitrack.csv"
-    gt_csv = GROUND_TRUTH_DIR / f"{take}_ground_truth_gantry.csv"
+    optitrack_file = OPTITRACK_DIR / f"{take}_optitrack.csv"
+    gantry_file = GROUND_TRUTH_DIR / f"{take}_ground_truth_gantry.csv"
 
     logger.info("[%s/%s] loading data...", take, body)
-    df_o, _ = load_optitrack_data(str(opti_csv), rigid_body_name=body)
-    meta = load_optitrack_metadata(str(opti_csv))
-    t0 = meta["Capture Start Time"].timestamp()
 
-    gt = pd.read_csv(gt_csv)
-    plat = gt[[f"{FRAME_BODY}.{a}" for a in "XYZ"]].to_numpy()
-    offset = (gt[[f"{body}.{a}" for a in "XYZ"]].to_numpy() - plat)[0]
+    # OptiTrack positions of the body, and the time at which the capture started
+    optitrack_data, _ = load_optitrack_data(str(optitrack_file), rigid_body_name=body)
+    metadata = load_optitrack_metadata(str(optitrack_file))
+    capture_start = metadata["Capture Start Time"].timestamp()
 
-    t_o = df_o["time"].to_numpy()
-    gan = interp_columns(t_o, gt["time"].to_numpy() - t0, plat)
+    # Positions of the z-axis platform recorded by the gantry, and offset of the body
+    # from the z-axis platform
+    gantry_data = pd.read_csv(gantry_file)
+    gantry_raw = gantry_data[[f"{FRAME_BODY}.{axis}" for axis in "XYZ"]].to_numpy()
+    body_positions = gantry_data[[f"{body}.{axis}" for axis in "XYZ"]].to_numpy()
+    offset = (body_positions - gantry_raw)[0]
 
-    # corrected platform (fixed params); no alignment involved
-    gcal = coord_calibrate(corr_params, pd.DataFrame(gan, columns=["x", "y", "z"]))[
-        ["x", "y", "z"]
+    # The gantry and OptiTrack do not sample at the same instants.
+    # Get the gantry positions at the instants of the OptiTrack samples.
+    optitrack_time = optitrack_data["time"].to_numpy()
+    gantry_time = gantry_data["time"].to_numpy() - capture_start
+    gantry = interp_columns(optitrack_time, gantry_time, gantry_raw)
+
+    # Gantry positions corrected with the model
+    gantry_corrected = coord_calibrate(model, pd.DataFrame(gantry, columns=XYZ))[
+        XYZ
     ].to_numpy()
 
-    def as_df(arr: FloatArray) -> pd.DataFrame:
-        out = pd.DataFrame(arr, columns=["x", "y", "z"])
-        out.insert(0, "time", t_o)
-        return out
+    def as_dataframe(positions: FloatArray) -> pd.DataFrame:
+        df = pd.DataFrame(positions, columns=XYZ)
+        df.insert(0, "time", optitrack_time)
+        return df
 
-    df_rb = as_df(df_o[["RB.X", "RB.Y", "RB.Z"]].to_numpy())
-    tgt_before = as_df(gan + offset)
-    tgt_after = as_df(gcal + offset)
+    optitrack = as_dataframe(optitrack_data[["RB.X", "RB.Y", "RB.Z"]].to_numpy())
+    gantry_before = as_dataframe(gantry + offset)
+    gantry_after = as_dataframe(gantry_corrected + offset)
 
-    # valid = rows where both the OptiTrack and the gantry are present
-    valid = ~df_rb[["x", "y", "z"]].isna().to_numpy().any(axis=1) & ~tgt_after[
-        ["x", "y", "z"]
-    ].isna().to_numpy().any(axis=1)
+    # Samples that have both an OptiTrack position and a gantry position
+    has_optitrack = ~optitrack[XYZ].isna().to_numpy().any(axis=1)
+    has_gantry = ~gantry_after[XYZ].isna().to_numpy().any(axis=1)
+    valid = has_optitrack & has_gantry
 
-    return df_rb, tgt_before, tgt_after, valid
+    return optitrack, gantry_before, gantry_after, valid
 
 
-def apply_skip_initial(valid: BoolArray, df_rb: pd.DataFrame) -> BoolArray:
-    """Exclude the first SKIP_INITIAL_S seconds of the take (the approach move)."""
+def apply_skip_initial(valid: BoolArray, optitrack: pd.DataFrame) -> BoolArray:
+    """Mark as not valid the samples of the first SKIP_INITIAL_S seconds of a take.
+
+    In that time the robot moves from rest to the start of its trajectory.
+    """
     if SKIP_INITIAL_S > 0:
-        t = df_rb["time"].to_numpy()
+        t = optitrack["time"].to_numpy()
         valid = valid & ((t - t[0]) >= SKIP_INITIAL_S)
     return valid
 
 
 def eval_alignment(
-    df_rb: pd.DataFrame,
-    tgt: pd.DataFrame,
+    optitrack: pd.DataFrame,
+    gantry: pd.DataFrame,
     valid: BoolArray,
     take: str,
     label: str,
-    params: npt.ArrayLike,
+    alignment: npt.ArrayLike,
 ) -> AlignmentResult:
-    """Apply the given alignment to the OptiTrack track and return the stats."""
-    p = np.asarray(params)
-    r = residual_3d(df_rb, tgt, p)
-    clean = valid & (r < DROPOUT_MM) & ~np.isnan(r)
+    """Compare OptiTrack positions with gantry positions, given an alignment.
 
-    rmse, med, p95, n = stats(r, clean)
-    n_drop = int(valid.sum() - clean.sum())
-    rvec = residual_vec(df_rb, tgt, p)[clean]
+    The OptiTrack positions are aligned with ``alignment``, and then their
+    distance to the gantry positions is computed for each sample. The samples
+    that are not ``valid`` or are farther than DROPOUT_MM are left out of the
+    statistics.
+
+    ``take`` and ``label`` are only used in the log message.
+    """
+    alignment = np.asarray(alignment)
+
+    # Distance between the aligned OptiTrack positions and the gantry ones
+    residual = residual_3d(optitrack, gantry, alignment)
+
+    # Samples to keep: the valid ones that are not tracking errors of OptiTrack
+    keep = valid & (residual < DROPOUT_MM) & ~np.isnan(residual)
+
+    rmse, median, p95, n = stats(residual, keep)
+    n_drop = int(valid.sum() - keep.sum())
+    residual_xyz = residual_vec(optitrack, gantry, alignment)[keep]
 
     logger.info(
         "[%s] %-6s: RMSE=%.2f  median=%.2f  P95=%.2f  (excl %d)",
         take,
         label,
         rmse,
-        med,
+        median,
         p95,
         n_drop,
     )
 
     return {
         "rmse": rmse,
-        "median": med,
+        "median": median,
         "p95": p95,
         "n": n,
         "n_drop": n_drop,
-        "params": np.asarray(p).tolist(),
-        "resid": r[clean],
-        "rvec": rvec,
-        "rmax": float(np.nanmax(r[clean])),
-        "r_all": r,
+        "params": alignment.tolist(),
+        "resid": residual[keep],
+        "rvec": residual_xyz,
+        "rmax": float(np.nanmax(residual[keep])),
+        "r_all": residual,
         "valid": valid,
     }
 
 
 def _fit_alignment_for_take(
-    take: str, corr_params: CorrectionModel, target: Target
+    take: str, model: CorrectionModel, target: Target
 ) -> FloatArray:
-    """Per-take alignment against the chosen gantry target, with glitch rejection."""
-    df_rb, tgt_before, tgt_after, valid = load_take(take, corr_params, FRAME_BODY)
-    tgt = tgt_after if target == "corrected" else tgt_before
-    valid = apply_skip_initial(valid, df_rb)
-    p = fit_alignment(df_rb, tgt, mask=valid)
-    r = residual_3d(df_rb, tgt, p)
-    clean = valid & (r < DROPOUT_MM) & ~np.isnan(r)
-    return fit_alignment(df_rb, tgt, mask=clean)
+    """Fit the alignment of a take."""
+    optitrack, gantry_before, gantry_after, valid = load_take(
+        take, model, FRAME_BODY
+    )
+    gantry = gantry_after if target == "corrected" else gantry_before
+    valid = apply_skip_initial(valid, optitrack)
+    return fit_alignment_without_tracking_errors(optitrack, gantry, valid)
 
 
 def fit_single_alignment(
-    ref_take: str, corr_params: CorrectionModel, target: Target
+    ref_take: str, model: CorrectionModel, target: Target
 ) -> FloatArray:
-    """Fit ONE campaign-wide alignment against the given gantry target.
+    """Fit one alignment to use with all the takes.
 
-    With ref_take='all' every take is fitted and the parameters averaged, which
-    avoids depending on a single (possibly atypical) take.
+    With ``ref_take`` set to "all", an alignment is fitted with each take and the
+    result is the mean of their parameters. With the name of a take, the result is
+    the alignment fitted with that take.
+
+    ``target`` says which gantry positions OptiTrack is aligned with: the ones
+    corrected with ``model`` or the uncorrected ones.
     """
     if ref_take in ("all", "mean"):
         logger.info(
             "Fitting the alignment on every take (%s gantry) and averaging...", target
         )
-        params = []
+        take_alignments = []
+
         for take in TAKES:
-            p = _fit_alignment_for_take(take, corr_params, target)
-            params.append(p)
-            logger.info("  [%s] %s", take, np.round(p, 4).tolist())
-        arr = np.array(params)
-        p = arr.mean(axis=0)
+            alignment = _fit_alignment_for_take(take, model, target)
+            take_alignments.append(alignment)
+            logger.info("  [%s] %s", take, np.round(alignment, 4).tolist())
+
+        alignments = np.array(take_alignments)
+        mean_alignment = alignments.mean(axis=0)
+
         logger.info(
             "Mean alignment (%s) (dt, rx, ry, rz, tx, ty, tz) = %s",
             target,
-            np.round(p, 4).tolist(),
+            np.round(mean_alignment, 4).tolist(),
         )
+
         logger.info(
             "Std  across takes                              = %s",
-            np.round(arr.std(axis=0), 4).tolist(),
+            np.round(alignments.std(axis=0), 4).tolist(),
         )
-        return p
+
+        return mean_alignment
 
     logger.info(
         "Fitting single alignment on reference take '%s' (%s gantry)...",
         ref_take,
         target,
     )
-    p = _fit_alignment_for_take(ref_take, corr_params, target)
+
+    alignment = _fit_alignment_for_take(ref_take, model, target)
+
     logger.info(
         "Single alignment (%s) (dt, rx, ry, rz, tx, ty, tz) = %s",
         target,
-        np.round(p, 4).tolist(),
+        np.round(alignment, 4).tolist(),
     )
-    return p
+
+    return alignment
 
 
-def fit_take_frames(take: str, corr_params: CorrectionModel) -> dict[str, FloatArray]:
-    """Per-take frames, fitted on the platform, one per target."""
-    df_rb, tgt_before, tgt_after, valid = load_take(take, corr_params, FRAME_BODY)
-    valid = apply_skip_initial(valid, df_rb)
-    frames: dict[str, FloatArray] = {}
-    for label, tgt in [("before", tgt_before), ("after", tgt_after)]:
+def fit_take_alignments(take: str, model: CorrectionModel) -> dict[str, FloatArray]:
+    """Fit the two alignments of a take.
+
+    Returns the "before" alignment, fitted with the uncorrected gantry positions,
+    and the "after" alignment, fitted with the gantry positions corrected with
+    ``model``.
+    """
+    optitrack, gantry_before, gantry_after, valid = load_take(
+        take, model, FRAME_BODY
+    )
+    valid = apply_skip_initial(valid, optitrack)
+
+    alignments: dict[str, FloatArray] = {}
+    gantry_positions = {"before": gantry_before, "after": gantry_after}
+
+    for label, gantry in gantry_positions.items():
         logger.info(
-            "[%s] %-6s: fitting per-take frame on %s...", take, label, FRAME_BODY
+            "[%s] %-6s: fitting per-take alignment on %s...", take, label, FRAME_BODY
         )
-        p = fit_alignment(df_rb, tgt, mask=valid)
-        r = residual_3d(df_rb, tgt, p)
-        clean = valid & (r < DROPOUT_MM) & ~np.isnan(r)
-        frames[label] = fit_alignment(df_rb, tgt, mask=clean)
-    return frames
+        alignments[label] = fit_alignment_without_tracking_errors(
+            optitrack, gantry, valid
+        )
+
+    return alignments
 
 
 def process_take(
     take: str,
-    corr_params: CorrectionModel,
+    model: CorrectionModel,
     bodies: list[str],
-    frames: Mapping[str, npt.ArrayLike],
+    alignments: Mapping[str, npt.ArrayLike],
 ) -> TakeResult:
-    """Evaluate every rigid body of a take with the given frames.
+    """Compare the OptiTrack positions of the rigid bodies of a take with the gantry.
 
-    frames is {"before": params, "after": params}; the same frame is applied to
-    all bodies, as the dataset does (there is one physical frame relationship).
+    Two comparisons are made for each body:
+
+    - "before": with the gantry positions before the correction. The OptiTrack
+      positions are aligned with ``alignments["before"]``.
+    - "after": with the gantry positions corrected with ``model``. The OptiTrack
+      positions are aligned with ``alignments["after"]``.
+
+    This function does not fit the alignments. They are fitted before calling it,
+    with ``fit_single_alignment`` or ``fit_take_alignments``. The same alignments
+    are used with all the bodies.
     """
     t_start = time.perf_counter()
     out: TakeResult = {"take": take, "bodies": {}}
+
     for body in bodies:
-        df_rb, tgt_before, tgt_after, valid = load_take(take, corr_params, body)
-        valid = apply_skip_initial(valid, df_rb)
-        for label, tgt in [("before", tgt_before), ("after", tgt_after)]:
+        optitrack, gantry_before, gantry_after, valid = load_take(
+            take, model, body
+        )
+        valid = apply_skip_initial(valid, optitrack)
+
+        gantry_positions = {"before": gantry_before, "after": gantry_after}
+        for label, gantry in gantry_positions.items():
             out["bodies"][(body, label)] = eval_alignment(
-                df_rb, tgt, valid, take, f"{body}/{label}", frames[label]
+                optitrack, gantry, valid, take, f"{body}/{label}", alignments[label]
             )
+
     logger.info("[%s] done in %.1f s", take, time.perf_counter() - t_start)
     return out
 
@@ -361,14 +480,15 @@ def parse_args() -> argparse.Namespace:
         "--dataset-dir",
         type=Path,
         default=DATASET_DIR,
-        help="dataset directory (must contain GANTRY_MEASUREMENTS "
+        help="dataset directory (must contain GROUND_TRUTH "
         "and OPTITRACK_MEASUREMENTS_CSV) (default: %(default)s)",
     )
     p.add_argument(
         "--calib",
         type=Path,
         default=CALIBRATION_FILE,
-        help="JSON file with the fixed correction parameters (default: %(default)s)",
+        help="calibration file with the parameters of the correction model "
+        "(default: %(default)s)",
     )
     p.add_argument(
         "--takes",
@@ -380,45 +500,43 @@ def parse_args() -> argparse.Namespace:
         "--bodies",
         nargs="+",
         default=BODIES,
-        help=f"rigid bodies to evaluate (default: {' '.join(BODIES)}); "
-        f"the frame is always estimated from {FRAME_BODY}",
+        help=f"rigid bodies to compare with the gantry (default: {' '.join(BODIES)}). "
+        f"The alignments are always fitted with {FRAME_BODY}",
     )
     p.add_argument(
         "--per-take-bodies",
         nargs="+",
         default=[FRAME_BODY],
         metavar="BODY",
-        help=f"bodies to break down per take; 'all' for every "
-        f"evaluated body (default: {FRAME_BODY})",
+        help="rigid bodies whose results are also printed for each take, or 'all' "
+        f"for all of them (default: {FRAME_BODY})",
     )
     p.add_argument(
         "--dropout-mm",
         type=float,
         default=DROPOUT_MM,
-        help="3D-residual threshold (mm) above which a sample is "
-        "treated as an OptiTrack tracking glitch and excluded "
+        help="3D-residual threshold (mm) above which samples are "
+        "considered as OptiTrack tracking glitches and are excluded "
         "(default: %(default)s)",
     )
     p.add_argument(
         "--skip-initial-s",
         type=float,
         default=SKIP_INITIAL_S,
-        help="exclude the first N seconds of each take, covering the "
-        "robot's approach move from rest (default: %(default)s)",
+        help="exclude the first seconds of each take, (default: %(default)s)",
     )
     p.add_argument(
         "--per-take-alignment",
         action="store_true",
-        help="fit one alignment per take instead of a single "
-        "campaign-wide one; also removes the take-to-take frame "
-        "variation, so it is a diagnostic rather than the "
-        "headline figure",
+        help="fit the alignments with each take, instead of using a single alignment "
+        "averaging all the takes.",
     )
     p.add_argument(
         "--ref-take",
         default="all",
-        help="take providing the single alignment; 'all' fits every "
-        "take and averages the parameters (default: %(default)s)",
+        help="take to used for a single alignment, or 'all' to use an average of all "
+        "the takes."
+        "(default: %(default)s)",
     )
     p.add_argument(
         "--sensitivity-thresholds",
@@ -426,12 +544,12 @@ def parse_args() -> argparse.Namespace:
         nargs="*",
         default=None,
         metavar="MM",
-        help="also print how the global AFTER residual varies with the "
-        "glitch threshold; pass the thresholds in mm, or the flag "
-        "alone to use the built-in list. Off by default",
+        help="also print the result of the gantry positions after the correction for "
+        "other values of --dropout-mm. Give the values in mm, or none to use a "
+        "predefined list",
     )
     p.add_argument(
-        "-q", "--quiet", action="store_true", help="suppress per-take progress logging"
+        "-q", "--quiet", action="store_true", help="do not print progress messages"
     )
     return p.parse_args()
 
@@ -446,6 +564,7 @@ def main() -> None:
         format="%(asctime)s  %(message)s",
         datefmt="%H:%M:%S",
     )
+
     DATASET_DIR = args.dataset_dir
     OPTITRACK_DIR = DATASET_DIR / "OPTITRACK_MEASUREMENTS_CSV"
     GROUND_TRUTH_DIR = DATASET_DIR / "GROUND_TRUTH"
@@ -454,13 +573,11 @@ def main() -> None:
     DROPOUT_MM = args.dropout_mm
     SKIP_INITIAL_S = args.skip_initial_s
 
-    sens = (
-        None
-        if args.sensitivity_thresholds is None
-        else (args.sensitivity_thresholds or SENS_THRESHOLDS)
-    )
+    thresholds = None
+    if args.sensitivity_thresholds is not None:
+        thresholds = args.sensitivity_thresholds or SENS_THRESHOLDS
 
-    corr_params = load_correction_params(CALIBRATION_FILE)
+    model = load_correction_params(CALIBRATION_FILE)
 
     single = not args.per_take_alignment
     mode = (
@@ -472,37 +589,39 @@ def main() -> None:
     print(f"Glitch-rejection threshold --dropout-mm = {DROPOUT_MM:g} mm")
     print(f"Skip initial --skip-initial-s = {SKIP_INITIAL_S:g} s\n")
 
-    # Each comparison is aligned against its own target: the BEFORE residual
-    # against the uncorrected gantry, the AFTER one against the corrected gantry.
-    fixed_frames = None
+    single_alignments = None
     if single:
-        fixed_frames = {
-            "before": fit_single_alignment(args.ref_take, corr_params, "uncorrected"),
-            "after": fit_single_alignment(args.ref_take, corr_params, "corrected"),
+        single_alignments = {
+            "before": fit_single_alignment(args.ref_take, model, "uncorrected"),
+            "after": fit_single_alignment(args.ref_take, model, "corrected"),
         }
 
+    # Compare OptiTrack with the gantry for all takes
     t_all = time.perf_counter()
-    results = []
+    results: list[TakeResult] = []
+
     for i, take in enumerate(TAKES, 1):
         logger.info("=== take %d/%d: %s ===", i, len(TAKES), take)
-        frames = fixed_frames or fit_take_frames(take, corr_params)
-        results.append(process_take(take, corr_params, args.bodies, frames))
+        alignments = single_alignments or fit_take_alignments(take, model)
+        results.append(process_take(take, model, args.bodies, alignments))
+
     logger.info(
         "all %d takes processed in %.1f s", len(TAKES), time.perf_counter() - t_all
     )
 
-    def pool(
+    def all_takes(
         body: str, label: str, key: Literal["resid", "rvec"] = "resid"
     ) -> FloatArray:
-        return np.concatenate([o["bodies"][(body, label)][key] for o in results])
+        """Residuals of a body in a comparison, with all the takes together."""
+        return np.concatenate([res["bodies"][(body, label)][key] for res in results])
 
     # per-take detail for the selected bodies
-    pt_bodies = (
+    per_take_bodies = (
         args.bodies
         if "all" in args.per_take_bodies
-        else [b for b in args.per_take_bodies if b in args.bodies]
+        else [body for body in args.per_take_bodies if body in args.bodies]
     )
-    for body in pt_bodies:
+    for body in per_take_bodies:
         print(f"{body} per take:")
         print(
             f"{'take':10s} {'n':>6s}  "
@@ -510,13 +629,14 @@ def main() -> None:
             f"{'AFT rmse':>9s} {'med':>6s} {'p95':>6s}  {'excl':>6s}"
         )
         print("-" * 78)
-        for o in results:
-            b = o["bodies"][(body, "before")]
-            a = o["bodies"][(body, "after")]
+        for res in results:
+            before = res["bodies"][(body, "before")]
+            after = res["bodies"][(body, "after")]
             print(
-                f"{o['take']:10s} {a['n']:6d}  "
-                f"{b['rmse']:9.2f} {b['median']:6.2f} {b['p95']:6.2f}  "
-                f"{a['rmse']:9.2f} {a['median']:6.2f} {a['p95']:6.2f}  {a['n_drop']:6d}"
+                f"{res['take']:10s} {after['n']:6d}  "
+                f"{before['rmse']:9.2f} {before['median']:6.2f} {before['p95']:6.2f}  "
+                f"{after['rmse']:9.2f} {after['median']:6.2f} {after['p95']:6.2f}  "
+                f"{after['n_drop']:6d}"
             )
         print()
 
@@ -529,16 +649,14 @@ def main() -> None:
     )
     print("-" * 71)
     for body in args.bodies:
-        cells = []
-        for label in ["before", "after"]:
-            r = pool(body, label)
-            cells.append(
-                (np.sqrt(np.mean(r**2)), np.median(r), np.percentile(r, 95), len(r))
-            )
-        (br, bm, bp, _), (ar, am, ap, an) = cells
+        before = all_takes(body, "before")
+        after = all_takes(body, "after")
         print(
-            f"{body:10s} {an:6d}  {br:9.2f} {bm:6.2f} {bp:6.2f}  "
-            f"{ar:9.2f} {am:6.2f} {ap:6.2f}"
+            f"{body:10s} {len(after):6d}  "
+            f"{np.sqrt(np.mean(before**2)):9.2f} {np.median(before):6.2f} "
+            f"{np.percentile(before, 95):6.2f}  "
+            f"{np.sqrt(np.mean(after**2)):9.2f} {np.median(after):6.2f} "
+            f"{np.percentile(after, 95):6.2f}"
         )
 
     # per-axis RMSE, all bodies, before and after
@@ -549,31 +667,31 @@ def main() -> None:
     )
     print("-" * 60)
     for body in args.bodies:
-        vals = []
-        for label in ["before", "after"]:
-            v = pool(body, label, "rvec")
-            vals += [np.sqrt(np.mean(v[:, i] ** 2)) for i in range(3)]
+        rmse_before = np.sqrt(np.mean(all_takes(body, "before", "rvec") ** 2, axis=0))
+        rmse_after = np.sqrt(np.mean(all_takes(body, "after", "rvec") ** 2, axis=0))
         print(
             f"{body:10s}  "
-            + " ".join(f"{x:7.2f}" for x in vals[:3])
+            + " ".join(f"{x:7.2f}" for x in rmse_before)
             + "  "
-            + " ".join(f"{x:7.2f}" for x in vals[3:])
+            + " ".join(f"{x:7.2f}" for x in rmse_after)
         )
 
-    # dropout-threshold sensitivity on the platform after residual (opt-in)
-    if sens:
+    # Results for other values of the  threshold
+    if thresholds:
         print(f"\nThreshold sensitivity ({FRAME_BODY} AFTER):")
-        for thr in sens:
-            rs = []
-            for o in results:
-                d = o["bodies"][(FRAME_BODY, "after")]
-                r = d["r_all"]
-                rs.append(r[d["valid"] & (r < thr) & ~np.isnan(r)])
-            r = np.concatenate(rs)
+        for threshold in thresholds:
+            kept = []
+            for res in results:
+                after = res["bodies"][(FRAME_BODY, "after")]
+                residual = after["r_all"]
+                keep = after["valid"] & (residual < threshold) & ~np.isnan(residual)
+                kept.append(residual[keep])
+            residual = np.concatenate(kept)
             print(
-                f"  thr={thr:>10.0f}: n={len(r):6d}  "
-                f"RMSE={np.sqrt(np.mean(r**2)):6.2f}  "
-                f"median={np.median(r):6.2f}  P95={np.percentile(r, 95):6.2f}"
+                f"  thr={threshold:>10.0f}: n={len(residual):6d}  "
+                f"RMSE={np.sqrt(np.mean(residual**2)):6.2f}  "
+                f"median={np.median(residual):6.2f}  "
+                f"P95={np.percentile(residual, 95):6.2f}"
             )
 
 

@@ -1,9 +1,6 @@
-"""Alternatives to the correction model in use, fitted on the same capture.
+"""Compare correction models using different number of terms
 
-The model in use is a polynomial without cross terms and at most linear in z (see
-``CorrectionParams`` in ``data.py``). This script fits richer and poorer members of
-the same family on the same aligned calibration capture and reports what each one
-is worth:
+This script fits correction models using different number of terms:
 
 - complete polynomials of degree n, with all the monomials x**i * y**j * z**k of
   degree i + j + k <= n;
@@ -12,24 +9,16 @@ is worth:
   the model in use.
 
 Every model is linear in its parameters, so all of them are solved by the same
-least squares call, and the comparison is unaffected by any optimizer setting. Two
-figures are reported per model: the in-sample residual, and a spatial
-cross-validation that leaves out one cell of a grid in the XY plane at a time and
-evaluates on it, which penalizes terms that only fit the noise of their own region.
+least squares call. Two results are shown: the in-sample residual, and a spatial
+cross-validation. The cross-validation leaves out one cell of a grid in the XY
+plane at a time and evaluates on it.
 
-With --validate, each model is also applied to the RoboLoc-G dataset, with the
-procedure of ``validate_dataset.py``, and the residual of the platform after the
-correction is reported. This is much slower, because the alignment of the dataset
-is fitted again for each model.
+With the --validate option, each model is also applied to the RoboLoc-G dataset,
+using the functions of ``validate_dataset.py``. Note that this is much slower,
+because the alignment of the dataset is fitted again for each model.
 
-The condition number of each design matrix is reported as well, both as built (in
-millimeters) and after centering and scaling its columns, which separates poor
-scaling from an actual near-degeneracy of the terms.
-
-Read-only: it does not modify the dataset, the pipeline, or the paper.
-
-Run (from this directory, using the local venv):
-    .venv/bin/python compare_correction_models.py --help
+The script also reports the condition number of each design matrix, both for
+the unmodified matrix in millimeters and after centering and scaling its columns
 """
 
 import argparse
@@ -196,11 +185,11 @@ def validate(model: Model | None) -> tuple[float, float]:
         target, label = "uncorrected", "before"
         model = Model([(1, 0, 0), (0, 1, 0), (0, 0, 1)], np.ones(3), np.eye(4, 3))
 
-    frame = vd.fit_single_alignment("all", model, target)
-    frames = {"before": frame, "after": frame}
+    alignment = vd.fit_single_alignment("all", model, target)
+    alignments = {"before": alignment, "after": alignment}
     resid = np.concatenate(
         [
-            vd.process_take(take, model, [vd.FRAME_BODY], frames)["bodies"][
+            vd.process_take(take, model, [vd.FRAME_BODY], alignments)["bodies"][
                 (vd.FRAME_BODY, label)
             ]["resid"]
             for take in vd.TAKES
@@ -218,6 +207,7 @@ def main(args: argparse.Namespace) -> None:
     config.alignment.minimize_options.display = False
     config.correction.minimize_options.display = False
 
+    # Override validate_dataset.py settings
     vd.DATASET_DIR = args.dataset_dir
     vd.OPTITRACK_DIR = args.dataset_dir / "OPTITRACK_MEASUREMENTS_CSV"
     vd.GROUND_TRUTH_DIR = args.dataset_dir / "GROUND_TRUTH"

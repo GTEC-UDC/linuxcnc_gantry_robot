@@ -1,184 +1,288 @@
+"""Plot the error between OptiTrack and the gantry over time for the RoboLoc-G dataset.
+
+For each take, the OptiTrack positions of the rigid body of the gantry ("Grua")
+are aligned with the gantry positions. Then the error (aligned OptiTrack
+position minus gantry position) is plotted against time.
+
+The plots show:
+
+- In red: the samples with an error of --dropout-mm or more. These are the ones
+  that ``validate_dataset.py`` excludes as tracking errors.
+- Shaded: the first seconds of each take (--skip-initial-s). They are plotted,
+  but they are not used to fit the alignment.
 """
-Plot the OptiTrack-vs-gantry positioning error (X, Y, Z and absolute) over time
-for each RoboLoc-G take, to visually inspect for bad/glitch OptiTrack samples.
 
-For each take the OptiTrack "Grua" rigid body is aligned to the gantry frame
-(per-take rigid alignment, fitted with glitch rejection so the baseline is
-clean), and the signed residual per axis plus the absolute 3D error are plotted
-against time. Samples whose absolute error exceeds --dropout-mm (the glitch
-threshold used by validate_dataset.py) are highlighted in red.
-
-Reuses the loading/alignment machinery of validate_dataset.py.
-
-Run (from this directory, using the local venv):
-    .venv/bin/python plot_dataset_errors.py                # show interactively
-    .venv/bin/python plot_dataset_errors.py --save         # save one PNG per take
-    .venv/bin/python plot_dataset_errors.py --help
-"""
 import argparse
 import logging
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
+import numpy.typing as npt
 import validate_dataset as vd
-from data import load_correction_params
+from data import CorrectionModel, load_correction_params
 from defaults import CALIBRATION_FILE, DATASET_DIR
 
 logger = logging.getLogger("plot_dataset_errors")
 
-AXES = ["X", "Y", "Z", "Abs"]
+AXES_NAMES = ["X", "Y", "Z", "Abs"]
+
 DEFAULT_OUTDIR = Path(__file__).resolve().parent / "dataset_error_plots"
 
+FloatArray = npt.NDArray[np.float64]
+BoolArray = npt.NDArray[np.bool_]
 
-def compute_errors(take, corr_params, target="uncorrected"):
-    """Return (t, err[N,4], valid, excluded) for a take.
 
-    err columns are the signed residual X, Y, Z and the absolute 3D error, in
-    the gantry frame after a glitch-clean per-take alignment.
+def compute_errors(
+    take: str, model: CorrectionModel, target: vd.Target
+) -> tuple[FloatArray, FloatArray, BoolArray]:
+    """Compute the error between OptiTrack and the gantry in a take.
+
+    ``target`` says which gantry positions are used: the ones corrected with
+    ``model`` or the uncorrected ones.
+
+    Returns:
+
+    - The time of each sample, in seconds from the first one.
+    - The error of each sample, in mm, with columns X, Y, Z and 3D distance.
+      It is NaN in the samples that are not valid.
+    - Bool array indicating the samples with an error of DROPOUT_MM or more.
     """
-    df_rb, tgt_before, tgt_after, valid = vd.load_take(take, corr_params)
-    tgt = tgt_after if target == "corrected" else tgt_before
+    optitrack, gantry_before, gantry_after, valid = vd.load_take(take, model)
+    gantry = gantry_after if target == "corrected" else gantry_before
 
-    # alignment is fitted on the retained window (glitches + initial skip out),
-    # but the residual is plotted over the full valid range so the excluded
-    # transient stays visible.
-    valid_fit = vd.apply_skip_initial(valid, df_rb)
-    p = vd.fit_alignment(df_rb, tgt, mask=valid_fit)
-    r = vd.residual_3d(df_rb, tgt, p)
-    clean = valid_fit & (r < vd.DROPOUT_MM) & ~np.isnan(r)
-    p = vd.fit_alignment(df_rb, tgt, mask=clean)
+    # The alignment is fitted without the first seconds of the take and without
+    # the tracking errors of OptiTrack
+    valid_after_skip = vd.apply_skip_initial(valid, optitrack)
+    alignment = vd.fit_alignment_without_tracking_errors(
+        optitrack, gantry, valid_after_skip
+    )
 
-    rvec = vd.residual_vec(df_rb, tgt, p)          # (N, 3) signed, gantry frame
-    rabs = vd.residual_3d(df_rb, tgt, p)           # (N,) absolute
-    err = np.column_stack([rvec, rabs])            # (N, 4): X, Y, Z, Abs
+    # The error is computed for all the samples, also the ones of the first
+    # seconds, so that they can be seen in the plot
+    error_xyz = vd.residual_vec(optitrack, gantry, alignment)
+    error_abs = vd.residual_3d(optitrack, gantry, alignment)
+    errors = np.column_stack([error_xyz, error_abs])
 
-    t = df_rb["time"].to_numpy()
-    t = t - t[0]
+    time = optitrack["time"].to_numpy()
+    time = time - time[0]
 
-    excluded = valid & (rabs >= vd.DROPOUT_MM) & ~np.isnan(rabs)
-    # invalid rows -> NaN so they show as gaps, not spurious lines
-    err[~valid] = np.nan
-    logger.info("[%s] target=%s  valid=%d  excluded(>%.0fmm)=%d  skip=%.0fs",
-                take, target, int(valid.sum()), vd.DROPOUT_MM,
-                int(excluded.sum()), vd.SKIP_INITIAL_S)
-    return t, err, valid, excluded
+    excluded = valid & (error_abs >= vd.DROPOUT_MM) & ~np.isnan(error_abs)
+
+    # With NaN, the samples that are not valid are shown as gaps in the plot
+    errors[~valid] = np.nan
+
+    logger.info(
+        "[%s] target=%s  valid=%d  excluded(>%.0fmm)=%d  skip=%.0fs",
+        take,
+        target,
+        int(valid.sum()),
+        vd.DROPOUT_MM,
+        int(excluded.sum()),
+        vd.SKIP_INITIAL_S,
+    )
+    return time, errors, excluded
 
 
-def plot_take(take, x, err, excluded, dropout_mm, target, skip_s, skip_end,
-              xlabel, outdir, save):
+def plot_take(
+    take: str,
+    time: FloatArray,
+    errors: FloatArray,
+    excluded: BoolArray,
+    target: vd.Target,
+    x_axis: Literal["seconds", "samples"],
+    outdir: Path | None,
+) -> None:
+    """Plot the errors of a take, as returned by ``compute_errors``.
+
+    The figure is saved in ``outdir``, or shown in a window if it is None.
+    """
     import matplotlib.pyplot as plt
 
+    dropout_mm = vd.DROPOUT_MM
+    skip_s = vd.SKIP_INITIAL_S
+
+    # Values of the horizontal axis, and where the first seconds end in it
+    if x_axis == "samples":
+        x = np.arange(len(time), dtype=float)
+        xlabel = "sample index"
+        skip_end = float(np.searchsorted(time, skip_s))
+    else:
+        x = time
+        xlabel = "time (s)"
+        skip_end = skip_s
+
+    num_excluded = int(excluded.sum())
+
     fig, axs = plt.subplots(4, 1, figsize=(11, 8), sharex=True)
-    n_excl = int(excluded.sum())
-    title = (f"{take}  (OptiTrack − {target} gantry, "
-             f"{n_excl} samples > {dropout_mm:g} mm")
+    title = (
+        f"{take}  (OptiTrack − {target} gantry, "
+        f"{num_excluded} samples > {dropout_mm:g} mm"
+    )
     title += f", skip first {skip_s:g} s)" if skip_s > 0 else ")"
     fig.suptitle(title)
 
-    for i, ax in enumerate(AXES):
-        a = axs[i]
-        a.axhline(0.0, color="0.7", lw=0.8)
-        if skip_end is not None:
-            a.axvspan(x[0], skip_end, color="0.85", zorder=0,
-                      label="skipped" if i == 0 else None)
-        a.plot(x, err[:, i], lw=0.6, color="tab:blue")
-        # highlight excluded (glitch) samples
-        if n_excl:
-            a.plot(x[excluded], err[excluded, i], "o", ms=3,
-                   color="tab:red", label="excluded" if i == 0 else None)
-        if ax == "Abs":
-            a.axhline(dropout_mm, color="tab:red", ls="--", lw=0.9,
-                      label=f"threshold {dropout_mm:g} mm")
-            a.set_ylim(bottom=0)
-        a.set_ylabel(f"e_{ax} (mm)" if ax != "Abs" else "|e| (mm)")
-        a.grid(True, alpha=0.3)
-        if i == 0 and (n_excl or skip_end is not None):
-            a.legend(loc="upper right", fontsize=8)
+    for i, (name, ax) in enumerate(zip(AXES_NAMES, axs)):
+        # The labels of the legend are only set in the first plot
+        first = i == 0
+
+        ax.axhline(0.0, color="0.7", lw=0.8)
+
+        # Shade the first seconds of the take
+        if skip_s > 0:
+            ax.axvspan(
+                x[0],
+                skip_end,
+                color="0.85",
+                zorder=0,
+                label="skipped" if first else None,
+            )
+
+        ax.plot(x, errors[:, i], lw=0.6, color="tab:blue")
+
+        # Mark in red the samples with an error over the threshold
+        if num_excluded:
+            ax.plot(
+                x[excluded],
+                errors[excluded, i],
+                "o",
+                ms=3,
+                color="tab:red",
+                label="excluded" if first else None,
+            )
+
+        if name == "Abs":
+            # Line at the threshold
+            ax.axhline(
+                dropout_mm,
+                color="tab:red",
+                ls="--",
+                lw=0.9,
+                label=f"threshold {dropout_mm:g} mm",
+            )
+            ax.set_ylim(bottom=0)
+            ax.set_ylabel("|e| (mm)")
+        else:
+            ax.set_ylabel(f"e_{name} (mm)")
+
+        ax.grid(True, alpha=0.3)
+        if first and (num_excluded or skip_s > 0):
+            ax.legend(loc="upper right", fontsize=8)
+
     axs[-1].set_xlabel(xlabel)
     fig.tight_layout(rect=(0, 0, 1, 0.98))
 
-    if save:
+    if outdir is not None:
         outdir.mkdir(parents=True, exist_ok=True)
-        out = outdir / f"{take}_optitrack_error.png"
-        fig.savefig(out, dpi=120)
-        logger.info("[%s] saved %s", take, out)
-        plt.close(fig)
+        filename = outdir / f"{take}_optitrack_error.png"
+        fig.savefig(filename, dpi=120)
+        logger.info("[%s] saved %s", take, filename)
     else:
         plt.show()
-        plt.close(fig)
+    plt.close(fig)
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description=__doc__,
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    p.add_argument("--dataset-dir", type=Path, default=DATASET_DIR,
-                   help="dataset directory (GANTRY_MEASUREMENTS + "
-                        "OPTITRACK_MEASUREMENTS_CSV)")
-    p.add_argument("--calib", type=Path, default=CALIBRATION_FILE,
-                   help="JSON file with the fixed correction parameters")
-    p.add_argument("--takes", nargs="+", default=vd.TAKES,
-                   help="takes to plot")
-    p.add_argument("--target", choices=["corrected", "uncorrected"],
-                   default="corrected",
-                   help="gantry reference the error is computed against; "
-                        "'corrected' gives a flat ~2 mm baseline where OptiTrack "
-                        "glitches stand out, 'uncorrected' keeps the systematic "
-                        "gantry structure (larger, wavy baseline)")
-    p.add_argument("--dropout-mm", type=float, default=vd.DROPOUT_MM,
-                   help="glitch threshold (mm): line + red highlight")
-    p.add_argument("--skip-initial-s", type=float, default=vd.SKIP_INITIAL_S,
-                   help="shade + exclude from the alignment fit the first N "
-                        "seconds of each take (the approach transient)")
-    p.add_argument("--x-axis", choices=["seconds", "samples"], default="seconds",
-                   help="units of the X axis: elapsed time or sample index "
-                        "(sample index matches the row numbers used elsewhere)")
-    p.add_argument("--save", action="store_true",
-                   help="save PNGs instead of showing figures interactively")
-    p.add_argument("--outdir", type=Path, default=DEFAULT_OUTDIR,
-                   help="directory for the PNG files (with --save)")
-    p.add_argument("-q", "--quiet", action="store_true",
-                   help="suppress progress logging")
+    p.add_argument(
+        "--dataset-dir",
+        type=Path,
+        default=DATASET_DIR,
+        help="dataset directory (must contain GROUND_TRUTH "
+        "and OPTITRACK_MEASUREMENTS_CSV) (default: %(default)s)",
+    )
+    p.add_argument(
+        "--calib",
+        type=Path,
+        default=CALIBRATION_FILE,
+        help="calibration file with the parameters of the correction model "
+        "(default: %(default)s)",
+    )
+    p.add_argument(
+        "--takes",
+        nargs="+",
+        default=vd.TAKES,
+        help="takes to plot (default: the 7 dynamic ones)",
+    )
+    p.add_argument(
+        "--target",
+        choices=["corrected", "uncorrected"],
+        default="corrected",
+        help="gantry positions used to compute the error. With 'corrected' the "
+        "error is small and flat, so the tracking errors of OptiTrack are easy to "
+        "see. With 'uncorrected' the error also includes the positioning error of "
+        "the gantry, so it is larger and it changes along the take "
+        "(default: %(default)s)",
+    )
+    p.add_argument(
+        "--dropout-mm",
+        type=float,
+        default=vd.DROPOUT_MM,
+        help="threshold of the 3D error (mm). The samples at this distance or more "
+        "are marked in red (default: %(default)s)",
+    )
+    p.add_argument(
+        "--skip-initial-s",
+        type=float,
+        default=vd.SKIP_INITIAL_S,
+        help="first seconds of each take that are not used to fit the alignment. "
+        "They are shaded in the plots (default: %(default)s)",
+    )
+    p.add_argument(
+        "--x-axis",
+        choices=["seconds", "samples"],
+        default="seconds",
+        help="horizontal axis of the plots: time in seconds or sample number "
+        "(default: %(default)s)",
+    )
+    p.add_argument(
+        "--save",
+        action="store_true",
+        help="save the plots as PNG files instead of showing them",
+    )
+    p.add_argument(
+        "--outdir",
+        type=Path,
+        default=DEFAULT_OUTDIR,
+        help="directory of the PNG files, used with --save (default: %(default)s)",
+    )
+    p.add_argument(
+        "-q", "--quiet", action="store_true", help="do not print progress messages"
+    )
     return p.parse_args()
 
 
-def main():
+def main() -> None:
     args = parse_args()
     logging.basicConfig(
         level=logging.WARNING if args.quiet else logging.INFO,
-        format="%(asctime)s  %(message)s", datefmt="%H:%M:%S",
+        format="%(asctime)s  %(message)s",
+        datefmt="%H:%M:%S",
     )
+
+    # Matplotlib Agg backend does not need a window.
+    # It has to be selected before importing pyplot.
     if args.save:
         import matplotlib
+
         matplotlib.use("Agg")
 
-    # let overrides reach validate_dataset's module globals
+    # Override validate_dataset.py settings
     vd.DATASET_DIR = args.dataset_dir
     vd.GROUND_TRUTH_DIR = args.dataset_dir / "GROUND_TRUTH"
     vd.OPTITRACK_DIR = args.dataset_dir / "OPTITRACK_MEASUREMENTS_CSV"
     vd.DROPOUT_MM = args.dropout_mm
     vd.SKIP_INITIAL_S = args.skip_initial_s
 
-    corr_params = load_correction_params(args.calib)
+    model = load_correction_params(args.calib)
+    outdir = args.outdir if args.save else None
 
     for take in args.takes:
-        t, err, _, excluded = compute_errors(take, corr_params, args.target)
-
-        if args.x_axis == "samples":
-            x = np.arange(len(t), dtype=float)
-            xlabel = "sample index"
-            # the skip window ends at the first sample past skip_initial_s
-            skip_end = float(np.searchsorted(t, args.skip_initial_s))
-        else:
-            x = t
-            xlabel = "time (s)"
-            skip_end = args.skip_initial_s
-        if args.skip_initial_s <= 0:
-            skip_end = None
-
-        plot_take(take, x, err, excluded, args.dropout_mm, args.target,
-                  args.skip_initial_s, skip_end, xlabel, args.outdir, args.save)
+        time, errors, excluded = compute_errors(take, model, args.target)
+        plot_take(take, time, errors, excluded, args.target, args.x_axis, outdir)
 
 
 if __name__ == "__main__":

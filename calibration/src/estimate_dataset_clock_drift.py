@@ -17,13 +17,13 @@ The script does the following:
 
 One offset and one drift are used for all the takes. With one offset per take,
 the offsets would hide the drift. The clock drift makes the time difference change
-from one take to the next. Using one offset that the capture start time of each
-take is right.
+from one take to the next. Using one offset requires that the capture start time
+of each take is right.
 """
 
 import argparse
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import numpy as np
@@ -57,7 +57,10 @@ class Take:
     time: FloatArray  # s, time of each sample from the start of the capture
     optitrack: FloatArray  # mm, aligned OptiTrack positions, one x, y, z row per sample
     gantry: FloatArray  # mm, corrected gantry positions, one x, y, z row per sample
-    keep: BoolArray  # samples used to compute the residual
+
+    # Samples used to compute the residual.
+    # Set after loading all the takes with the value of samples_to_keep
+    keep: BoolArray = field(init=False)
 
     @property
     def absolute_time(self) -> FloatArray:
@@ -87,18 +90,6 @@ def load_take(take: str, model: CorrectionModel, alignment: npt.ArrayLike) -> Ta
     time = optitrack_unaligned["time"].to_numpy()[selected]
     optitrack, gantry = optitrack[selected], gantry[selected]
 
-    # Samples used to compute the residual. These samples are left out:
-    # - The tracking errors of OptiTrack (DROPOUT_MM or more from the gantry).
-    # - A margin at both ends of the take, because the samples of the ends are
-    #   moved out of the take when the time is shifted.
-    margin = MAX_OFFSET_MS * 1e-3 + MAX_DRIFT_PPM * 1e-6 * (time[-1] - time[0])
-    distance = np.linalg.norm(optitrack - gantry, axis=1)
-    keep = (
-        (distance < vd.DROPOUT_MM)
-        & (time >= time[0] + margin)
-        & (time <= time[-1] - margin)
-    )
-
     metadata = load_optitrack_metadata(str(vd.OPTITRACK_DIR / f"{take}_optitrack.csv"))
 
     return Take(
@@ -107,7 +98,27 @@ def load_take(take: str, model: CorrectionModel, alignment: npt.ArrayLike) -> Ta
         time=time,
         optitrack=optitrack,
         gantry=gantry,
-        keep=keep,
+    )
+
+
+def samples_to_keep(take: Take, t_ref: float) -> BoolArray:
+    """Choose the samples of a take that are used to compute the residual.
+
+    These samples are left out:
+
+    - The tracking errors of OptiTrack (DROPOUT_MM or more from the gantry).
+    - A margin at both ends of the take, because the samples of the ends are
+      moved out of the take when the time is shifted. The margin is the largest
+      time shift that the search can apply to a sample of the take.
+    """
+    max_time_to_ref = np.abs(take.absolute_time - t_ref).max()
+    margin = MAX_OFFSET_MS * 1e-3 + MAX_DRIFT_PPM * 1e-6 * max_time_to_ref
+    distance = np.linalg.norm(take.optitrack - take.gantry, axis=1)
+
+    return (
+        (distance < vd.DROPOUT_MM)
+        & (take.time >= take.time[0] + margin)
+        & (take.time <= take.time[-1] - margin)
     )
 
 
@@ -292,6 +303,9 @@ def main() -> None:
     span = max(take.absolute_time[-1] for take in takes) - min(
         take.absolute_time[0] for take in takes
     )
+
+    for take in takes:
+        take.keep = samples_to_keep(take, t_ref)
 
     print_takes(takes, span)
     print_scan(takes, t_ref, args.scan, span)

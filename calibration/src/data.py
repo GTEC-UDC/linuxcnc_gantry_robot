@@ -1,5 +1,6 @@
 import logging
 import re
+from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Literal, cast
@@ -207,7 +208,20 @@ Degree = tuple[PositiveInt, PositiveInt, PositiveInt]
 DEFAULT_DEGREE: Degree = (2, 2, 1)
 
 
-class CorrectionParams(BaseModel):
+class CorrectionModel(ABC):
+    """A model that corrects gantry positions.
+
+    The model in use is ``CorrectionParams``. Other models can derive from this
+    class to take its place where only the corrected positions are needed, as when
+    comparing alternatives to it.
+    """
+
+    @abstractmethod
+    def apply(self, pos: np.ndarray) -> np.ndarray:
+        """Apply the model to an (N, 3) array of positions, or to a single one."""
+
+
+class CorrectionParams(BaseModel, CorrectionModel):
     # Parameters of the correction model
     #
     #   pos_corrected = c + A[0] @ pos + A[1] @ pos**2 + ... + A[n-1] @ pos**n
@@ -224,7 +238,6 @@ class CorrectionParams(BaseModel):
         return len(self.A)
 
     def apply(self, pos: np.ndarray) -> np.ndarray:
-        """Apply the model to an (N, 3) array of positions, or to a single one."""
         out = np.zeros_like(pos, dtype=float) + np.array(self.c)
         power = np.ones_like(pos, dtype=float)
         for matrix in self.A:
@@ -265,10 +278,10 @@ def coord_align(
     )
 
 
-def coord_calibrate(params: CorrectionParams, df: pd.DataFrame) -> pd.DataFrame:
-    """Apply the correction model to gantry coordinates, given its parameters."""
+def coord_calibrate(model: CorrectionModel, df: pd.DataFrame) -> pd.DataFrame:
+    """Apply a correction model to gantry coordinates."""
     df_tr = df.copy()
-    df_tr[["x", "y", "z"]] = params.apply(df[["x", "y", "z"]].to_numpy())
+    df_tr[["x", "y", "z"]] = model.apply(df[["x", "y", "z"]].to_numpy())
     return df_tr
 
 

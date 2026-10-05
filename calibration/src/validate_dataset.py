@@ -36,13 +36,17 @@ Run (from this directory, using the local venv):
 import argparse
 import logging
 import time
+from collections.abc import Mapping
 from pathlib import Path
+from typing import Literal, TypedDict
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import scipy as scp
 from coordinates_utils import coord_mse
 from data import (
+    CorrectionModel,
     coord_align,
     coord_calibrate,
     interp_columns,
@@ -70,8 +74,40 @@ DROPOUT_MM = 15.0  # mm, 3D-residual glitch-rejection threshold
 SKIP_INITIAL_S = 6.0  # s, drop the approach transient at the take start
 SENS_THRESHOLDS = [1e9, 200, 100, 50, 30, 20, 15]  # mm, sensitivity sweep (after)
 
+FloatArray = npt.NDArray[np.float64]
+BoolArray = npt.NDArray[np.bool_]
 
-def fit_alignment(df_rb, df_target, mask=None):
+# Gantry positions an alignment is fitted against
+Target = Literal["corrected", "uncorrected"]
+
+
+class AlignmentResult(TypedDict):
+    """Residual of one rigid body of a take under a given alignment."""
+
+    rmse: float
+    median: float
+    p95: float
+    n: int  # samples the figures are computed on
+    n_drop: int  # valid samples excluded as glitches
+    params: list[float]  # alignment (dt, rx, ry, rz, tx, ty, tz)
+    resid: FloatArray  # 3D residual of the samples kept
+    rvec: FloatArray  # residual vector of the samples kept, one row per sample
+    rmax: float
+    r_all: FloatArray  # 3D residual of every sample of the take
+    valid: BoolArray  # samples of the take that were candidates to be kept
+
+
+class TakeResult(TypedDict):
+    """Residuals of the rigid bodies of a take."""
+
+    take: str
+    # Keyed by (body, "before" or "after")
+    bodies: dict[tuple[str, str], AlignmentResult]
+
+
+def fit_alignment(
+    df_rb: pd.DataFrame, df_target: pd.DataFrame, mask: BoolArray | None = None
+) -> FloatArray:
     """Fit the 7-param rigid alignment mapping df_rb (opti) onto df_target (gantry)."""
     rb = df_rb if mask is None else df_rb[mask].reset_index(drop=True)
     tg = df_target if mask is None else df_target[mask].reset_index(drop=True)
@@ -98,23 +134,29 @@ def fit_alignment(df_rb, df_target, mask=None):
     return res.x
 
 
-def residual_vec(df_rb, df_target, params):
+def residual_vec(
+    df_rb: pd.DataFrame, df_target: pd.DataFrame, params: npt.ArrayLike
+) -> FloatArray:
     aligned = coord_align(params, df_rb, ROT_CENTER)
     return aligned[["x", "y", "z"]].to_numpy() - df_target[["x", "y", "z"]].to_numpy()
 
 
-def residual_3d(df_rb, df_target, params):
+def residual_3d(
+    df_rb: pd.DataFrame, df_target: pd.DataFrame, params: npt.ArrayLike
+) -> FloatArray:
     return np.sqrt(np.sum(residual_vec(df_rb, df_target, params) ** 2, axis=1))
 
 
-def stats(res, mask):
+def stats(res: FloatArray, mask: BoolArray) -> tuple[float, float, float, int]:
     r = res[mask]
     r = r[~np.isnan(r)]
     rmse = float(np.sqrt(np.mean(r**2)))
     return rmse, float(np.median(r)), float(np.percentile(r, 95)), len(r)
 
 
-def load_take(take, corr_params, body=FRAME_BODY):
+def load_take(
+    take: str, corr_params: CorrectionModel, body: str = FRAME_BODY
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, BoolArray]:
     """Load one rigid body of a take and build its (un)corrected references.
 
     The reference for a mobile body is the gantry platform plus its fixed offset
@@ -146,7 +188,7 @@ def load_take(take, corr_params, body=FRAME_BODY):
         ["x", "y", "z"]
     ].to_numpy()
 
-    def as_df(arr):
+    def as_df(arr: FloatArray) -> pd.DataFrame:
         out = pd.DataFrame(arr, columns=["x", "y", "z"])
         out.insert(0, "time", t_o)
         return out
@@ -163,7 +205,7 @@ def load_take(take, corr_params, body=FRAME_BODY):
     return df_rb, tgt_before, tgt_after, valid
 
 
-def apply_skip_initial(valid, df_rb):
+def apply_skip_initial(valid: BoolArray, df_rb: pd.DataFrame) -> BoolArray:
     """Exclude the first SKIP_INITIAL_S seconds of the take (the approach move)."""
     if SKIP_INITIAL_S > 0:
         t = df_rb["time"].to_numpy()
@@ -171,7 +213,14 @@ def apply_skip_initial(valid, df_rb):
     return valid
 
 
-def eval_alignment(df_rb, tgt, valid, take, label, params):
+def eval_alignment(
+    df_rb: pd.DataFrame,
+    tgt: pd.DataFrame,
+    valid: BoolArray,
+    take: str,
+    label: str,
+    params: npt.ArrayLike,
+) -> AlignmentResult:
     """Apply the given alignment to the OptiTrack track and return the stats."""
     p = np.asarray(params)
     r = residual_3d(df_rb, tgt, p)
@@ -206,7 +255,9 @@ def eval_alignment(df_rb, tgt, valid, take, label, params):
     }
 
 
-def _fit_alignment_for_take(take, corr_params, target):
+def _fit_alignment_for_take(
+    take: str, corr_params: CorrectionModel, target: Target
+) -> FloatArray:
     """Per-take alignment against the chosen gantry target, with glitch rejection."""
     df_rb, tgt_before, tgt_after, valid = load_take(take, corr_params, FRAME_BODY)
     tgt = tgt_after if target == "corrected" else tgt_before
@@ -217,7 +268,9 @@ def _fit_alignment_for_take(take, corr_params, target):
     return fit_alignment(df_rb, tgt, mask=clean)
 
 
-def fit_single_alignment(ref_take, corr_params, target):
+def fit_single_alignment(
+    ref_take: str, corr_params: CorrectionModel, target: Target
+) -> FloatArray:
     """Fit ONE campaign-wide alignment against the given gantry target.
 
     With ref_take='all' every take is fitted and the parameters averaged, which
@@ -259,11 +312,11 @@ def fit_single_alignment(ref_take, corr_params, target):
     return p
 
 
-def fit_take_frames(take, corr_params):
+def fit_take_frames(take: str, corr_params: CorrectionModel) -> dict[str, FloatArray]:
     """Per-take frames, fitted on the platform, one per target."""
     df_rb, tgt_before, tgt_after, valid = load_take(take, corr_params, FRAME_BODY)
     valid = apply_skip_initial(valid, df_rb)
-    frames = {}
+    frames: dict[str, FloatArray] = {}
     for label, tgt in [("before", tgt_before), ("after", tgt_after)]:
         logger.info(
             "[%s] %-6s: fitting per-take frame on %s...", take, label, FRAME_BODY
@@ -275,14 +328,19 @@ def fit_take_frames(take, corr_params):
     return frames
 
 
-def process_take(take, corr_params, bodies, frames):
+def process_take(
+    take: str,
+    corr_params: CorrectionModel,
+    bodies: list[str],
+    frames: Mapping[str, npt.ArrayLike],
+) -> TakeResult:
     """Evaluate every rigid body of a take with the given frames.
 
     frames is {"before": params, "after": params}; the same frame is applied to
     all bodies, as the dataset does (there is one physical frame relationship).
     """
     t_start = time.perf_counter()
-    out = {"take": take, "bodies": {}}
+    out: TakeResult = {"take": take, "bodies": {}}
     for body in bodies:
         df_rb, tgt_before, tgt_after, valid = load_take(take, corr_params, body)
         valid = apply_skip_initial(valid, df_rb)
@@ -294,7 +352,7 @@ def process_take(take, corr_params, bodies, frames):
     return out
 
 
-def parse_args():
+def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -378,7 +436,7 @@ def parse_args():
     return p.parse_args()
 
 
-def main():
+def main() -> None:
     global DATASET_DIR, OPTITRACK_DIR, GROUND_TRUTH_DIR, CALIBRATION_FILE, TAKES
     global DROPOUT_MM, SKIP_INITIAL_S
 
@@ -433,7 +491,9 @@ def main():
         "all %d takes processed in %.1f s", len(TAKES), time.perf_counter() - t_all
     )
 
-    def pool(body, label, key="resid"):
+    def pool(
+        body: str, label: str, key: Literal["resid", "rvec"] = "resid"
+    ) -> FloatArray:
         return np.concatenate([o["bodies"][(body, label)][key] for o in results])
 
     # per-take detail for the selected bodies

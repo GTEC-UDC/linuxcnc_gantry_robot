@@ -212,7 +212,7 @@ def parse_args():
         "--calib",
         type=Path,
         default=CALIBRATION_FILE,
-        help="JSON file with the fixed correction parameters",
+        help="JSON file with the fixed correction parameters (default: %(default)s)",
     )
     p.add_argument(
         "--takes",
@@ -226,9 +226,12 @@ def parse_args():
         nargs=3,
         metavar=("FROM", "TO", "STEP"),
         default=[-60.0, 60.0, 10.0],
-        help="drift scan in ppm, offsets refitted at each point",
+        help="drift scan in ppm, offsets refitted at each point "
+        "(default: %(default)s)",
     )
-    p.add_argument("-q", "--quiet", action="store_true")
+    p.add_argument(
+        "-q", "--quiet", action="store_true", help="suppress progress logging"
+    )
     return p.parse_args()
 
 

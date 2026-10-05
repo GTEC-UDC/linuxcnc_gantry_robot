@@ -151,10 +151,30 @@ if __name__ == "__main__":
         description="Compare alternatives to the correction model on the calibration capture",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("--optitrack", type=Path, default=OPTITRACK_FILE)
-    parser.add_argument("--gantry", type=Path, default=GANTRY_FILE)
-    parser.add_argument("--config", type=Path, default=CONFIG_FILE)
-    parser.add_argument("--calibration", type=Path, default=CALIBRATION_FILE)
+    parser.add_argument(
+        "--optitrack",
+        type=Path,
+        default=OPTITRACK_FILE,
+        help="Path to Optitrack CSV file",
+    )
+    parser.add_argument(
+        "--gantry",
+        type=Path,
+        default=GANTRY_FILE,
+        help="Path to Gantry CSV file",
+    )
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=CONFIG_FILE,
+        help="Path to the calibration configuration file",
+    )
+    parser.add_argument(
+        "--calibration",
+        type=Path,
+        default=CALIBRATION_FILE,
+        help="Path to the calibration parameters file",
+    )
     parser.add_argument(
         "--grid",
         type=int,

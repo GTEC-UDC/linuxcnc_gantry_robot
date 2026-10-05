@@ -304,7 +304,7 @@ def parse_args():
         type=Path,
         default=DATASET_DIR,
         help="dataset directory (must contain GANTRY_MEASUREMENTS "
-        "and OPTITRACK_MEASUREMENTS_CSV)",
+        "and OPTITRACK_MEASUREMENTS_CSV) (default: %(default)s)",
     )
     p.add_argument(
         "--calib",

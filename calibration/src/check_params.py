@@ -117,6 +117,11 @@ def get_joint_bounds(
                 ),
             )
 
+            if not res.success:
+                logger.warning(
+                    "The search of the joint limit did not converge: %s", res.message
+                )
+
             print(
                 f"Found joint {j_idx} {'min' if opt_idx == 0 else 'max'}: "
                 f"{res.fun * opt_factor} on axis position {res.x}"

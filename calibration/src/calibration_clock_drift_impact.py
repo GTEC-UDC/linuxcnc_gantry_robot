@@ -5,6 +5,7 @@ re-fits the correction model, and reports what changes in the calibration soluti
 """
 
 import argparse
+import logging
 from pathlib import Path
 from typing import cast
 
@@ -23,6 +24,8 @@ from data import (
 )
 from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
 from estimate_calibration_clock_drift import GAN_COLS, RB_COLS, rms3d, time_shifted
+
+logger = logging.getLogger(__name__)
 
 
 def fit_correction(
@@ -74,6 +77,10 @@ def fit_offset(
         bounds=(-0.3, 0.3),
         method="bounded",
     )
+
+    if not res.success:
+        logger.warning("The offset fit did not converge: %s", res.message)
+
     return float(res.x)
 
 
@@ -157,6 +164,10 @@ def main(args: argparse.Namespace) -> None:
         method="Powell",
         tol=1e-12,
     )
+
+    if not res.success:
+        logger.warning("The offset and drift fit did not converge: %s", res.message)
+
     dt_fit, drift_fit = float(res.x[0]), float(res.x[1])
     print(
         f"\njoint fit on positions: offset {dt_fit * 1e3:+.2f} ms, "

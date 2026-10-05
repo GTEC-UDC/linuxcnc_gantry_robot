@@ -148,6 +148,10 @@ def fit_alignment(
         method="Powell",
         options={"disp": False},
     )
+
+    if not res.success:
+        logger.warning("The alignment fit did not converge: %s", res.message)
+
     return res.x
 
 

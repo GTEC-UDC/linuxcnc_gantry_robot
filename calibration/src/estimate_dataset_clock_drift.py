@@ -177,6 +177,10 @@ def fit_offset(takes: list[Take], drift_ppm: float, t_ref: float) -> float:
         bounds=(-MAX_OFFSET_MS * 1e-3, MAX_OFFSET_MS * 1e-3),
         method="bounded",
     )
+
+    if not res.success:
+        logger.warning("The offset fit did not converge: %s", res.message)
+
     return float(res.x)
 
 
@@ -195,6 +199,10 @@ def fit_offset_and_drift(takes: list[Take], t_ref: float) -> tuple[float, float,
             (-MAX_DRIFT_PPM, MAX_DRIFT_PPM),
         ],
     )
+
+    if not res.success:
+        logger.warning("The offset and drift fit did not converge: %s", res.message)
+
     return float(res.x[0]), float(res.x[1]), float(res.fun)
 
 

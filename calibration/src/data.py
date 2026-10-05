@@ -621,6 +621,9 @@ def get_processed_data(
             method=min_opts.method,
         )
 
+        if not res.success:
+            logger.warning("The alignment fit did not converge: %s", res.message)
+
         alignment_params_array = res.x
         logger.info("Alignment completed. Parameters: %s", alignment_params_array)
 

@@ -23,6 +23,7 @@ every candidate pair, so only the timing is left for (dt, drift) to explain.
 """
 
 import argparse
+import logging
 from pathlib import Path
 from typing import cast
 
@@ -41,6 +42,8 @@ GAN_COLS = ["GAN.X", "GAN.Y", "GAN.Z"]
 GAN_COLS_CALIBRATED = ["GAN.CALIBRATED.X", "GAN.CALIBRATED.Y", "GAN.CALIBRATED.Z"]
 
 Array = npt.NDArray[np.float64]
+
+logger = logging.getLogger(__name__)
 
 
 def fill_gaps(pos: Array) -> tuple[Array, npt.NDArray[np.bool]]:
@@ -150,12 +153,17 @@ def fit_drift(
         tol=1e-12,
         options={"disp": display},
     )
+
+    if not res.success:
+        logger.warning("The drift fit did not converge: %s", res.message)
+
     dt, drift_ppm = float(res.x[0]), float(res.x[1])
     rms_after = rms3d(
         velocity_residual(
             time, v_gantry, v_optitrack, dt, drift_ppm * 1e-6, t_ref, fit_matrix
         )
     )
+
     return dt, drift_ppm, rms_before, rms_after
 
 
@@ -206,6 +214,8 @@ def drift_profile(
             bounds=(-0.5, 0.5),
             method="bounded",
         )
+        if not res.success:
+            logger.warning("The offset fit did not converge: %s", res.message)
         err = velocity_residual(
             time, v_gantry, v_optitrack, float(res.x), d * 1e-6, t_ref
         )

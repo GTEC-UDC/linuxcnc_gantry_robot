@@ -28,10 +28,10 @@
 
 #include "linalg3.h"
 
-void print_m_3x3(const double m[3][3]) { fprint_m_3x3(stdin, m); }
+void print_m_3x3(const double m[3][3]) { fprint_m_3x3(stdout, m); }
 
 void fprint_m_3x3(FILE *stream, const double m[3][3]) {
-  fprintf_m_3x3(stream, " 10.3g", m);
+  fprintf_m_3x3(stream, " %10.3g", m);
 }
 
 void fprintf_m_3x3(FILE *stream, const char *fmt, const double m[3][3]) {
@@ -62,7 +62,7 @@ double det_m_3x3(const double m[3][3]) {
 int inv_m_3x3(const double m[restrict 3][3], double inverse[restrict 3][3]) {
   double det = det_m_3x3(m);
 
-  if (det == 0.0) {
+  if (det == 0.0 || !isfinite(det)) {
     return -EINVAL;
   }
 

@@ -25,16 +25,14 @@
 
 #include <errno.h>
 #include <math.h>
+#include <stdbool.h>
 #include <string.h>
 #include <strings.h>
-#include <stdbool.h>
 
 #include "emcmotcfg.h"
 #include "hal.h"
 #include "kinematics.h"
-#include "motion.h"
 #include "rtapi.h"
-#include "usrmotintf.h"
 
 #include "calibxyzkinsutils.h"
 #include "calibxyzlib.h"
@@ -56,14 +54,12 @@
  *      coordinates=XYZZZZ   x:0   Y:1   Z:2,3,4,5
  *      coordinates=XXYZ     X:0,1 Y:2   Z:3
  */
-static int init_joints_mapping(const char *coordinates, const int max_joints,
-                               const int allow_duplicates,
-                               joints_mapping_t *jmap) {
+static int init_joints_mapping(const char *coordinates, int max_joints,
+                               int allow_duplicates, joints_mapping_t *jmap) {
   const char *errtag = "calibxyzkins";
   const char *coord_letter = "XYZABCUVW";
   int dups[EMCMOT_MAX_AXIS] = {0};
-  int jno = 0;
-  bool found = 0;
+  int jno;
 
   if (coordinates == NULL) {
     rtapi_print_msg(RTAPI_MSG_ERR, "%s: null coordinates\n", errtag);
@@ -88,39 +84,44 @@ static int init_joints_mapping(const char *coordinates, const int max_joints,
   }
 
   jno = 0; // begin: assign joint numbers at 0th coords position
-  for (int i = 0; coordinates[i] != 0; ++i, ++jno) {
-    found = 0;
+  for (int i = 0; coordinates[i] != 0; ++i) {
+    int coord_no = -1;
+
     // clang-format off
     switch (coordinates[i]) {
-      case 'x': case 'X': jmap->axno_for_jno[jno] = 0; dups[0]++; found = 1; break;
-      case 'y': case 'Y': jmap->axno_for_jno[jno] = 1; dups[1]++; found = 1; break;
-      case 'z': case 'Z': jmap->axno_for_jno[jno] = 2; dups[2]++; found = 1; break;
-      case 'a': case 'A': jmap->axno_for_jno[jno] = 3; dups[3]++; found = 1; break;
-      case 'b': case 'B': jmap->axno_for_jno[jno] = 4; dups[4]++; found = 1; break;
-      case 'c': case 'C': jmap->axno_for_jno[jno] = 5; dups[5]++; found = 1; break;
-      case 'u': case 'U': jmap->axno_for_jno[jno] = 6; dups[6]++; found = 1; break;
-      case 'v': case 'V': jmap->axno_for_jno[jno] = 7; dups[7]++; found = 1; break;
-      case 'w': case 'W': jmap->axno_for_jno[jno] = 8; dups[8]++; found = 1; break;
+      case 'x': case 'X': coord_no=0; break;
+      case 'y': case 'Y': coord_no=1; break;
+      case 'z': case 'Z': coord_no=2; break;
+      case 'a': case 'A': coord_no=3; break;
+      case 'b': case 'B': coord_no=4; break;
+      case 'c': case 'C': coord_no=5; break;
+      case 'u': case 'U': coord_no=6; break;
+      case 'v': case 'V': coord_no=7; break;
+      case 'w': case 'W': coord_no=8; break;
       case ' ': case '\t': continue;  // whitespace
     }
     // clang-format on
 
-    if (!found) {
+    if (coord_no < 0) {
       rtapi_print_msg(RTAPI_MSG_ERR,
                       "%s: Invalid character '%c' in coordinates '%s'\n",
                       errtag, coordinates[i], coordinates);
       return -EINVAL;
     }
 
-    if (jno > max_joints) {
+    if (jno >= max_joints) {
       rtapi_print_msg(RTAPI_MSG_ERR,
                       "%s: too many coordinates (%s) for max_joints=%d\n",
                       errtag, coordinates, max_joints);
       return -EINVAL;
     }
+
+    jmap->axno_for_jno[jno] = coord_no;
+    dups[coord_no]++;
+    ++jno;
   }
 
-  if (!found) {
+  if (jno == 0) {
     rtapi_print_msg(RTAPI_MSG_ERR, "%s: missing coordinates '%s'\n", errtag,
                     coordinates);
     return -EINVAL;
@@ -170,30 +171,34 @@ static int init_joints_mapping(const char *coordinates, const int max_joints,
   return 0;
 }
 
-int init_hal_params(int comp_id, haldata_t *haldata) {
+int init_hal_params(int comp_id, int degree, haldata_t *haldata) {
   const char *coord_letter = "xyz";
   int res = 0;
+
+  if (degree <= 0 || degree > CALIB_XYZ_MAX_DEGREE) {
+    return -EINVAL;
+  }
 
   if (haldata == NULL) {
     return -EINVAL;
   }
 
-  // Calibration matrices A, B, and vector C
-  for (int i = 0; i < 3; ++i) {
-    for (int j = 0; j < 3; ++j) {
-      if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_A[i][j],
-                                      comp_id, "calibxyzkins.calib-a.%c%c",
-                                      coord_letter[i], coord_letter[j])) < 0) {
-        return res;
-      }
-
-      if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_B[i][j],
-                                      comp_id, "calibxyzkins.calib-b.%c%c",
-                                      coord_letter[i], coord_letter[j])) < 0) {
-        return res;
+  // Calibration matrices A_k
+  for (int k = 0; k < degree; ++k) {
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+        if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_A[k][i][j],
+                                        comp_id, "calibxyzkins.calib-a%d.%c%c",
+                                        k + 1, coord_letter[i],
+                                        coord_letter[j])) < 0) {
+          return res;
+        }
       }
     }
+  }
 
+  // Calibration vector c
+  for (int i = 0; i < 3; ++i) {
     if ((res = hal_param_float_newf(HAL_RW, &haldata->calib_c[i], comp_id,
                                     "calibxyzkins.calib-c.%c",
                                     coord_letter[i])) < 0) {
@@ -216,14 +221,13 @@ int init_hal_params(int comp_id, haldata_t *haldata) {
     }
   }
 
-  // Initialize matrix A to identity, matrix B and vector C to zero
-  memset((real_t *)haldata->calib_A, 0, sizeof(real_t) * 9);
-  memset((real_t *)haldata->calib_B, 0, sizeof(real_t) * 9);
-  memset((real_t *)haldata->calib_c, 0, sizeof(real_t) * 3);
+  // Initialize matrix A_1 to identity, and A_k (k>1) and vector C to zero
+  memset((real_t *)haldata->calib_A, 0, sizeof(haldata->calib_A));
+  memset((real_t *)haldata->calib_c, 0, sizeof(haldata->calib_c));
 
-  haldata->calib_A[0][0] = 1.0;
-  haldata->calib_A[1][1] = 1.0;
-  haldata->calib_A[2][2] = 1.0;
+  haldata->calib_A[0][0][0] = 1.0;
+  haldata->calib_A[0][1][1] = 1.0;
+  haldata->calib_A[0][2][2] = 1.0;
 
   // Initialize joints min/max to -inf/+inf
   for (int i = 0; i < 3; ++i) {
@@ -257,7 +261,7 @@ int init_hal_pins(int comp_id, haldata_t *haldata) {
   return 0;
 }
 
-static int init_hal_data(int comp_id, haldata_t **haldata) {
+static int init_hal_data(int comp_id, int degree, haldata_t **haldata) {
   int res;
 
   *haldata = hal_malloc(sizeof(haldata_t));
@@ -266,7 +270,7 @@ static int init_hal_data(int comp_id, haldata_t **haldata) {
     return -ENOMEM;
   }
 
-  if ((res = init_hal_params(comp_id, *haldata)) < 0) {
+  if ((res = init_hal_params(comp_id, degree, *haldata)) < 0) {
     rtapi_print_msg(RTAPI_MSG_ERR,
                     "calibxyzkins: error initializing hal parameters\n");
     return res;
@@ -281,8 +285,8 @@ static int init_hal_data(int comp_id, haldata_t **haldata) {
   return 0;
 }
 
-int calib_xyz_kins_setup(int comp_id, const char *coordinates,
-                         const int max_joints, const int allow_duplicates,
+int calib_xyz_kins_setup(int comp_id, const char *coordinates, int degree,
+                         int max_joints, int allow_duplicates,
                          haldata_t **haldata,
                          joints_mapping_t *joints_mapping) {
   const char *errtag = "calibxyzkins";
@@ -337,7 +341,7 @@ int calib_xyz_kins_setup(int comp_id, const char *coordinates,
   }
 
   // Initialize hal data
-  if ((res = init_hal_data(comp_id, haldata)) < 0) {
+  if ((res = init_hal_data(comp_id, degree, haldata)) < 0) {
     return res;
   }
 
@@ -348,15 +352,19 @@ int calib_xyz_kins_setup(int comp_id, const char *coordinates,
  * Read calibration params from the HAL data
  * This copies the volatile doubles data to doubles.
  */
-static void read_hal_calibration_params(const haldata_t *haldata,
-                                        double A[3][3], double B[3][3],
-                                        double C[3]) {
-  for (int i = 0; i < 3; ++i) {
-    for (int j = 0; j < 3; ++j) {
-      A[i][j] = haldata->calib_A[i][j];
-      B[i][j] = haldata->calib_B[i][j];
+static void read_hal_calibration_params(const haldata_t *haldata, int degree,
+                                        double A[CALIB_XYZ_MAX_DEGREE][3][3],
+                                        double c[3]) {
+  for (int k = 0; k < degree; ++k) {
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+        A[k][i][j] = haldata->calib_A[k][i][j];
+      }
     }
-    C[i] = haldata->calib_c[i];
+  }
+
+  for (int i = 0; i < 3; ++i) {
+    c[i] = haldata->calib_c[i];
   }
 }
 
@@ -376,12 +384,11 @@ static void read_hal_joints_limits_params(const haldata_t *haldata,
 /*
  * Update positions from joints
  */
-int calib_xyz_kins_forward(const joints_mapping_t *joints_mapping,
+int calib_xyz_kins_forward(int degree, const joints_mapping_t *joints_mapping,
                            const haldata_t *haldata, const double *joints,
                            EmcPose *pos) {
-  double A[3][3];
-  double B[3][3];
-  double C[3];
+  double A[CALIB_XYZ_MAX_DEGREE][3][3];
+  double c[3];
 
   double xyz_joints[3] = {
       joints[joints_mapping->first_jno_for_axno[0]],
@@ -391,10 +398,10 @@ int calib_xyz_kins_forward(const joints_mapping_t *joints_mapping,
 
   double xyz_pos[3];
 
-  read_hal_calibration_params(haldata, A, B, C);
+  read_hal_calibration_params(haldata, degree, A, c);
 
   // Get calibrated XYZ position values from XYZ joint values
-  calib_xyz_forward(A, B, C, xyz_joints, xyz_pos);
+  calib_xyz_forward(degree, A, c, xyz_joints, xyz_pos);
 
   for (int jno = 0; jno < EMCMOT_MAX_JOINTS; ++jno) {
     int axno = joints_mapping->axno_for_jno[jno];
@@ -422,25 +429,31 @@ int calib_xyz_kins_forward(const joints_mapping_t *joints_mapping,
 /*
  * Update joints (including joints for duplicate letters) from positions
  */
-int calib_xyz_kins_inverse(const joints_mapping_t *joints_mapping,
+int calib_xyz_kins_inverse(int degree, const joints_mapping_t *joints_mapping,
                            const haldata_t *haldata, const EmcPose *pos,
                            double *joints) {
-  double A[3][3];
-  double B[3][3];
-  double C[3];
+  int ret;
+  double A[CALIB_XYZ_MAX_DEGREE][3][3];
+  double c[3];
   double joints_min[3];
   double joints_max[3];
 
   double xyz_pos[3] = {pos->tran.x, pos->tran.y, pos->tran.z};
   double xyz_joints[3];
 
-  read_hal_calibration_params(haldata, A, B, C);
+  read_hal_calibration_params(haldata, degree, A, c);
   read_hal_joints_limits_params(haldata, joints_min, joints_max);
 
   // Get calibrated XYZ joint values from XYZ position values
   // The returned joint values are within the specified bounds
-  calib_xyz_inverse(A, B, C, joints_min, joints_max, *haldata->max_iter,
-                    *haldata->tol, xyz_pos, xyz_joints, NULL);
+  ret = calib_xyz_inverse(degree, A, c, joints_min, joints_max,
+                          *haldata->max_iter, *haldata->tol, xyz_pos,
+                          xyz_joints, NULL);
+
+  if (ret) {
+    // Could not update joints: Jacobian is not invertible
+    return -1;
+  }
 
   for (int jno = 0; jno < EMCMOT_MAX_JOINTS; ++jno) {
     int axno = joints_mapping->axno_for_jno[jno];

@@ -24,53 +24,42 @@
  ********************************************************************/
 
 /*-------------------------------------------------------------------
-This module provides forward and inverse kinematic functions for a calibrated
-XYZ cartesian machine. The forward transformation from joints jx, jy, jz
-to positions x, y, z is defined as:
+This module provides forward and inverse kinematic functions for a
+calibrated XYZ cartesian machine. The forward transformation from joints
+jx, jy, jz to positions x, y, z is defined as:
 
-[x, y, z]^T = A * [jx, jy, jz]^T + B * [jx^2, jy^2, jz^2]^T + c
+[x, y, z]^T = c + sum_{k=1}^{n} A_k * [jx^k, jy^k, jz^k]^T
 
-Where A and B are 3x3 matrices, c is a 3x1 vector, and ^T is the transpose
-operation.
+Where n is the degree of the transformation, c is a 3x1 vector, the A_k
+are 3x3 matrices, and ^T is the transpose operation.
 
-The default values for A, B, and c are:
-  - A: 3x3 identity matrix
-  - B: all zero 3x3 matrix
+The default values for n, c, and A_k:
+  - n: 1
   - c: all zero 3x1 matrix
+  - A_k: 3x3 identity matrix for k=1, else all zero 3x3 matrix
 
 Thus, by default the kinematics are just the trivial kinematics.
 
 The inverse transformation is obtained using the Newton-Raphson method.
-The maximum number of iterations and tolerance of the method can be set with the
-provided HAL pins.
+The maximum number of iterations and tolerance of the method can be set
+with the provided HAL pins.
 
 HAL parameters (defaults in parentheses):
-  * Calibration matrix A:
-    calibxyzkins.calib-a.xx (1)
-    calibxyzkins.calib-a.xy (0)
-    calibxyzkins.calib-a.xz (0)
-    calibxyzkins.calib-a.yx (0)
-    calibxyzkins.calib-a.yy (1)
-    calibxyzkins.calib-a.yz (0)
-    calibxyzkins.calib-a.zx (0)
-    calibxyzkins.calib-a.zy (0)
-    calibxyzkins.calib-a.zz (1)
-
-  * Calibration matrix B:
-    calibxyzkins.calib-b.xx (0)
-    calibxyzkins.calib-b.xy (0)
-    calibxyzkins.calib-b.xz (0)
-    calibxyzkins.calib-b.yx (0)
-    calibxyzkins.calib-b.yy (0)
-    calibxyzkins.calib-b.yz (0)
-    calibxyzkins.calib-b.zx (0)
-    calibxyzkins.calib-b.zy (0)
-    calibxyzkins.calib-b.zz (0)
-
   * Calibration vector c:
     calibxyzkins.calib-c.x (0)
     calibxyzkins.calib-c.y (0)
     calibxyzkins.calib-c.z (0)
+
+  * Calibration matrix A_k (replace <k> by the number k):
+    calibxyzkins.calib-a<k>.xx (1 if k = 1 else 0)
+    calibxyzkins.calib-a<k>.xy (0)
+    calibxyzkins.calib-a<k>.xz (0)
+    calibxyzkins.calib-a<k>.yx (0)
+    calibxyzkins.calib-a<k>.yy (1 if k = 1 else 0)
+    calibxyzkins.calib-a<k>.yz (0)
+    calibxyzkins.calib-a<k>.zx (0)
+    calibxyzkins.calib-a<k>.zy (0)
+    calibxyzkins.calib-a<k>.zz (1 if k = 1 else 0)
 
   * Max/min joints limits for the XYZ axes:
     calibxyzkins.min-limit.x (-inf)
@@ -93,8 +82,7 @@ HAL pins (defaults in parentheses):
 
 #include "hal.h"
 #include "kinematics.h"
-#include "rtapi.h"     /* RTAPI realtime OS API */
-#include "rtapi_app.h" /* RTAPI realtime module decls */
+#include "rtapi.h" /* RTAPI realtime OS API */
 
 #include "calibxyzkinsutils.h"
 
@@ -106,6 +94,10 @@ MODULE_LICENSE("GPL")
 // System coordinates input parameter
 static const char *coordinates = "XYZABCUVW";
 RTAPI_MP_STRING(coordinates, "Existing Axes")
+
+// Degree input parameter
+static int degree = 1;
+RTAPI_MP_INT(degree, "Degree of the transformation")
 
 /*
  * Global data
@@ -127,7 +119,7 @@ int kinematicsForward(const double *joints, EmcPose *pos,
     return -EPERM;
   }
 
-  return calib_xyz_kins_forward(&joints_mapping, haldata, joints, pos);
+  return calib_xyz_kins_forward(degree, &joints_mapping, haldata, joints, pos);
 }
 
 /*
@@ -142,7 +134,7 @@ int kinematicsInverse(const EmcPose *pos, double *joints,
     return -EPERM;
   }
 
-  return calib_xyz_kins_inverse(&joints_mapping, haldata, pos, joints);
+  return calib_xyz_kins_inverse(degree, &joints_mapping, haldata, pos, joints);
 }
 
 KINEMATICS_TYPE
@@ -163,8 +155,9 @@ int rtapi_app_main(void) {
   }
 
   rtapi_print_msg(RTAPI_MSG_ERR, "calibxyzkins: setting up\n");
-  if ((res = calib_xyz_kins_setup(comp_id, coordinates, EMCMOT_MAX_JOINTS, true,
-                                  &haldata, &joints_mapping)) < 0) {
+  if ((res =
+           calib_xyz_kins_setup(comp_id, coordinates, degree, EMCMOT_MAX_JOINTS,
+                                true, &haldata, &joints_mapping)) < 0) {
     hal_exit(comp_id);
     return res;
   }

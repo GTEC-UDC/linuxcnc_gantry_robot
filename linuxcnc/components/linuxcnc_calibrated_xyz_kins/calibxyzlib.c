@@ -29,13 +29,72 @@
 #include "calibxyzlib.h"
 #include "linalg3.h"
 
-void calib_xyz_forward(const double A[3][3], const double B[3][3],
+void calib_xyz_forward(int degree, const double A[CALIB_XYZ_MAX_DEGREE][3][3],
                        const double c[3], const double joints[3],
                        double position[3]) {
+  double acc[3][3];
+
+  // position = c + sum_{k=0}^{n-1} A[k] * joints^(k+1)
+  //
+  // Using Horner's method:
+  //
+  // acc[i][j] = A[0][i][j] +
+  //             A[1][i][j] * joints[j] +
+  //             ... +
+  //             A[degree-1][i][j] * joints[j]^(degree-1)
+
+  // Initialize acc with case k = degree - 1
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      acc[i][j] = A[degree - 1][i][j];
+    }
+  }
+
+  // Loop for k < degree - 1. If degree = 1 this does nothing.
+  for (int k = degree - 2; k >= 0; --k) {
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+        acc[i][j] = acc[i][j] * joints[j] + A[k][i][j];
+      }
+    }
+  }
+
+  // Note that acc[i][j] is missing a joints[j] power
+  // so here we multiply acc[i][j] by joints[j]
   for (int i = 0; i < 3; ++i) {
     position[i] = c[i];
     for (int j = 0; j < 3; ++j) {
-      position[i] += A[i][j] * joints[j] + B[i][j] * joints[j] * joints[j];
+      position[i] += acc[i][j] * joints[j];
+    }
+  }
+}
+
+/*
+ * Calculate the Jacobian matrix:
+ * J = sum_{k=0}^{n-1} (k+1) * A[k] * diag(joints)^k
+ */
+static void jacobian(int degree, const double A[CALIB_XYZ_MAX_DEGREE][3][3],
+                     const double joints[3], double jacobian[3][3]) {
+  // Using Horner's method:
+  //
+  // jacobian[i][j] = A[0][i][j] +
+  //                  2 * A[1][i][j] * joints[j] +
+  //                  ... +
+  //                  degree * A[degree-1][i][j] * joints[j]^(degree-1)
+
+  // Initialize acc with case k = degree - 1
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      jacobian[i][j] = degree * A[degree - 1][i][j];
+    }
+  }
+
+  // Loop for k < degree - 1. If degree = 1 this does nothing.
+  for (int k = degree - 2; k >= 0; --k) {
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+        jacobian[i][j] = jacobian[i][j] * joints[j] + (k + 1) * A[k][i][j];
+      }
     }
   }
 }
@@ -45,13 +104,13 @@ static double clamp(double val, double min, double max) {
   return t > max ? max : t;
 }
 
-int calib_xyz_inverse(const double A[3][3], const double B[3][3],
+int calib_xyz_inverse(int degree, const double A[CALIB_XYZ_MAX_DEGREE][3][3],
                       const double c[3], const double *min_bounds,
-                      const double *max_bounds, const unsigned int max_iter,
+                      const double *max_bounds, unsigned int max_iter,
                       const double tol, const double position[3],
                       double joints[3], double *r_norm) {
+  double r_norm_val = 0;
   double r[3];
-  double r_norm_val;
   double J[3][3];
   double inv_J[3][3];
   double delta[3];
@@ -71,12 +130,12 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
   }
 
   for (int iter = 0; iter < max_iter; ++iter) {
-    // r = A * joints + B * joints^2 + c - position
+
+    // r = c + sum_{k=0}^{n-1} A[k] * joints^(k+1) - position
+    calib_xyz_forward(degree, A, c, joints, r);
+
     for (int i = 0; i < 3; ++i) {
-      r[i] = c[i] - position[i];
-      for (int j = 0; j < 3; ++j) {
-        r[i] += A[i][j] * joints[j] + B[i][j] * joints[j] * joints[j];
-      }
+      r[i] -= position[i];
     }
 
     // Euclidean norm of r
@@ -93,16 +152,12 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
       break;
     }
 
-    // Jacobian J = A + 2 * B * diag(joints)
-    for (int i = 0; i < 3; ++i) {
-      for (int j = 0; j < 3; ++j) {
-        J[i][j] = A[i][j] + 2 * B[i][j] * joints[j];
-      }
-    }
+    // Jacobian J = sum_{k=0}^{n-1} (k+1) * A[k] diag(joints)^k
+    jacobian(degree, A, joints, J);
 
     // Inverse of Jacobian
     if (inv_m_3x3(J, inv_J)) {
-      return -EINVAL;
+      return -1;
     }
 
     // delta = J^-1 * r
@@ -127,36 +182,79 @@ int calib_xyz_inverse(const double A[3][3], const double B[3][3],
   return 0;
 }
 
-int calib_xyz_check_inv(const double A[3][3], const double B[3][3],
+// a * b with the convention 0 * inf = 0
+static double mul0(double a, double b) { return a == 0.0 ? 0.0 : a * b; }
+
+int calib_xyz_check_inv(int degree, const double A[CALIB_XYZ_MAX_DEGREE][3][3],
                         const double min_bounds[3],
                         const double max_bounds[3]) {
-  double inv_A[3][3];
+  double inv_A0[3][3];
   double max_abs_bounds[3];
+  double T[3][3];
   double M[3][3];
 
-  if (inv_m_3x3(A, inv_A)) {
+  if (inv_m_3x3(A[0], inv_A0)) {
     return -1;
+  }
+
+  if (degree == 1) {
+    // For degree 1 the model only needs for A to have inverse
+    return 0;
   }
 
   // Max absolute value of bounds
   for (int i = 0; i < 3; ++i) {
+    if (isnan(min_bounds[i]) || isnan(max_bounds[i])) {
+      return -EINVAL;
+    }
     double min_abs = fabs(min_bounds[i]);
     double max_abs = fabs(max_bounds[i]);
     max_abs_bounds[i] = min_abs > max_abs ? min_abs : max_abs;
   }
 
-  // M = 2 * A^-1 * B * diag(max_abs_bounds)
-  mult_mm_3x3(inv_A, B, M);
+  // Calculate matrix
+  // M = sum_{k=1}^{n-1} (k+1) * | A[0]^-1 * A[k] | * diag(max_abs_bounds)^k
+  //
+  // Using Horner's method:
+  // With M[k] = A[0]^-1 * A[k]
+  //
+  // T[i][j] = 2 * |M[1][i][j]| * max_abs_bounds[j] +
+  //           3 * |M[2][i][j]| * max_abs_bounds[j]^2 +
+  //           ... +
+  //           degree * |M[degree-1][i][j]| * max_abs_bounds[j]^(degree-1)
 
+  // Initialize T with case k = degree - 1
+  mult_mm_3x3(inv_A0, A[degree - 1], M);
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      M[i][j] = 2 * M[i][j] * max_abs_bounds[j];
+      T[i][j] = degree * fabs(M[i][j]);
     }
   }
 
-  if (norm_1_m_3x3(M) >= 1 || norm_inf_m_3x3(M) >= 1) {
-    return -2;
+  // Loop for k < degree - 1 until k == 1. If degree = 2 this does nothing.
+  for (int k = degree - 2; k >= 1; --k) {
+    mult_mm_3x3(inv_A0, A[k], M);
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 3; ++j) {
+        T[i][j] = mul0(T[i][j], max_abs_bounds[j]) + (k + 1) * fabs(M[i][j]);
+      }
+    }
   }
 
-  return 0;
+  // Note that T[i][j] is missing a max_abs_bounds[j] power
+  // so here we multiply T[i][j] by max_abs_bounds[j]
+  for (int i = 0; i < 3; ++i) {
+    for (int j = 0; j < 3; ++j) {
+      T[i][j] = mul0(T[i][j], max_abs_bounds[j]);
+      if (!isfinite(T[i][j])) {
+        return -2;
+      }
+    }
+  }
+
+  if (norm_1_m_3x3(T) < 1 || norm_inf_m_3x3(T) < 1) {
+    return 0;
+  }
+
+  return -2;
 }

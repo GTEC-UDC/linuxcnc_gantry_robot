@@ -26,6 +26,7 @@
 #ifndef CALIBXYZKINSUTILS_H
 #define CALIBXYZKINSUTILS_H
 
+#include "calibxyzlib.h"
 #include "emcmotcfg.h"
 #include "emcpos.h"
 #include "hal.h"
@@ -33,15 +34,14 @@
 /*
  * HAL data
  * Parameters:
- *  - Calibration matrices A and B, and vector c
+ *  - Calibration matrices A and vector c
  *  - Min/max values of joints of XYZ coordinates
  * Pins:
  *  - Max iterations for inverse kinematics
  *  - Tolerance for inverse kinematics
  */
 typedef struct {
-  hal_float_t calib_A[3][3];
-  hal_float_t calib_B[3][3];
+  hal_float_t calib_A[CALIB_XYZ_MAX_DEGREE][3][3];
   hal_float_t calib_c[3];
   hal_float_t joints_min[3];
   hal_float_t joints_max[3];
@@ -64,14 +64,14 @@ typedef struct {
 /*
  * Initialize the HAL data and the joints mappings
  */
-int calib_xyz_kins_setup(int comp_id, const char *coordinates,
-                         const int max_joints, const int allow_duplicates,
+int calib_xyz_kins_setup(int comp_id, const char *coordinates, int degree,
+                         int max_joints, int allow_duplicates,
                          haldata_t **haldata, joints_mapping_t *joints_mapping);
 /*
  * Update position from joints based on the joints mapping and the calibration
  * data.
  */
-int calib_xyz_kins_forward(const joints_mapping_t *joints_mapping,
+int calib_xyz_kins_forward(int degree, const joints_mapping_t *joints_mapping,
                            const haldata_t *haldata, const double *joints,
                            EmcPose *pos);
 
@@ -79,7 +79,7 @@ int calib_xyz_kins_forward(const joints_mapping_t *joints_mapping,
  * Update joints (including joints for duplicate letters) based on the joints
  * mapping and the calibration data.
  */
-int calib_xyz_kins_inverse(const joints_mapping_t *joints_mapping,
+int calib_xyz_kins_inverse(int degree, const joints_mapping_t *joints_mapping,
                            const haldata_t *haldata, const EmcPose *pos,
                            double *joints);
 

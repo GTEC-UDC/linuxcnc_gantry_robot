@@ -82,7 +82,8 @@ HAL pins (defaults in parentheses):
 
 #include "hal.h"
 #include "kinematics.h"
-#include "rtapi.h" /* RTAPI realtime OS API */
+#include "rtapi.h"     /* RTAPI realtime OS API */
+#include "rtapi_app.h" /* RTAPI realtime module decls */
 
 #include "calibxyzkinsutils.h"
 

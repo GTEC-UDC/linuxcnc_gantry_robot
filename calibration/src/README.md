@@ -121,7 +121,7 @@ The `calibxyzkins` module of LinuxCNC included in this repository uses the Newto
 
 $$\mathbf{f}(x, y, z) = \mathbf{c} + \sum_{k=1}^{n} \mathbf{A}_k \begin{bmatrix} x^k \\ y^k \\ z^k \end{bmatrix} = \begin{bmatrix} x' \\ y' \\ z' \end{bmatrix}$$
 
-**Note**: The `calibxyzkins` module implements the transformation up to the second degree. The `check_params.py` script accepts any degree.
+**Note**: The `calibxyzkins` module implements the transformation for degrees 1 to 5, set with its `degree` parameter. The `check_params.py` script accepts any degree.
 
 To ensure the calibration parameters are valid we include the `check_params.py` script, which performs the following validation tests:
 
@@ -426,35 +426,48 @@ The `calibxyzkins` module included in this repository can be used to calibrate t
 python print_calibxyzkins_config.py
 ```
 
-The module implements the correction transformation up to the second degree, so the script fails for calibration files of a higher degree, such as the one of the `2025-04-09` measurement. For a calibration file of the second degree, it outputs a HAL configuration like the following:
+The script outputs the HAL parameters of the calibration matrices $\mathbf{A}_1$ to $\mathbf{A}_n$ and of the vector $\mathbf{c}$, with $n$ the degree of the correction model of the calibration file. The module creates the parameters of the matrices up to the degree given by its `degree` parameter, so it must be loaded with the degree of the correction model (for example, `loadrt calibxyzkins coordinates=xyyz degree=3`). The module implements the transformation up to degree 5. For the calibration file of the `2025-04-09` measurement, of degree three, it outputs the following HAL configuration:
 
 ```text
-# Calibration matrix A
-setp calibxyzkins.calib-a.xx 0.9990369633
-setp calibxyzkins.calib-a.xy 0.00351911362
-setp calibxyzkins.calib-a.xz 0.01233976766
-setp calibxyzkins.calib-a.yx -0.002370503681
-setp calibxyzkins.calib-a.yy 1.002465791
-setp calibxyzkins.calib-a.yz 0.003979069254
-setp calibxyzkins.calib-a.zx -0.001035471646
-setp calibxyzkins.calib-a.zy -0.004752129099
-setp calibxyzkins.calib-a.zz 1.000191446
+# The calibxyzkins module must be loaded with degree=3
 
-# Calibration matrix B
-setp calibxyzkins.calib-b.xx 2.205888871e-07
-setp calibxyzkins.calib-b.xy -8.883515393e-07
-setp calibxyzkins.calib-b.xz 0
-setp calibxyzkins.calib-b.yx 3.1221182e-07
-setp calibxyzkins.calib-b.yy -4.690445432e-08
-setp calibxyzkins.calib-b.yz 0
-setp calibxyzkins.calib-b.zx 2.301649573e-07
-setp calibxyzkins.calib-b.zy 9.733292478e-07
-setp calibxyzkins.calib-b.zz 0
+# Calibration matrix A1
+setp calibxyzkins.calib-a1.xx 1.00453144
+setp calibxyzkins.calib-a1.xy 0.0006060829668
+setp calibxyzkins.calib-a1.xz 0.01190260298
+setp calibxyzkins.calib-a1.yx -0.004710143219
+setp calibxyzkins.calib-a1.yy 1.001237522
+setp calibxyzkins.calib-a1.yz 0.003901566711
+setp calibxyzkins.calib-a1.zx 0.001472640288
+setp calibxyzkins.calib-a1.zy -0.00597684889
+setp calibxyzkins.calib-a1.zz 1.000135891
 
-# Calibration vector C
-setp calibxyzkins.calib-c.x 9.648396195
-setp calibxyzkins.calib-c.y 0.8905471887
-setp calibxyzkins.calib-c.z 4.55518685
+# Calibration matrix A2
+setp calibxyzkins.calib-a2.xx -2.285671595e-06
+setp calibxyzkins.calib-a2.xy 4.970607672e-07
+setp calibxyzkins.calib-a2.xz 0
+setp calibxyzkins.calib-a2.yx 1.373238973e-06
+setp calibxyzkins.calib-a2.yy 6.381111199e-07
+setp calibxyzkins.calib-a2.yz 0
+setp calibxyzkins.calib-a2.zx -9.16928908e-07
+setp calibxyzkins.calib-a2.zy 1.460611551e-06
+setp calibxyzkins.calib-a2.zz 0
+
+# Calibration matrix A3
+setp calibxyzkins.calib-a3.xx 3.088439582e-10
+setp calibxyzkins.calib-a3.xy -1.726905844e-10
+setp calibxyzkins.calib-a3.xz 0
+setp calibxyzkins.calib-a3.yx -1.310698088e-10
+setp calibxyzkins.calib-a3.yy -9.461374443e-11
+setp calibxyzkins.calib-a3.yz 0
+setp calibxyzkins.calib-a3.zx 1.405389167e-10
+setp calibxyzkins.calib-a3.zy -5.941468316e-11
+setp calibxyzkins.calib-a3.zz 0
+
+# Calibration vector c
+setp calibxyzkins.calib-c.x 8.468703477
+setp calibxyzkins.calib-c.y 2.221451156
+setp calibxyzkins.calib-c.z 3.838348357
 ```
 
 ### Corrected Gantry and OptiTrack Path Visualization

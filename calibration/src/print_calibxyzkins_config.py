@@ -1,9 +1,12 @@
 import argparse
 from pathlib import Path
 
-import numpy as np
 from data import load_correction_params
 from defaults import CALIBRATION_FILE
+
+# Maximum degree of the model in the calibxyzkins module, set at compile time
+# with the CALIB_XYZ_MAX_DEGREE macro of calibxyzlib.h
+CALIBXYZKINS_MAX_DEGREE = 5
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -22,34 +25,33 @@ if __name__ == "__main__":
 
     params = load_correction_params(args.calibration)
 
-    # The calibxyzkins module implements the model up to the second degree, with
-    # the matrix A for the linear terms and the matrix B for the squares
-    if params.degree > 2:
+    if params.degree > CALIBXYZKINS_MAX_DEGREE:
         parser.error(
             f"The correction model of {args.calibration} is of degree "
-            f"{params.degree}, and the calibxyzkins module supports up to degree 2"
+            f"{params.degree}, and the calibxyzkins module supports up to degree "
+            f"{CALIBXYZKINS_MAX_DEGREE}"
         )
-
-    A = np.array(params.A[0])
-    B = np.array(params.A[1]) if params.degree == 2 else np.zeros((3, 3))
-    c = np.array(params.c)
 
     coords = ["x", "y", "z"]
 
-    for matrix_name, matrix in (('A', A), ('B', B)):
-        print(f"# Calibration matrix {matrix_name}")
-        name = matrix_name.lower()
+    # The module creates the parameters of the matrices A1 to An, with n the
+    # value of its degree parameter
+    print(f"# Load the calibxyzkins module with degree={params.degree}")
+    print()
+
+    for k, matrix in enumerate(params.A, start=1):
+        print(f"# Calibration matrix A{k}")
 
         for row_i, row_coord in enumerate(coords):
             for col_i, col_coord in enumerate(coords):
-                param = f"calibxyzkins.calib-{name}.{row_coord}{col_coord}"
-                value = matrix[row_i, col_i]
+                param = f"calibxyzkins.calib-a{k}.{row_coord}{col_coord}"
+                value = matrix[row_i][col_i]
                 print(f"setp {param} {value:.10g}")
 
         print()
 
-    print("# Calibration vector C")
+    print("# Calibration vector c")
     for row_i, row_coord in enumerate(coords):
         param = f"calibxyzkins.calib-c.{row_coord}"
-        value = c[row_i]
+        value = params.c[row_i]
         print(f"setp {param} {value:.10g}")

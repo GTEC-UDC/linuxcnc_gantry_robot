@@ -22,6 +22,7 @@ The system consists of several scripts to process and analyze the data:
 
 3. **Analysis**: Various scripts for plotting and analyzing the gantry and OptiTrack data, which can be executed after the calibration is complete:
    - `check_params.py`: Check the calibration parameters.
+   - `check_inverse_kinematics.py`: Check the convergence of the inverse kinematics solver over the workspace.
    - `print_calibxyzkins_config.py`: Print the HAL configuration for the `calibxyzkins` module.
    - `plot_movement.py`: Visualize the gantry and OptiTrack path.
    - `plot_errors.py`: Plot positioning errors over time.

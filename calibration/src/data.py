@@ -617,6 +617,176 @@ def samples_mean_distance(a: FloatArray, b: FloatArray) -> float:
     return float(np.nanmean(np.sqrt(np.sum((a - b) ** 2, axis=1))))
 
 
+def fit_alignment(
+    time: FloatArray,
+    gantry_samples: FloatArray,
+    optitrack_samples: FloatArray,
+    config: CalibrationAlignmentConfig | None = None,
+) -> FloatArray:
+    """Fit the alignment of the OptiTrack positions with the gantry positions.
+
+    The alignment shifts the OptiTrack positions in time, rotates them about the
+    rotation center of ``config`` and translates them (see ``coord_align_array``).
+    The parameters are found with a numerical minimization starting at
+    ``config.init_params``.
+
+    Args:
+        time (FloatArray): Time of each sample in seconds, shape (N,) or (N, 1).
+        gantry_samples (FloatArray): Gantry positions, shape (N, 3).
+        optitrack_samples (FloatArray): OptiTrack positions, shape (N, 3), paired
+            row by row with the gantry ones. The pairs with NaN are ignored.
+        config (CalibrationAlignmentConfig | None): Settings of the fit. None
+            uses the default ones.
+
+    Returns:
+        FloatArray: Alignment parameters (dt, rx, ry, rz, tx, ty, tz), shape (7,).
+    """
+    g_xyz, o_xyz = gantry_samples, optitrack_samples
+    config = config or CalibrationAlignmentConfig()
+    rot_center = np.asarray(config.rotation_center)
+
+    # Initial alignment parameters
+    if config.init_params:
+        x0 = np.array(config.init_params)
+    else:
+        x0 = np.zeros(7)
+
+    bounds: list[tuple[float | None, float | None]] | None = None
+
+    if max_rotation := config.max_rotation:
+        bounds = [(None, None) for _ in range(len(x0))]
+        bounds[1] = (x0[1] - max_rotation, x0[1] + max_rotation)
+        bounds[2] = (x0[2] - max_rotation, x0[2] + max_rotation)
+        bounds[3] = (x0[3] - max_rotation, x0[3] + max_rotation)
+
+    objective_fn = samples_mse if config.objective == "mse" else samples_mean_distance
+
+    min_opts = config.minimize_options
+
+    def opt_callback(intermediate_result):
+        if min_opts.display:
+            fval = getattr(intermediate_result, "fun", intermediate_result)
+            print(f"fval: {fval}")
+
+    logger.info("Aligning OptiTrack data with gantry data...")
+
+    res = scp.optimize.minimize(
+        fun=lambda x: objective_fn(
+            g_xyz, coord_align_array(x, time, o_xyz, rot_center)
+        ),
+        x0=x0,
+        bounds=bounds,
+        tol=min_opts.tolerance,
+        options={"disp": min_opts.display},
+        callback=opt_callback,
+        method=min_opts.method,
+    )
+
+    if not res.success:
+        logger.warning("The alignment fit did not converge: %s", res.message)
+
+    alignment_params_array = res.x
+    logger.info("Alignment completed. Parameters: %s", alignment_params_array)
+
+    o_xyz_aligned = coord_align_array(res.x, time, o_xyz, rot_center)
+    mean_dist_err = samples_mean_distance(g_xyz, o_xyz_aligned)
+    mean_sq_err = samples_mse(g_xyz, o_xyz_aligned)
+
+    logger.info("Alignment mean distance error: %f", mean_dist_err)
+    logger.info("Alignment mean square error: %f", mean_sq_err)
+
+    return alignment_params_array
+
+
+def fit_correction_with_config(
+    gantry_samples: FloatArray,
+    optitrack_samples: FloatArray,
+    config: CalibrationCorrectionConfig | None = None,
+) -> PolynomialCorrection:
+    """Fit the correction model of the gantry with the settings of ``config``.
+
+    The model maps the gantry positions onto the OptiTrack positions, which must
+    be already aligned with the gantry:
+
+        pos_optitrack = c + A_1 @ pos_gantry + ... + A_n @ pos_gantry**n
+
+    where the powers are elementwise, c is a vector and A_1, ..., A_n are 3x3
+    matrices (see ``PolynomialCorrection``). Each coordinate enters with the
+    powers up to its entry in ``config.degree``.
+
+    With the "mse" objective the model is fitted by linear least squares (see
+    ``fit_correction``). With the "mean_distance" objective it is fitted with a
+    numerical minimization.
+
+    Args:
+        gantry_samples (FloatArray): Gantry positions, shape (N, 3).
+        optitrack_samples (FloatArray): Aligned OptiTrack positions, shape (N, 3),
+            paired row by row with the gantry ones. The pairs with NaN are left
+            out.
+        config (CalibrationCorrectionConfig | None): Settings of the fit. None
+            uses the default ones.
+
+    Returns:
+        PolynomialCorrection: Fitted correction model.
+    """
+    g_xyz, o_xyz = gantry_samples, optitrack_samples
+    config = config or CalibrationCorrectionConfig()
+    degree = config.degree
+
+    logger.info("Fitting correction model for gantry data...")
+    valid = ~np.isnan(g_xyz).any(axis=1) & ~np.isnan(o_xyz).any(axis=1)
+    g_xyz, o_xyz = g_xyz[valid], o_xyz[valid]
+
+    if config.objective == "mse":
+        # The correction model is linear in c and the matrices A_k, so we
+        # use linear least squares to minimize the mean square error.
+        correction = fit_correction(g_xyz, o_xyz, degree)
+    else:
+        # The parameters to optimize are the coefficients of the model on the
+        # scaled gantry positions, one row of three per term and one for c
+        # (see correction_scale). The initial point is the identity.
+        terms = correction_terms(degree)
+        scale = correction_scale(g_xyz)
+        coef0 = np.zeros((len(terms) + 1, 3))
+
+        for row, (k, axis) in enumerate(terms):
+            if k == 1:
+                coef0[row, axis] = scale[axis]
+
+        mat_d = design_matrix(g_xyz / scale, degree)
+
+        min_opts = config.minimize_options
+
+        def opt_callback(intermediate_result):
+            if min_opts.display:
+                fval = getattr(intermediate_result, "fun", intermediate_result)
+                print(f"fval: {fval}")
+
+        res = scp.optimize.minimize(
+            fun=lambda x: samples_mean_distance(o_xyz, mat_d @ x.reshape(-1, 3)),
+            x0=coef0.flatten(),
+            tol=min_opts.tolerance,
+            options={"disp": min_opts.display},
+            callback=opt_callback,
+            method=min_opts.method,
+        )
+
+        if not res.success:
+            logger.warning("The correction fit did not converge: %s", res.message)
+
+        correction = correction_from_coef(res.x.reshape(-1, 3), degree, scale)
+
+    g_xyz_corrected = correction.apply(g_xyz)
+    mean_dist_err = samples_mean_distance(o_xyz, g_xyz_corrected)
+    mean_sq_err = samples_mse(o_xyz, g_xyz_corrected)
+
+    logger.info("Correction completed. Parameters: %s", correction)
+    logger.info("Correction mean distance error: %f", mean_dist_err)
+    logger.info("Correction mean square error: %f", mean_sq_err)
+
+    return correction
+
+
 def get_processed_data(
     gantry_filename: str | Path,
     optitrack_filename: str | Path,
@@ -681,64 +851,10 @@ def get_processed_data(
         alignment_params_array = np.array(calibration_params.alignment)
     elif config.alignment.enabled:
         time = df.loc[:, ["time"]].to_numpy()
-        # Gantry data
-        g_xyz = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]].to_numpy()
-        # OptiTrack data
-        o_xyz = df.loc[:, ["RB.X", "RB.Y", "RB.Z"]].to_numpy()
+        g_xyz = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]].to_numpy()  # Gantry data
+        o_xyz = df.loc[:, ["RB.X", "RB.Y", "RB.Z"]].to_numpy()  # OptiTrack data
 
-        # Initial alignment parameters
-        if config.alignment.init_params:
-            x0 = np.array(config.alignment.init_params)
-        else:
-            x0 = np.zeros(7)
-
-        bounds: list[tuple[float | None, float | None]] | None = None
-
-        if max_rotation := config.alignment.max_rotation:
-            bounds = [(None, None) for _ in range(len(x0))]
-            bounds[1] = (x0[1] - max_rotation, x0[1] + max_rotation)
-            bounds[2] = (x0[2] - max_rotation, x0[2] + max_rotation)
-            bounds[3] = (x0[3] - max_rotation, x0[3] + max_rotation)
-
-        objective_fn = (
-            samples_mse
-            if config.alignment.objective == "mse"
-            else samples_mean_distance
-        )
-
-        min_opts = config.alignment.minimize_options
-
-        def opt_callback(intermediate_result):
-            if min_opts.display:
-                fval = getattr(intermediate_result, "fun", intermediate_result)
-                print(f"fval: {fval}")
-
-        logger.info("Aligning OptiTrack data with gantry data...")
-
-        res = scp.optimize.minimize(
-            fun=lambda x: objective_fn(
-                g_xyz, coord_align_array(x, time, o_xyz, np.asarray(rotation_center))
-            ),
-            x0=x0,
-            bounds=bounds,
-            tol=min_opts.tolerance,
-            options={"disp": min_opts.display},
-            callback=opt_callback,
-            method=min_opts.method,
-        )
-
-        if not res.success:
-            logger.warning("The alignment fit did not converge: %s", res.message)
-
-        alignment_params_array = res.x
-        logger.info("Alignment completed. Parameters: %s", alignment_params_array)
-
-        o_xyz_aligned = coord_align_array(res.x, time, o_xyz, rotation_center)
-        mean_dist_err = samples_mean_distance(g_xyz, o_xyz_aligned)
-        mean_sq_err = samples_mse(g_xyz, o_xyz_aligned)
-
-        logger.info("Alignment mean distance error: %f", mean_dist_err)
-        logger.info("Alignment mean square error: %f", mean_sq_err)
+        alignment_params_array = fit_alignment(time, g_xyz, o_xyz, config.alignment)
 
     if alignment_params_array is not None:
         # Transform all the OptiTrack coordinates in the dataframe
@@ -802,22 +918,11 @@ def get_processed_data(
         df.loc[df.index[valid][~keep], coord_cols] = np.nan
 
     # -------------------------------------------------------------------------
-    # Calculate and apply non-linear coordinate transformation to correct the
-    # misalignments between the gantry and the OptiTrack system.
+    # Correct the gantry positions
     #
-    # We consider the following transformation:
-    #
-    #   pos_optitrack = c + pos_gantry @ A_1.T + ... + pos_gantry ** n @ A_n.T
-    #
-    # where:
-    #   - pos_gantry is the position of the gantry (row vector)
-    #   - pos_optitrack is the position of the OptiTrack system (row vector)
-    #   - A_1, ..., A_n are 3x3 matrices
-    #   - c is a 3x1 vector
-    #
-    # The parameters are the vector c and the elements of the matrices A_k, in
-    # the columns of the powers that the degree of the configuration allows.
-    # See PolynomialCorrection.
+    # The correction model maps the gantry positions onto the aligned OptiTrack
+    # positions. It is fitted here unless its parameters are given. See
+    # fit_correction_with_config.
     # -------------------------------------------------------------------------
 
     correction: PolynomialCorrection | None = None
@@ -834,62 +939,10 @@ def get_processed_data(
                 degree,
             )
     elif config.correction.enabled:
-        time = df.loc[:, ["time"]].to_numpy()
-        # Gantry data
-        g_xyz = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]].to_numpy()
-        # OptiTrack data
-        o_xyz = df.loc[:, ["RB.X", "RB.Y", "RB.Z"]].to_numpy()
+        g_xyz = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]].to_numpy()  # Gantry data
+        o_xyz = df.loc[:, ["RB.X", "RB.Y", "RB.Z"]].to_numpy()  # OptiTrack data
 
-        logger.info("Correcting gantry data...")
-        valid = ~np.isnan(g_xyz).any(axis=1) & ~np.isnan(o_xyz).any(axis=1)
-        g_xyz, o_xyz = g_xyz[valid], o_xyz[valid]
-
-        if config.correction.objective == "mse":
-            # The correction model is linear in c and the matrices A_k, so we
-            # use linear least squares to minimize the mean square error.
-            correction = fit_correction(g_xyz, o_xyz, degree)
-        else:
-            # The parameters to optimize are the coefficients of the model on the
-            # scaled gantry positions, one row of three per term and one for c
-            # (see correction_scale). The initial point is the identity.
-            terms = correction_terms(degree)
-            scale = correction_scale(g_xyz)
-            coef0 = np.zeros((len(terms) + 1, 3))
-
-            for row, (k, axis) in enumerate(terms):
-                if k == 1:
-                    coef0[row, axis] = scale[axis]
-
-            mat_d = design_matrix(g_xyz / scale, degree)
-
-            min_opts = config.correction.minimize_options
-
-            def opt_callback(intermediate_result):
-                if min_opts.display:
-                    fval = getattr(intermediate_result, "fun", intermediate_result)
-                    print(f"fval: {fval}")
-
-            res = scp.optimize.minimize(
-                fun=lambda x: samples_mean_distance(o_xyz, mat_d @ x.reshape(-1, 3)),
-                x0=coef0.flatten(),
-                tol=min_opts.tolerance,
-                options={"disp": min_opts.display},
-                callback=opt_callback,
-                method=min_opts.method,
-            )
-
-            if not res.success:
-                logger.warning("The correction fit did not converge: %s", res.message)
-
-            correction = correction_from_coef(res.x.reshape(-1, 3), degree, scale)
-
-        g_xyz_corrected = correction.apply(g_xyz)
-        mean_dist_err = samples_mean_distance(o_xyz, g_xyz_corrected)
-        mean_sq_err = samples_mse(o_xyz, g_xyz_corrected)
-
-        logger.info("Correction completed. Parameters: %s", correction)
-        logger.info("Correction mean distance error: %f", mean_dist_err)
-        logger.info("Correction mean square error: %f", mean_sq_err)
+        correction = fit_correction_with_config(g_xyz, o_xyz, config.correction)
 
     if correction is not None:
         df_correct: pd.DataFrame = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]]

@@ -52,7 +52,7 @@ from data import (
     coord_align,
     coord_calibrate,
     interp_columns,
-    load_correction_params,
+    load_correction,
     load_optitrack_data,
     load_optitrack_metadata,
 )
@@ -581,7 +581,7 @@ def main() -> None:
     if args.sensitivity_thresholds is not None:
         thresholds = args.sensitivity_thresholds or SENS_THRESHOLDS
 
-    model = load_correction_params(CALIBRATION_FILE)
+    model = load_correction(CALIBRATION_FILE)
 
     single = not args.per_take_alignment
     mode = (

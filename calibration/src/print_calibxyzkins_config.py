@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from data import load_correction_params
+from data import load_correction
 from defaults import CALIBRATION_FILE
 
 # Maximum degree of the model in the calibxyzkins module, set at compile time
@@ -23,12 +23,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    params = load_correction_params(args.calibration)
+    correction = load_correction(args.calibration)
 
-    if params.degree > CALIBXYZKINS_MAX_DEGREE:
+    if correction.degree > CALIBXYZKINS_MAX_DEGREE:
         parser.error(
             f"The correction model of {args.calibration} is of degree "
-            f"{params.degree}, and the calibxyzkins module supports up to degree "
+            f"{correction.degree}, and the calibxyzkins module supports up to degree "
             f"{CALIBXYZKINS_MAX_DEGREE}"
         )
 
@@ -36,10 +36,10 @@ if __name__ == "__main__":
 
     # The module creates the parameters of the matrices A1 to An, with n the
     # value of its degree parameter
-    print(f"# Load the calibxyzkins module with degree={params.degree}")
+    print(f"# Load the calibxyzkins module with degree={correction.degree}")
     print()
 
-    for k, matrix in enumerate(params.A, start=1):
+    for k, matrix in enumerate(correction.A, start=1):
         print(f"# Calibration matrix A{k}")
 
         for row_i, row_coord in enumerate(coords):
@@ -53,5 +53,5 @@ if __name__ == "__main__":
     print("# Calibration vector c")
     for row_i, row_coord in enumerate(coords):
         param = f"calibxyzkins.calib-c.{row_coord}"
-        value = params.c[row_i]
+        value = correction.c[row_i]
         print(f"setp {param} {value:.10g}")

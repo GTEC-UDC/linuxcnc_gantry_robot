@@ -3,14 +3,14 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from data import CorrectionParams, load_correction_params
+from data import PolynomialCorrection, load_correction
 from defaults import CALIBRATION_FILE
 from matplotlib.widgets import Button, Slider
 
 
 class TransformationPlotter:
-    def __init__(self, params: CorrectionParams):
-        self.params = params
+    def __init__(self, correction: PolynomialCorrection):
+        self.correction = correction
 
         self.fig = plt.figure(figsize=(10, 8))
         self.ax = self.fig.add_subplot(111, projection="3d")
@@ -104,7 +104,7 @@ class TransformationPlotter:
         coords[:, self.coord_indices[self.current_coord]] = self.fixed_value
 
         # Apply transformation
-        coords_transformed = self.params.apply(coords)
+        coords_transformed = self.correction.apply(coords)
 
         # Calculate differences
         diff = (
@@ -157,4 +157,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    plotter = TransformationPlotter(load_correction_params(args.calibration))
+    plotter = TransformationPlotter(load_correction(args.calibration))

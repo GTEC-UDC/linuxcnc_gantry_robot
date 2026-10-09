@@ -20,7 +20,7 @@ from typing import Literal
 import numpy as np
 import numpy.typing as npt
 import validate_dataset as vd
-from data import CorrectionModel, load_correction_params
+from data import CorrectionModel, load_correction
 from defaults import CALIBRATION_FILE, DATASET_DIR
 
 logger = logging.getLogger("plot_dataset_errors")
@@ -277,7 +277,7 @@ def main() -> None:
     vd.DROPOUT_MM = args.dropout_mm
     vd.SKIP_INITIAL_S = args.skip_initial_s
 
-    model = load_correction_params(args.calib)
+    model = load_correction(args.calib)
     outdir = args.outdir if args.save else None
 
     for take in args.takes:

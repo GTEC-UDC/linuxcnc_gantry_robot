@@ -5,31 +5,31 @@ from pathlib import Path
 
 import numpy as np
 import scipy as scp
-from data import CorrectionParams, load_correction_params
+from data import PolynomialCorrection, load_correction
 from defaults import CALIBRATION_FILE
 
 logger = logging.getLogger(__name__)
 
 
 def forward_kinematics(
-    joint_values: np.ndarray, params: CorrectionParams
+    joint_values: np.ndarray, correction: PolynomialCorrection
 ) -> np.ndarray:
-    return params.apply(joint_values)
+    return correction.apply(joint_values)
 
 
 def inverse_kinematics(
     pos: np.ndarray,
-    params: CorrectionParams,
+    correction: PolynomialCorrection,
     x0: np.ndarray | None = None,
     bounds: tuple[np.ndarray, np.ndarray] | None = None,
     max_iter: int = 10,
     tol: float = 1e-3,
 ) -> np.ndarray:
-    matrices = np.array(params.A)
+    matrices = np.array(correction.A)
 
     # Function to minimize
     def f_opt(x: np.ndarray) -> np.ndarray:
-        return params.apply(x) - pos
+        return correction.apply(x) - pos
 
     # Jacobian: sum of k * A_k @ diag(x)**(k - 1)
     def J(x: np.ndarray) -> np.ndarray:
@@ -70,9 +70,9 @@ def inverse_kinematics(
 
 def check_J_inv(
     bounds: tuple[np.ndarray, np.ndarray],
-    params: CorrectionParams,
+    correction: PolynomialCorrection,
 ) -> bool:
-    matrices = np.array(params.A)
+    matrices = np.array(correction.A)
     max_abs_x = np.max(np.abs(np.array([bounds[0], bounds[1]])), axis=0)
 
     # Bound of the entries of the matrix
@@ -92,7 +92,7 @@ def check_J_inv(
 
 
 def get_joint_bounds(
-    params: CorrectionParams,
+    correction: PolynomialCorrection,
     axis_bounds: tuple[np.ndarray, np.ndarray],
 ) -> tuple[np.ndarray, np.ndarray]:
     min_joints = np.zeros(3)
@@ -100,7 +100,7 @@ def get_joint_bounds(
 
     # Function to minimize
     def f_opt(pos: np.ndarray, j_idx: int, opt_factor: int) -> float:
-        joints = inverse_kinematics(pos, params, max_iter=20, tol=1e-9)
+        joints = inverse_kinematics(pos, correction, max_iter=20, tol=1e-9)
         return joints[j_idx] * opt_factor
 
     for j_idx in range(3):
@@ -136,11 +136,11 @@ def get_joint_bounds(
 
 
 def check_joint_bounds(
-    params: CorrectionParams,
+    correction: PolynomialCorrection,
     axis_bounds: tuple[np.ndarray, np.ndarray],
     joint_bounds: tuple[np.ndarray, np.ndarray],
 ) -> bool:
-    min_joints, max_joints = get_joint_bounds(params, axis_bounds)
+    min_joints, max_joints = get_joint_bounds(correction, axis_bounds)
     print(f"Joint bounds: min = {min_joints}, max = {max_joints}")
 
     return bool(
@@ -201,12 +201,12 @@ def main():
 
     args = parser.parse_args()
 
-    params = load_correction_params(args.calibration)
+    correction = load_correction(args.calibration)
 
     # Check J invertibility on the joint space
     if not check_J_inv(
         bounds=(np.array(args.joints_min), np.array(args.joints_max)),
-        params=params,
+        correction=correction,
     ):
         print(
             "Jacobian invertibility test failed. "
@@ -220,7 +220,7 @@ def main():
 
     # Check inverse kinematics from axis to joint space is within the joint limits
     if not check_joint_bounds(
-        params,
+        correction,
         (np.array(args.axis_min), np.array(args.axis_max)),
         (np.array(args.joints_min), np.array(args.joints_max)),
     ):

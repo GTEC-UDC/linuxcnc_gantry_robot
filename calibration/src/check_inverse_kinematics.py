@@ -11,7 +11,7 @@ from pathlib import Path
 
 import numpy as np
 import numpy.typing as npt
-from data import CorrectionParams, load_correction_params
+from data import PolynomialCorrection, load_correction
 from defaults import CALIBRATION_FILE
 
 Bounds = tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]
@@ -21,25 +21,25 @@ REFERENCE_ITER = 50
 
 
 def jacobian(
-    params: CorrectionParams, joints: npt.NDArray[np.float64]
+    correction: PolynomialCorrection, joints: npt.NDArray[np.float64]
 ) -> npt.NDArray[np.float64]:
     """Jacobian of the correction at each row of ``joints``.
 
     It is the sum of k * A_k @ diag(x)**(k - 1), for k from 1 to the degree.
     """
     out = np.zeros((joints.shape[0], 3, 3))
-    for k, mat in enumerate(np.array(params.A), start=1):
+    for k, mat in enumerate(np.array(correction.A), start=1):
         out += k * mat * joints[:, None, :] ** (k - 1)
     return out
 
 
 def newton_step(
-    params: CorrectionParams,
+    correction: PolynomialCorrection,
     joints: npt.NDArray[np.float64],
     residual: npt.NDArray[np.float64],
     bounds: Bounds | None,
 ) -> npt.NDArray[np.float64]:
-    delta = np.linalg.solve(jacobian(params, joints), residual[:, :, None])[:, :, 0]
+    delta = np.linalg.solve(jacobian(correction, joints), residual[:, :, None])[:, :, 0]
     joints = joints - delta
     if bounds is not None:
         joints = np.clip(joints, bounds[0], bounds[1])
@@ -48,7 +48,7 @@ def newton_step(
 
 def inverse_kinematics(
     pos: npt.NDArray[np.float64],
-    params: CorrectionParams,
+    correction: PolynomialCorrection,
     bounds: Bounds | None = None,
     max_iter: int = 10,
     tol: float = 1e-3,
@@ -78,7 +78,7 @@ def inverse_kinematics(
     worst_r_norm = []
 
     for _ in range(max_iter):
-        residual = params.apply(joints[active]) - pos[active]
+        residual = correction.apply(joints[active]) - pos[active]
         r_norm[active] = np.linalg.norm(residual, axis=1)
         worst_r_norm.append(r_norm.max())
 
@@ -88,7 +88,7 @@ def inverse_kinematics(
             break
 
         joints[active] = newton_step(
-            params, joints[active], residual[not_converged], bounds
+            correction, joints[active], residual[not_converged], bounds
         )
         steps[active] += 1
 
@@ -96,7 +96,7 @@ def inverse_kinematics(
 
 
 def check_inverse_kinematics(
-    params: CorrectionParams,
+    correction: PolynomialCorrection,
     axis_bounds: Bounds,
     points: int,
     joint_bounds: Bounds | None = None,
@@ -107,20 +107,20 @@ def check_inverse_kinematics(
     pos = np.stack(np.meshgrid(*grid, indexing="ij"), axis=-1).reshape(-1, 3)
 
     joints, steps, r_norm, worst_r_norm = inverse_kinematics(
-        pos, params, joint_bounds, max_iter, tol
+        pos, correction, joint_bounds, max_iter, tol
     )
     converged = r_norm < tol
 
     # Reference solution: unbounded iteration run well past convergence
     reference = pos.copy()
     for _ in range(REFERENCE_ITER):
-        residual = params.apply(reference) - pos
-        reference = newton_step(params, reference, residual, None)
+        residual = correction.apply(reference) - pos
+        reference = newton_step(correction, reference, residual, None)
 
     initial = pos if joint_bounds is None else np.clip(pos, *joint_bounds)
     initial_dist = np.linalg.norm(initial - reference, axis=1)
 
-    print(f"Correction model of degree {params.degree}")
+    print(f"Correction model of degree {correction.degree}")
     print(f"Target positions: {pos.shape[0]} ({points} per axis)")
     print(f"Axis limits: min = {axis_bounds[0]}, max = {axis_bounds[1]}")
     if joint_bounds is not None:
@@ -238,10 +238,10 @@ def main():
     if args.joints_min is not None:
         joint_bounds = (np.array(args.joints_min), np.array(args.joints_max))
 
-    params = load_correction_params(args.calibration)
+    correction = load_correction(args.calibration)
 
     if not check_inverse_kinematics(
-        params,
+        correction,
         (np.array(args.axis_min), np.array(args.axis_max)),
         args.points,
         joint_bounds=joint_bounds,

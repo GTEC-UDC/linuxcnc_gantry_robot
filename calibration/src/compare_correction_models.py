@@ -107,7 +107,7 @@ def design(
 
 
 @dataclass
-class Model(CorrectionModel):
+class FullPolynomialModel(CorrectionModel):
     """A polynomial correction model, fitted by least squares."""
 
     monomials: list[Monomial]
@@ -122,7 +122,7 @@ def fit(
     gantry: npt.NDArray[np.float64],
     optitrack: npt.NDArray[np.float64],
     monomials: list[Monomial],
-) -> Model:
+) -> FullPolynomialModel:
     """Least squares fit of a model that maps gantry onto optitrack.
 
     The positions are scaled as in the fit of the model in use. See
@@ -132,7 +132,7 @@ def fit(
     coef, _, _, _ = np.linalg.lstsq(
         design(gantry / scale, monomials), optitrack, rcond=None
     )
-    return Model(monomials, scale, coef.astype(np.float64))
+    return FullPolynomialModel(monomials, scale, coef.astype(np.float64))
 
 
 def scaled_cond(mat: npt.NDArray[np.float64]) -> float:
@@ -170,7 +170,7 @@ def cross_validate(
     return rms3d(np.concatenate(residuals))
 
 
-def validate(model: Model | None) -> tuple[float, float]:
+def validate(model: FullPolynomialModel | None) -> tuple[float, float]:
     """RMSE and 95th percentile of the platform residual on the RoboLoc-G dataset.
 
     Follows ``validate_dataset.py``: a single alignment for the whole campaign,
@@ -183,7 +183,9 @@ def validate(model: Model | None) -> tuple[float, float]:
         # The uncorrected positions do not depend on the model, but the functions
         # of validate_dataset.py need one to build the corrected ones
         target, label = "uncorrected", "before"
-        model = Model([(1, 0, 0), (0, 1, 0), (0, 0, 1)], np.ones(3), np.eye(4, 3))
+        model = FullPolynomialModel(
+            [(1, 0, 0), (0, 1, 0), (0, 0, 1)], np.ones(3), np.eye(4, 3)
+        )
 
     alignment = vd.fit_single_alignment("all", model, target)
     alignments = {"before": alignment, "after": alignment}
@@ -232,7 +234,7 @@ def main(args: argparse.Namespace) -> None:
         cv: float,
         cond: float,
         cond_s: float,
-        model: Model | None,
+        model: FullPolynomialModel | None,
     ) -> None:
         sigma = err.std(axis=0, ddof=1)
         rows[name] = {

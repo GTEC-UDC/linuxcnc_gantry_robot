@@ -33,7 +33,7 @@ import validate_dataset as vd
 from data import (
     CorrectionModel,
     coord_align,
-    load_correction_params,
+    load_correction,
     load_optitrack_metadata,
 )
 from defaults import CALIBRATION_FILE, DATASET_DIR
@@ -299,7 +299,7 @@ def main() -> None:
     vd.GROUND_TRUTH_DIR = vd.DATASET_DIR / "GROUND_TRUTH"
     vd.TAKES = args.takes
 
-    model = load_correction_params(args.calib)
+    model = load_correction(args.calib)
 
     # One alignment for the whole campaign: the mean of the alignments of the takes
     alignment = vd.fit_single_alignment("all", model, "corrected")

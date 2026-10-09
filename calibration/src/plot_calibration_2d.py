@@ -3,14 +3,14 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from data import CorrectionParams, load_correction_params
+from data import PolynomialCorrection, load_correction
 from defaults import CALIBRATION_FILE
 from matplotlib.widgets import Button, Slider
 
 
 class TransformationPlotter:
-    def __init__(self, params: CorrectionParams):
-        self.params = params
+    def __init__(self, correction: PolynomialCorrection):
+        self.correction = correction
 
         self.fig, (self.ax1, self.ax2) = plt.subplots(1, 2, figsize=(14, 7))
         plt.subplots_adjust(bottom=0.3)  # Make room for sliders
@@ -113,7 +113,7 @@ class TransformationPlotter:
         coords = np.vstack(coord_arrays).transpose()
 
         # Apply transformation
-        coords_transformed = self.params.apply(coords)
+        coords_transformed = self.correction.apply(coords)
 
         # Get current coordinate index
         curr_idx = self.coord_indices[self.current_coord]
@@ -173,4 +173,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    plotter = TransformationPlotter(load_correction_params(args.calibration))
+    plotter = TransformationPlotter(load_correction(args.calibration))

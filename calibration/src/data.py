@@ -209,19 +209,14 @@ DEFAULT_DEGREE: Degree = (2, 2, 1)
 
 
 class CorrectionModel(ABC):
-    """A model that corrects gantry positions.
-
-    The model in use is ``CorrectionParams``. Other models can derive from this
-    class to take its place where only the corrected positions are needed, as when
-    comparing alternatives to it.
-    """
+    """A model that corrects gantry positions."""
 
     @abstractmethod
     def apply(self, pos: np.ndarray) -> np.ndarray:
         """Apply the model to an (N, 3) array of positions, or to a single one."""
 
 
-class CorrectionParams(BaseModel, CorrectionModel):
+class PolynomialCorrection(BaseModel, CorrectionModel):
     # Parameters of the correction model
     #
     #   pos_corrected = c + A[0] @ pos + A[1] @ pos**2 + ... + A[n-1] @ pos**n
@@ -311,9 +306,9 @@ def design_matrix(gantry: np.ndarray, degree: Degree = DEFAULT_DEGREE) -> np.nda
     return np.column_stack(cols + [np.ones(len(gantry))])
 
 
-def correction_params_from_coef(
+def correction_from_coef(
     coef: np.ndarray, degree: Degree, scale: np.ndarray
-) -> CorrectionParams:
+) -> PolynomialCorrection:
     """Parameters of the correction model from the coefficients of a fit.
 
     ``coef`` has one row per column of the design matrix, built from the gantry
@@ -323,7 +318,7 @@ def correction_params_from_coef(
     mat_a = np.zeros((max(degree), 3, 3))
     for row, (k, axis) in zip(coef, correction_terms(degree)):
         mat_a[k - 1, :, axis] = row / scale[axis] ** k
-    return CorrectionParams.model_validate(
+    return PolynomialCorrection.model_validate(
         {"c": coef[-1].tolist(), "A": mat_a.tolist()}
     )
 
@@ -343,9 +338,9 @@ def correction_scale(gantry: np.ndarray) -> np.ndarray:
     return scale
 
 
-def fit_correction_params(
+def fit_correction(
     gantry: np.ndarray, optitrack: np.ndarray, degree: Degree = DEFAULT_DEGREE
-) -> CorrectionParams:
+) -> PolynomialCorrection:
     """Least squares fit of the correction model that maps gantry onto optitrack.
 
     The samples must be free of NaN.
@@ -353,7 +348,7 @@ def fit_correction_params(
     scale = correction_scale(gantry)
     design = design_matrix(gantry / scale, degree)
     coef, _, _, _ = np.linalg.lstsq(design, optitrack, rcond=None)
-    return correction_params_from_coef(coef, degree, scale)
+    return correction_from_coef(coef, degree, scale)
 
 
 def reject_samples(
@@ -386,8 +381,8 @@ def reject_samples(
     keep = np.ones(len(gantry), dtype=bool)
 
     for _ in range(max(iterations, 1)):
-        params = fit_correction_params(gantry[keep], optitrack[keep], degree)
-        residual = np.linalg.norm(params.apply(gantry) - optitrack, axis=1)
+        correction = fit_correction(gantry[keep], optitrack[keep], degree)
+        residual = np.linalg.norm(correction.apply(gantry) - optitrack, axis=1)
         median = np.median(residual)
         spread = np.median(np.abs(residual - median)) * 1.4826
         rejected = residual >= median + sigma * spread
@@ -479,7 +474,7 @@ class SkipSamplesConfig(BaseModel):
 
 class CalibrationCorrectionConfig(BaseModel):
     enabled: bool = True
-    # Highest power of x, y and z in the correction model. See CorrectionParams.
+    # Highest power of x, y and z in the correction model. See PolynomialCorrection.
     degree: Degree = DEFAULT_DEGREE
     init_params: list[float] | None = None
     objective: Objective = "mse"
@@ -499,10 +494,10 @@ class CalibrationConfig(BaseModel):
 
 class CalibrationParams(BaseModel):
     alignment: list[float] | None = None
-    correction: CorrectionParams | None = None
+    correction: PolynomialCorrection | None = None
 
 
-def load_correction_params(filename: str | Path) -> CorrectionParams:
+def load_correction(filename: str | Path) -> PolynomialCorrection:
     """Load the parameters of the correction model from a file."""
     with open(filename, "r") as f:
         calibration_params = CalibrationParams.model_validate_json(f.read())
@@ -638,9 +633,7 @@ def get_processed_data(
         # Transform all the OptiTrack coordinates in the dataframe
         cols_params = {
             f"{axis.lower()}_cols": [
-                col
-                for col in df.columns
-                if col.startswith((f"M.{axis}", f"RB.{axis}"))
+                col for col in df.columns if col.startswith((f"M.{axis}", f"RB.{axis}"))
             ]
             for axis in ["X", "Y", "Z"]
         }
@@ -722,20 +715,20 @@ def get_processed_data(
     #
     # The parameters are the vector c and the elements of the matrices A_k, in
     # the columns of the powers that the degree of the configuration allows.
-    # See CorrectionParams.
+    # See PolynomialCorrection.
     # -------------------------------------------------------------------------
 
-    correction_params: CorrectionParams | None = None
+    correction: PolynomialCorrection | None = None
     degree = config.correction.degree
 
     if config.correction.enabled and calibration_params.correction is not None:
-        correction_params = calibration_params.correction
+        correction = calibration_params.correction
 
-        if correction_params.degree != max(degree):
+        if correction.degree != max(degree):
             logger.warning(
                 "The correction parameters are of degree %d, but the degree of the "
                 "configuration is %s",
-                correction_params.degree,
+                correction.degree,
                 degree,
             )
     elif config.correction.enabled:
@@ -757,7 +750,7 @@ def get_processed_data(
         if config.correction.objective == "mse":
             # The correction model is linear in c and the matrices A_k, so we
             # use linear least squares to minimize the mean square error.
-            correction_params = fit_correction_params(mat_g_xyz, mat_o_xyz, degree)
+            correction = fit_correction(mat_g_xyz, mat_o_xyz, degree)
         else:
             # The parameters to optimize are the coefficients of the model on the
             # scaled gantry positions, one row of three per term and one for c
@@ -794,22 +787,20 @@ def get_processed_data(
             if not res.success:
                 logger.warning("The correction fit did not converge: %s", res.message)
 
-            correction_params = correction_params_from_coef(
-                res.x.reshape(-1, 3), degree, scale
-            )
+            correction = correction_from_coef(res.x.reshape(-1, 3), degree, scale)
 
-        df_g_correct = coord_calibrate(correction_params, df_g_xyz)
+        df_g_correct = coord_calibrate(correction, df_g_xyz)
         mean_dist_err = coord_mean_distance(df_o_xyz, df_g_correct)
         mean_sq_err = coord_mse(df_o_xyz, df_g_correct)
 
-        logger.info("Correction completed. Parameters: %s", correction_params)
+        logger.info("Correction completed. Parameters: %s", correction)
         logger.info("Correction mean distance error: %f", mean_dist_err)
         logger.info("Correction mean square error: %f", mean_sq_err)
 
-    if correction_params is not None:
+    if correction is not None:
         df_correct: pd.DataFrame = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]]
         df_correct.columns = pd.Index(["x", "y", "z"])
-        df_correct = coord_calibrate(correction_params, df_correct)
+        df_correct = coord_calibrate(correction, df_correct)
 
         # Add final calibrated coordinates to the dataframe
         df["GAN.CALIBRATED.X"] = df_correct["x"]
@@ -845,7 +836,7 @@ def get_processed_data(
 
     calibration_params = CalibrationParams(
         alignment=np_to_list(alignment_params_array),
-        correction=correction_params,
+        correction=correction,
     )
 
     # -------------------------------------------------------------------------

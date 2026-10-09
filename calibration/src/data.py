@@ -521,7 +521,6 @@ class CalibrationCorrectionConfig(BaseModel):
     enabled: bool = True
     # Highest power of x, y and z in the correction model. See PolynomialCorrection.
     degree: Degree = DEFAULT_DEGREE
-    init_params: list[float] | None = None
     objective: Objective = "mse"
     minimize_options: MinimizeOptions = Field(default_factory=MinimizeOptions)
     reject_samples: RejectSamplesConfig = Field(default_factory=RejectSamplesConfig)

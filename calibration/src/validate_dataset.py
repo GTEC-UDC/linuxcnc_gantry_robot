@@ -46,15 +46,14 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 import scipy as scp
-from coordinates_utils import coord_mse
 from data import (
     CorrectionModel,
-    coord_align,
-    coord_calibrate,
+    coord_align_array,
     interp_columns,
     load_correction,
     load_optitrack_data,
     load_optitrack_metadata,
+    samples_mse,
 )
 from defaults import CALIBRATION_FILE, DATASET_DIR
 
@@ -126,11 +125,15 @@ def fit_alignment(
         optitrack = optitrack[mask].reset_index(drop=True)
         gantry = gantry[mask].reset_index(drop=True)
 
+    optitrack_time = optitrack["time"].to_numpy()
+    optitrack_xyz = optitrack[XYZ].to_numpy()
+    gantry_xyz = gantry[XYZ].to_numpy()
+
     # Initial values of the parameters: no time shift, the known rotation about z,
     # and the translation that makes the mean positions coincide after rotating
     x0 = np.array([0.0, 0.0, 0.0, Z_ROT_GUESS, 0.0, 0.0, 0.0])
-    rotated = coord_align(x0, optitrack, ROT_CENTER)
-    x0[4:7] = np.nanmean(gantry[XYZ].to_numpy() - rotated[XYZ].to_numpy(), axis=0)
+    rotated = coord_align_array(x0, optitrack_time, optitrack_xyz, ROT_CENTER)
+    x0[4:7] = np.nanmean(gantry_xyz - rotated, axis=0)
 
     # Each rotation can move at most MAX_ROT from its initial value
     bounds = [(None, None)] * 7
@@ -141,7 +144,10 @@ def fit_alignment(
     # Search for the parameters that minimize the mean squared distance between
     # the gantry positions and the aligned OptiTrack positions
     res = scp.optimize.minimize(
-        fun=lambda x: coord_mse(gantry, coord_align(x, optitrack, ROT_CENTER)),
+        fun=lambda x: samples_mse(
+            gantry_xyz,
+            coord_align_array(x, optitrack_time, optitrack_xyz, ROT_CENTER),
+        ),
         x0=x0,
         bounds=bounds,
         tol=1e-9,
@@ -180,8 +186,13 @@ def residual_vec(
 
     Returns one row per sample, with the difference in x, y and z, in mm.
     """
-    aligned = coord_align(alignment, optitrack, ROT_CENTER)
-    return aligned[XYZ].to_numpy() - gantry[XYZ].to_numpy()
+    aligned = coord_align_array(
+        np.asarray(alignment),
+        optitrack["time"].to_numpy(),
+        optitrack[XYZ].to_numpy(),
+        ROT_CENTER,
+    )
+    return aligned - gantry[XYZ].to_numpy()
 
 
 def residual_3d(
@@ -257,9 +268,7 @@ def load_take(
     gantry = interp_columns(optitrack_time, gantry_time, gantry_raw)
 
     # Gantry positions corrected with the model
-    gantry_corrected = coord_calibrate(model, pd.DataFrame(gantry, columns=XYZ))[
-        XYZ
-    ].to_numpy()
+    gantry_corrected = model.apply(gantry)
 
     def as_dataframe(positions: FloatArray) -> pd.DataFrame:
         df = pd.DataFrame(positions, columns=XYZ)

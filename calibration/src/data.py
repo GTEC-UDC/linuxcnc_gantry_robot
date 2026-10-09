@@ -1,24 +1,22 @@
 import logging
 import re
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Literal, cast
 
 import numpy as np
+import numpy.typing as npt
 import pandas as pd
 import scipy as scp
-from coordinates_utils import (
-    TransformRotate,
-    TransformShiftT,
-    TransformShiftXYZ,
-    coord_mean_distance,
-    coord_mse,
-    coord_transform,
-)
+import scipy.spatial.transform as scp_tr
 from pydantic import BaseModel, Field, PositiveInt
 
 logger = logging.getLogger(__name__)
+
+FloatArray = npt.NDArray[np.float64]
+BoolArray = npt.NDArray[np.bool]
 
 # Center about which the rotations of the alignment are applied
 ROTATION_CENTER = (0.0, 0.0, 1500.0)
@@ -212,19 +210,23 @@ class CorrectionModel(ABC):
     """A model that corrects gantry positions."""
 
     @abstractmethod
-    def apply(self, pos: np.ndarray) -> np.ndarray:
+    def apply(self, pos: FloatArray) -> FloatArray:
         """Apply the model to an (N, 3) array of positions, or to a single one."""
 
 
 class PolynomialCorrection(BaseModel, CorrectionModel):
-    # Parameters of the correction model
-    #
-    #   pos_corrected = c + A[0] @ pos + A[1] @ pos**2 + ... + A[n-1] @ pos**n
-    #
-    # where pos is a position (x, y, z), pos**k is its elementwise power, c is a
-    # constant offset, and A holds one 3x3 matrix per power. The degree n of the
-    # model is the number of matrices. A power of a coordinate that the model does
-    # not use has a zero column in its matrix.
+    """Polynomial correction model of the gantry positions.
+
+    The corrected position is
+
+        pos_corrected = c + A[0] @ pos + A[1] @ pos**2 + ... + A[n-1] @ pos**n
+
+    where pos is a position (x, y, z), pos**k is its elementwise power, c is a
+    constant offset, and A holds one 3x3 matrix per power. The degree n of the
+    model is the number of matrices. A power of a coordinate that the model does
+    not use has a zero column in its matrix.
+    """
+
     c: Vector3
     A: list[Matrix3] = Field(min_length=1)
 
@@ -232,7 +234,7 @@ class PolynomialCorrection(BaseModel, CorrectionModel):
     def degree(self) -> int:
         return len(self.A)
 
-    def apply(self, pos: np.ndarray) -> np.ndarray:
+    def apply(self, pos: FloatArray) -> FloatArray:
         out = np.zeros_like(pos, dtype=float) + np.array(self.c)
         power = np.ones_like(pos, dtype=float)
         for matrix in self.A:
@@ -241,51 +243,20 @@ class PolynomialCorrection(BaseModel, CorrectionModel):
         return out
 
 
-def coord_align(
-    x,
-    df: pd.DataFrame,
-    rotation_center: tuple[float, float, float] = ROTATION_CENTER,
-    time_col: str = "time",
-    x_cols: list[str] | None = None,
-    y_cols: list[str] | None = None,
-    z_cols: list[str] | None = None,
-) -> pd.DataFrame:
-    """Bring OptiTrack coordinates into the gantry frame.
-
-    The alignment shifts the time base, rotates about ``rotation_center`` and
-    translates, with ``x`` holding (dt, rx, ry, rz, tx, ty, tz). It acts on the
-    columns x/y/z unless ``x_cols``, ``y_cols`` and ``z_cols`` name others, as
-    needed when the frame carries several sets of coordinates.
-    """
-    x_cols = ["x"] if x_cols is None else x_cols
-    y_cols = ["y"] if y_cols is None else y_cols
-    z_cols = ["z"] if z_cols is None else z_cols
-
-    return coord_transform(
-        df,
-        [
-            TransformShiftT(x[0], time_col, x_cols, y_cols, z_cols),
-            TransformRotate("x", x[1], rotation_center, x_cols, y_cols, z_cols),
-            TransformRotate("y", x[2], rotation_center, x_cols, y_cols, z_cols),
-            TransformRotate("z", x[3], rotation_center, x_cols, y_cols, z_cols),
-            TransformShiftXYZ(x[4], x[5], x[6], x_cols, y_cols, z_cols),
-        ],
-    )
-
-
-def coord_calibrate(model: CorrectionModel, df: pd.DataFrame) -> pd.DataFrame:
-    """Apply a correction model to gantry coordinates."""
-    df_tr = df.copy()
-    df_tr[["x", "y", "z"]] = model.apply(df[["x", "y", "z"]].to_numpy())
-    return df_tr
-
-
 def correction_terms(degree: Degree = DEFAULT_DEGREE) -> list[tuple[int, int]]:
     """Terms of the correction model besides the constant, as (power, axis) pairs.
 
-    The terms are ordered by power, and by axis within each power. With the default
-    degree (2, 2, 1) they are x, y, z, x**2 and y**2 and the returned value is
-    [(1, 0), (1, 1), (1, 2), (2, 0), (2, 1)]
+    The terms are ordered by power, and by axis within each power. The default
+    degree is (2, 2, 1).
+
+    Examples:
+        With degree (2, 2, 1) the terms are x, y, z, x**2 and y**2, and the
+        returned value is
+        [(1, 0), (1, 1), (1, 2), (2, 0), (2, 1)]
+
+        With degree (3, 3, 1) the terms are x, y, z, x**2, y**2, x**3 and y**3,
+        and the returned value is
+        [(1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (3, 0), (3, 1)]
     """
     return [
         (power, axis)
@@ -295,25 +266,53 @@ def correction_terms(degree: Degree = DEFAULT_DEGREE) -> list[tuple[int, int]]:
     ]
 
 
-def design_matrix(gantry: np.ndarray, degree: Degree = DEFAULT_DEGREE) -> np.ndarray:
+def design_matrix(
+    gantry_samples: FloatArray, degree: Degree = DEFAULT_DEGREE
+) -> FloatArray:
     """Design matrix of the correction model for a set of gantry positions.
 
-    The columns are the terms of ``correction_terms`` followed by a column of ones,
-    so each row of the least squares solution against the OptiTrack positions holds
-    the column of A that multiplies its term, and c in the last one.
+    The matrix has one row per position and one column per term of the model.
+    The columns are the terms of ``correction_terms``, in the same order and
+    evaluated at each position, followed by a column of ones for the constant.
+
+    Args:
+        gantry_samples (FloatArray): Gantry positions, shape (N, 3).
+        degree (Degree): Highest power of x, y and z in the model.
+
+    Returns:
+        FloatArray: Design matrix, shape (N, T + 1), with T the number of terms
+            of ``correction_terms``.
+
+    Examples:
+        With degree (2, 2, 1) the columns are [x, y, z, x**2, y**2, 1].
+        For samples [[2, 3, 5], [10, 20, 30]] the result is
+        [[ 2,  3,  5,   4,   9, 1],
+         [10, 20, 30, 100, 400, 1]]
     """
-    cols = [gantry[:, axis] ** power for power, axis in correction_terms(degree)]
-    return np.column_stack(cols + [np.ones(len(gantry))])
+    cols = [
+        gantry_samples[:, axis] ** power for power, axis in correction_terms(degree)
+    ]
+    return np.column_stack(cols + [np.ones(len(gantry_samples))])
 
 
 def correction_from_coef(
-    coef: np.ndarray, degree: Degree, scale: np.ndarray
+    coef: FloatArray, degree: Degree, scale: FloatArray
 ) -> PolynomialCorrection:
     """Parameters of the correction model from the coefficients of a fit.
 
     ``coef`` has one row per column of the design matrix, built from the gantry
     positions divided by ``scale``. The scaling is undone here, so the parameters
     apply to the positions as they are.
+
+    Args:
+        coef (FloatArray): Coefficients of the fit, shape (T + 1, 3), with T the
+            number of terms of ``correction_terms``. Each row holds the
+            coefficients of one term for x, y and z, and the last row is c.
+        degree (Degree): Highest power of x, y and z in the model.
+        scale (FloatArray): Scale of each coordinate, shape (3,).
+
+    Returns:
+        PolynomialCorrection: Correction model with the parameters of the fit.
     """
     mat_a = np.zeros((max(degree), 3, 3))
     for row, (k, axis) in zip(coef, correction_terms(degree)):
@@ -323,7 +322,7 @@ def correction_from_coef(
     )
 
 
-def correction_scale(gantry: np.ndarray) -> np.ndarray:
+def correction_scale(gantry: FloatArray) -> FloatArray:
     """Scale of each coordinate that brings the gantry positions to [-1, 1].
 
     The correction model is fitted on the scaled positions. In millimeters the
@@ -332,6 +331,13 @@ def correction_scale(gantry: np.ndarray) -> np.ndarray:
     ``numpy.linalg.lstsq`` treats as zero the singular values below the value
     specified in the `rcond` parameter. The default value for `rcond` (when None
     is specified) is the machine precision times the number of samples.
+
+    Args:
+        gantry (FloatArray): Gantry positions, shape (N, 3). NaN are ignored.
+
+    Returns:
+        FloatArray: Largest absolute value of each coordinate, shape (3,), or 1
+            for a coordinate that is always zero.
     """
     scale = np.nanmax(np.abs(gantry), axis=0)
     scale[scale == 0] = 1.0
@@ -339,27 +345,38 @@ def correction_scale(gantry: np.ndarray) -> np.ndarray:
 
 
 def fit_correction(
-    gantry: np.ndarray, optitrack: np.ndarray, degree: Degree = DEFAULT_DEGREE
+    gantry_samples: FloatArray,
+    optitrack_samples: FloatArray,
+    degree: Degree = DEFAULT_DEGREE,
 ) -> PolynomialCorrection:
     """Least squares fit of the correction model that maps gantry onto optitrack.
 
     The samples must be free of NaN.
+
+    Args:
+        gantry_samples (FloatArray): Gantry positions, shape (N, 3).
+        optitrack_samples (FloatArray): OptiTrack positions, shape (N, 3), paired
+            row by row with the gantry ones.
+        degree (Degree): Highest power of x, y and z in the model.
+
+    Returns:
+        PolynomialCorrection: Fitted correction model.
     """
-    scale = correction_scale(gantry)
-    design = design_matrix(gantry / scale, degree)
-    coef, _, _, _ = np.linalg.lstsq(design, optitrack, rcond=None)
+    scale = correction_scale(gantry_samples)
+    design = design_matrix(gantry_samples / scale, degree)
+    coef, _, _, _ = np.linalg.lstsq(design, optitrack_samples, rcond=None)
     return correction_from_coef(coef, degree, scale)
 
 
 def reject_samples(
-    gantry: np.ndarray,
-    optitrack: np.ndarray,
-    time: np.ndarray,
+    gantry_samples: FloatArray,
+    optitrack_samples: FloatArray,
+    time: FloatArray,
     sigma: float = 5.0,
     margin_s: float = 0.25,
     iterations: int = 2,
     degree: Degree = DEFAULT_DEGREE,
-) -> np.ndarray:
+) -> BoolArray:
     """Samples of the correction fit to keep, found by iterated outlier rejection.
 
     Fits the model, measures the 3D residual, and rejects every sample farther than
@@ -376,22 +393,40 @@ def reject_samples(
     so ``sigma`` keeps its usual meaning.
 
     The samples must be free of NaN and ordered in time.
-    Returns the mask of the samples to keep.
+
+    Args:
+        gantry_samples (FloatArray): Gantry positions, shape (N, 3).
+        optitrack_samples (FloatArray): OptiTrack positions, shape (N, 3), paired
+            row by row with the gantry ones.
+        time (FloatArray): Time of each sample in seconds, shape (N,).
+        sigma (float): Rejection threshold, in robust standard deviations.
+        margin_s (float): Time rejected on either side of a rejected sample, in
+            seconds.
+        iterations (int): Number of rounds of fit and rejection, at least one.
+        degree (Degree): Highest power of x, y and z in the model.
+
+    Returns:
+        BoolArray: Mask of the samples to keep, shape (N,).
     """
-    keep = np.ones(len(gantry), dtype=bool)
+    keep = np.ones(len(gantry_samples), dtype=bool)
 
     for _ in range(max(iterations, 1)):
-        correction = fit_correction(gantry[keep], optitrack[keep], degree)
-        residual = np.linalg.norm(correction.apply(gantry) - optitrack, axis=1)
+        correction = fit_correction(
+            gantry_samples[keep], optitrack_samples[keep], degree
+        )
+        residual = np.linalg.norm(
+            correction.apply(gantry_samples) - optitrack_samples, axis=1
+        )
         median = np.median(residual)
         spread = np.median(np.abs(residual - median)) * 1.4826
         rejected = residual >= median + sigma * spread
 
         if margin_s > 0 and rejected.any():
-            # Each rejected sample widens into the interval of samples within
-            # margin_s of it, and the mask is the union of those intervals. Every
-            # interval contributes one +1 and one -1 to the edge count, so the
-            # running sum gives how many of them cover each sample.
+            # Each rejected sample widens into the interval of samples
+            # within `margin_s` seconds of it, and the mask is the union
+            # of those intervals. Every interval contributes one +1 and
+            # one -1 to the edge count, so the running sum gives how
+            # many of them cover each sample.
             start = np.searchsorted(time, time[rejected] - margin_s, side="left")
             end = np.searchsorted(time, time[rejected] + margin_s, side="right")
             edges = np.zeros(len(time) + 1, dtype=int)
@@ -404,14 +439,24 @@ def reject_samples(
     return keep
 
 
-def interp_columns(t: np.ndarray, t_src: np.ndarray, values: np.ndarray) -> np.ndarray:
+def interp_columns(t: FloatArray, t_src: FloatArray, values: FloatArray) -> FloatArray:
     """Resample the columns of ``values``, taken at ``t_src``, onto the times ``t``.
 
     ``values`` has one row per sample of ``t_src`` and any number of columns,
     each interpolated independently. Times outside the range covered by
     ``t_src`` are returned as NaN.
+
+    Args:
+        t (FloatArray): Times to resample onto, shape (M,) or (M, 1).
+        t_src (FloatArray): Times of the samples, increasing, shape (N,) or (N, 1).
+        values (FloatArray): Samples, shape (N, K).
+
+    Returns:
+        FloatArray: Resampled values, shape (M, K).
     """
-    values = np.asarray(values)
+    t = t.flatten()
+    t_src = t_src.flatten()
+
     return np.column_stack(
         [
             np.interp(t, t_src, values[:, i], left=np.nan, right=np.nan)
@@ -508,6 +553,70 @@ def load_correction(filename: str | Path) -> PolynomialCorrection:
     return calibration_params.correction
 
 
+def coord_align_array(
+    x: FloatArray,
+    time: FloatArray,
+    samples: FloatArray,
+    rotation_center: Sequence[float] | FloatArray | None = ROTATION_CENTER,
+) -> FloatArray:
+    """Align OptiTrack coordinates with the gantry coordinates.
+
+    The alignment shifts the time base, rotates about ``rotation_center`` and
+    translates.
+
+    Args:
+        x (FloatArray): Alignment parameters (dt, rx, ry, rz, tx, ty, tz), shape
+            (7,): time shift in seconds, rotation angles in radians about the
+            fixed x, y and z axes, applied in that order, and translation.
+        time (FloatArray): Time of each sample in seconds, shape (N,) or (N, 1).
+        samples (FloatArray): OptiTrack positions, shape (N, 3).
+        rotation_center (Sequence[float] | FloatArray | None): Point about which
+            the rotation is applied, shape (3,). None is the origin.
+
+    Returns:
+        FloatArray: Aligned positions, shape (N, 3). The samples shifted outside
+            the time range are NaN.
+    """
+    rotation_center = np.asarray(
+        [0, 0, 0] if rotation_center is None else rotation_center
+    )
+
+    ret = interp_columns(time - x[0], time, samples)
+    ret = (
+        scp_tr.Rotation.from_euler("xyz", x[1:4]).apply(ret - rotation_center)
+        + rotation_center
+    )
+    ret += np.asarray(x[4:7])
+
+    return ret
+
+
+def samples_mse(a: FloatArray, b: FloatArray) -> float:
+    """Mean squared distance between two sets of positions paired row by row.
+
+    Args:
+        a (FloatArray): Positions, shape (N, 3).
+        b (FloatArray): Positions, shape (N, 3).
+
+    Returns:
+        float: Mean of the squared distances, ignoring the pairs with NaN.
+    """
+    return float(np.nanmean(np.sum((a - b) ** 2, axis=1)))
+
+
+def samples_mean_distance(a: FloatArray, b: FloatArray) -> float:
+    """Mean distance between two sets of positions paired row by row.
+
+    Args:
+        a (FloatArray): Positions, shape (N, 3).
+        b (FloatArray): Positions, shape (N, 3).
+
+    Returns:
+        float: Mean of the distances, ignoring the pairs with NaN.
+    """
+    return float(np.nanmean(np.sqrt(np.sum((a - b) ** 2, axis=1))))
+
+
 def get_processed_data(
     gantry_filename: str | Path,
     optitrack_filename: str | Path,
@@ -567,17 +676,15 @@ def get_processed_data(
 
     rotation_center = config.alignment.rotation_center
 
-    alignment_params_array: np.ndarray | None = None
+    alignment_params_array: FloatArray | None = None
     if config.alignment.enabled and calibration_params.alignment is not None:
         alignment_params_array = np.array(calibration_params.alignment)
     elif config.alignment.enabled:
+        time = df.loc[:, ["time"]].to_numpy()
         # Gantry data
-        df_g_xyz: pd.DataFrame = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
-        df_g_xyz.columns = pd.Index(["time", "x", "y", "z"])
-
+        g_xyz = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]].to_numpy()
         # OptiTrack data
-        df_o_xyz: pd.DataFrame = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
-        df_o_xyz.columns = pd.Index(["time", "x", "y", "z"])
+        o_xyz = df.loc[:, ["RB.X", "RB.Y", "RB.Z"]].to_numpy()
 
         # Initial alignment parameters
         if config.alignment.init_params:
@@ -594,8 +701,11 @@ def get_processed_data(
             bounds[3] = (x0[3] - max_rotation, x0[3] + max_rotation)
 
         objective_fn = (
-            coord_mse if config.alignment.objective == "mse" else coord_mean_distance
+            samples_mse
+            if config.alignment.objective == "mse"
+            else samples_mean_distance
         )
+
         min_opts = config.alignment.minimize_options
 
         def opt_callback(intermediate_result):
@@ -604,9 +714,10 @@ def get_processed_data(
                 print(f"fval: {fval}")
 
         logger.info("Aligning OptiTrack data with gantry data...")
-        res = scp.optimize.minimize(  # type: ignore[call-overload]
+
+        res = scp.optimize.minimize(
             fun=lambda x: objective_fn(
-                df_g_xyz, coord_align(x, df_o_xyz, rotation_center)
+                g_xyz, coord_align_array(x, time, o_xyz, np.asarray(rotation_center))
             ),
             x0=x0,
             bounds=bounds,
@@ -622,30 +733,21 @@ def get_processed_data(
         alignment_params_array = res.x
         logger.info("Alignment completed. Parameters: %s", alignment_params_array)
 
-        df_o_aligned = coord_align(res.x, df_o_xyz, rotation_center)
-        mean_dist_err = coord_mean_distance(df_g_xyz, df_o_aligned)
-        mean_sq_err = coord_mse(df_g_xyz, df_o_aligned)
+        o_xyz_aligned = coord_align_array(res.x, time, o_xyz, rotation_center)
+        mean_dist_err = samples_mean_distance(g_xyz, o_xyz_aligned)
+        mean_sq_err = samples_mse(g_xyz, o_xyz_aligned)
 
         logger.info("Alignment mean distance error: %f", mean_dist_err)
         logger.info("Alignment mean square error: %f", mean_sq_err)
 
     if alignment_params_array is not None:
         # Transform all the OptiTrack coordinates in the dataframe
-        cols_params = {
-            f"{axis.lower()}_cols": [
-                col for col in df.columns if col.startswith((f"M.{axis}", f"RB.{axis}"))
-            ]
-            for axis in ["X", "Y", "Z"]
-        }
-
-        df = coord_align(
-            alignment_params_array,
-            df,
-            rotation_center,
-            x_cols=cols_params["x_cols"],
-            y_cols=cols_params["y_cols"],
-            z_cols=cols_params["z_cols"],
-        )
+        time = df.loc[:, "time"].to_numpy()
+        for x_col in [col for col in df.columns if col.startswith(("M.X", "RB.X"))]:
+            cols = [x_col.replace(".X", f".{axis}", 1) for axis in "XYZ"]
+            df[cols] = coord_align_array(
+                alignment_params_array, time, df[cols].to_numpy(), rotation_center
+            )
 
     # -------------------------------------------------------------------------
     # Skip samples
@@ -673,17 +775,17 @@ def get_processed_data(
     # -------------------------------------------------------------------------
 
     if config.correction.enabled and config.correction.reject_samples.enabled:
-        mat_g_xyz = df[["GAN.X", "GAN.Y", "GAN.Z"]].to_numpy()
-        mat_o_xyz = df[["RB.X", "RB.Y", "RB.Z"]].to_numpy()
-        mat_t = df["time"].to_numpy()
-        valid = ~(np.isnan(mat_g_xyz).any(axis=1) | np.isnan(mat_o_xyz).any(axis=1))
+        g_xyz = df[["GAN.X", "GAN.Y", "GAN.Z"]].to_numpy()
+        o_xyz = df[["RB.X", "RB.Y", "RB.Z"]].to_numpy()
+        time = df["time"].to_numpy()
+        valid = ~np.isnan(g_xyz).any(axis=1) & ~np.isnan(o_xyz).any(axis=1)
         valid = cast(np.typing.NDArray[np.bool], valid)
 
         reject_opts = config.correction.reject_samples
         keep = reject_samples(
-            mat_g_xyz[valid],
-            mat_o_xyz[valid],
-            mat_t[valid],
+            g_xyz[valid],
+            o_xyz[valid],
+            time[valid],
             sigma=reject_opts.sigma,
             margin_s=reject_opts.margin_s,
             iterations=reject_opts.iterations,
@@ -732,41 +834,33 @@ def get_processed_data(
                 degree,
             )
     elif config.correction.enabled:
+        time = df.loc[:, ["time"]].to_numpy()
         # Gantry data
-        df_g_xyz = df.loc[:, ["time", "GAN.X", "GAN.Y", "GAN.Z"]]
-        df_g_xyz.columns = pd.Index(["time", "x", "y", "z"])
-
+        g_xyz = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]].to_numpy()
         # OptiTrack data
-        df_o_xyz = df.loc[:, ["time", "RB.X", "RB.Y", "RB.Z"]]
-        df_o_xyz.columns = pd.Index(["time", "x", "y", "z"])
+        o_xyz = df.loc[:, ["RB.X", "RB.Y", "RB.Z"]].to_numpy()
 
         logger.info("Correcting gantry data...")
-        mat_g_xyz = df_g_xyz[["x", "y", "z"]].to_numpy()
-        mat_o_xyz = df_o_xyz[["x", "y", "z"]].to_numpy()
-
-        valid = ~(np.isnan(mat_g_xyz).any(axis=1) | np.isnan(mat_o_xyz).any(axis=1))
-        mat_g_xyz, mat_o_xyz = mat_g_xyz[valid], mat_o_xyz[valid]
+        valid = ~np.isnan(g_xyz).any(axis=1) & ~np.isnan(o_xyz).any(axis=1)
+        g_xyz, o_xyz = g_xyz[valid], o_xyz[valid]
 
         if config.correction.objective == "mse":
             # The correction model is linear in c and the matrices A_k, so we
             # use linear least squares to minimize the mean square error.
-            correction = fit_correction(mat_g_xyz, mat_o_xyz, degree)
+            correction = fit_correction(g_xyz, o_xyz, degree)
         else:
             # The parameters to optimize are the coefficients of the model on the
             # scaled gantry positions, one row of three per term and one for c
             # (see correction_scale). The initial point is the identity.
             terms = correction_terms(degree)
-            scale = correction_scale(mat_g_xyz)
+            scale = correction_scale(g_xyz)
             coef0 = np.zeros((len(terms) + 1, 3))
+
             for row, (k, axis) in enumerate(terms):
                 if k == 1:
                     coef0[row, axis] = scale[axis]
 
-            mat_d = design_matrix(mat_g_xyz / scale, degree)
-
-            def mean_distance(x: np.ndarray) -> float:
-                err = mat_d @ x.reshape(-1, 3) - mat_o_xyz
-                return float(np.sqrt((err**2).sum(axis=1)).mean())
+            mat_d = design_matrix(g_xyz / scale, degree)
 
             min_opts = config.correction.minimize_options
 
@@ -775,8 +869,8 @@ def get_processed_data(
                     fval = getattr(intermediate_result, "fun", intermediate_result)
                     print(f"fval: {fval}")
 
-            res = scp.optimize.minimize(  # type: ignore[call-overload]
-                fun=mean_distance,
+            res = scp.optimize.minimize(
+                fun=lambda x: samples_mean_distance(o_xyz, mat_d @ x.reshape(-1, 3)),
                 x0=coef0.flatten(),
                 tol=min_opts.tolerance,
                 options={"disp": min_opts.display},
@@ -789,9 +883,9 @@ def get_processed_data(
 
             correction = correction_from_coef(res.x.reshape(-1, 3), degree, scale)
 
-        df_g_correct = coord_calibrate(correction, df_g_xyz)
-        mean_dist_err = coord_mean_distance(df_o_xyz, df_g_correct)
-        mean_sq_err = coord_mse(df_o_xyz, df_g_correct)
+        g_xyz_corrected = correction.apply(g_xyz)
+        mean_dist_err = samples_mean_distance(o_xyz, g_xyz_corrected)
+        mean_sq_err = samples_mse(o_xyz, g_xyz_corrected)
 
         logger.info("Correction completed. Parameters: %s", correction)
         logger.info("Correction mean distance error: %f", mean_dist_err)
@@ -800,7 +894,9 @@ def get_processed_data(
     if correction is not None:
         df_correct: pd.DataFrame = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]]
         df_correct.columns = pd.Index(["x", "y", "z"])
-        df_correct = coord_calibrate(correction, df_correct)
+        df_correct[["x", "y", "z"]] = correction.apply(
+            df_correct[["x", "y", "z"]].to_numpy()
+        )
 
         # Add final calibrated coordinates to the dataframe
         df["GAN.CALIBRATED.X"] = df_correct["x"]
@@ -831,7 +927,7 @@ def get_processed_data(
     # Create the CalibrationParams object to return
     # -------------------------------------------------------------------------
 
-    def np_to_list(x: np.ndarray | None) -> list[float] | None:
+    def np_to_list(x: FloatArray | None) -> list[float] | None:
         return x.tolist() if x is not None else None
 
     calibration_params = CalibrationParams(

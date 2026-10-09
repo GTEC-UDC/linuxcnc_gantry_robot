@@ -32,7 +32,7 @@ import scipy as scp
 import validate_dataset as vd
 from data import (
     CorrectionModel,
-    coord_align,
+    coord_align_array,
     load_correction,
     load_optitrack_metadata,
 )
@@ -80,8 +80,12 @@ def load_take(take: str, model: CorrectionModel, alignment: npt.ArrayLike) -> Ta
     )
     valid = vd.apply_skip_initial(valid, optitrack_unaligned)
 
-    aligned = coord_align(alignment, optitrack_unaligned, vd.ROT_CENTER)
-    optitrack = aligned[vd.XYZ].to_numpy()
+    optitrack = coord_align_array(
+        np.asarray(alignment),
+        optitrack_unaligned["time"].to_numpy(),
+        optitrack_unaligned[vd.XYZ].to_numpy(),
+        vd.ROT_CENTER,
+    )
     gantry = gantry_corrected[vd.XYZ].to_numpy()
 
     # Remove the samples that are not valid or that have no position

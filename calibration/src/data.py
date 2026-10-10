@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Literal, cast
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import numpy.typing as npt
@@ -16,6 +17,10 @@ logger = logging.getLogger(__name__)
 
 FloatArray = npt.NDArray[np.float64]
 BoolArray = npt.NDArray[np.bool]
+
+# Time zone of the OptiTrack computer. The OptiTrack files give the capture
+# start time as a local time without time zone.
+OPTITRACK_TZ = ZoneInfo("Europe/Madrid")
 
 
 def load_gantry_data(filename: str | Path) -> pd.DataFrame:
@@ -48,7 +53,7 @@ def load_optitrack_metadata(filename: str | Path) -> dict[str, Any]:
             - Capture Start Frame (int)
             - Total Frames in Take (int)
             - Total Exported Frames (int)
-            - Capture Start Time (datetime)
+            - Capture Start Time (datetime, in the time zone OPTITRACK_TZ)
     """
     with open(filename, "r") as f:
         line = f.readline().strip()
@@ -65,18 +70,17 @@ def load_optitrack_metadata(filename: str | Path) -> dict[str, Any]:
     metadata["Total Exported Frames"] = int(metadata["Total Exported Frames"])
 
     # Convert capture start date and time
-    # The date is in the format "2025-02-21 12.00.00.000"
+    # The date is in the format "YYYY-MM-DD hh.mm.ss.fff"
     # Note that the time is given in 12-hour format but no AM/PM is given
-    # Although the system time is set correctly, the capture start time
-    # reported in the data seems to be off by a few seconds, so it cannot
-    # be used directly to get the actual start time
+    # Note that the time may be off by a few milliseconds
     capture_date_str = (
         metadata["Capture Start Time"].strip()
         + " "
         + ("PM" if take_name.endswith("PM") else "AM")
     )
     date_format = "%Y-%m-%d %I.%M.%S.%f %p"
-    metadata["Capture Start Time"] = datetime.strptime(capture_date_str, date_format)  # noqa: DTZ007
+    capture_date = datetime.strptime(capture_date_str, date_format)  # noqa: DTZ007
+    metadata["Capture Start Time"] = capture_date.replace(tzinfo=OPTITRACK_TZ)
 
     return metadata
 

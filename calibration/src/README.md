@@ -56,7 +56,7 @@ First, the OptiTrack data is transformed to the coordinate system of the gantry,
 - **Rotation**: Rotations around X, Y, and Z axes. By default the rotation center is `(0, 0, 1500)`.
 - **Time Shift**: Temporal alignment to account for timing differences.
 
-The alignment parameters are found using numerical optimization with the `scipy.optimize.minimize` function (Powell method by default). The objective to minimize is selectable via the `objective` setting: the mean squared error (`mse`, the default) or the mean Euclidean distance (`mean_distance`) between the gantry and the aligned OptiTrack positions.
+The alignment parameters are found using numerical optimization with the `scipy.optimize.minimize` function (Powell method by default). The objective to minimize is the mean squared error between the gantry and the aligned OptiTrack positions.
 
 ### Step 2: Correction
 
@@ -113,7 +113,7 @@ $$
 
 **Note**: The powers of $z$ above the first are left out by default because in our measurements the Z-axis only shows a linear distortion.
 
-The correction parameters are found by minimizing the error between the corrected gantry positions and the aligned OptiTrack positions, with the objective selectable via the `objective` setting. Because the transformation is linear in $\mathbf{c}$ and $\mathbf{A}_k$, the mean squared error (`mse`, the default) is minimized with `numpy.linalg.lstsq`, while the mean Euclidean distance (`mean_distance`) is minimized iteratively with `scipy.optimize.minimize` (using the Powell method by default).
+The correction parameters are found by minimizing the mean squared error between the corrected gantry positions and the aligned OptiTrack positions. Because the transformation is linear in $\mathbf{c}$ and $\mathbf{A}_k$, the minimum is found by linear least squares with `numpy.linalg.lstsq`.
 
 ## Parameters Validation
 
@@ -242,8 +242,8 @@ i/o: Jump to start/end
 
 Before running the calibration script, you need to create a JSON configuration file, by default named `config.json`. The configuration file defines the calibration parameters, data processing options, and analysis settings. The configuration format follows the structure defined in the `CalibrationConfig` class in `data.py`, allowing you to customize:
 
-- Alignment parameters, objective, and `minimize_options` settings
-- Correction parameters, objective, and `minimize_options` settings
+- Alignment parameters and `minimize_options` settings
+- Correction parameters
 - Frame skipping ranges for excluding poor tracking data
 
 The contents of the configuration file used for the `2025-04-09` measurement are the following:
@@ -254,7 +254,6 @@ The contents of the configuration file used for the `2025-04-09` measurement are
     "init_params": [50, 0, 0, -1.5707963267948966, 2500, 2500, -2500],
     "max_rotation": null,
     "rotation_center": [0, 0, 1500],
-    "objective": "mse",
     "minimize_options": {
       "method": "Powell",
       "tolerance": 1e-9,
@@ -264,12 +263,6 @@ The contents of the configuration file used for the `2025-04-09` measurement are
   "correction": {
     "enabled": true,
     "degree": [3, 3, 1],
-    "objective": "mse",
-    "minimize_options": {
-      "method": "Powell",
-      "tolerance": 1e-9,
-      "display": true
-    },
     "reject_samples": {
       "enabled": true,
       "sigma": 5.0,
@@ -288,7 +281,7 @@ The contents of the configuration file used for the `2025-04-09` measurement are
 
 Some important considerations:
 
-- The initialization parameters in the `init_params` field of the `alignment` section are the initial values for the optimization of the calibration alignment step. If not specified, default values of 0 are used. The parameters are the following, in the order they are used in the optimization (see the `coord_align` function in `data.py`):
+- The initialization parameters in the `init_params` field of the `alignment` section are the initial values for the optimization of the calibration alignment step. If not specified, default values of 0 are used. The parameters are the following, in the order they are used in the optimization (see the `AlignmentTransform` class in `data.py`):
 
   - `time_shift`: Time shift in seconds
   - `x_rotation`: Rotation around the x-axis in radians

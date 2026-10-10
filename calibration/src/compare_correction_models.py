@@ -207,7 +207,6 @@ def main(args: argparse.Namespace) -> None:
         calibration_params = CalibrationParams.model_validate_json(f.read())
 
     config.alignment.minimize_options.display = False
-    config.correction.minimize_options.display = False
 
     # Override validate_dataset.py settings
     vd.DATASET_DIR = args.dataset_dir

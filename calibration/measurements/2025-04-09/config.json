@@ -3,7 +3,6 @@
     "init_params": [50, 0, 0, -1.5707963267948966, 2500, 2500, -2500],
     "max_rotation": null,
     "rotation_center": [0, 0, 1500],
-    "objective": "mse",
     "minimize_options": {
       "method": "Powell",
       "tolerance": 1e-9,
@@ -13,12 +12,6 @@
   "correction": {
     "enabled": true,
     "degree": [3, 3, 1],
-    "objective": "mse",
-    "minimize_options": {
-      "method": "Powell",
-      "tolerance": 1e-9,
-      "display": true
-    },
     "reject_samples": {
       "enabled": true,
       "sigma": 5.0,

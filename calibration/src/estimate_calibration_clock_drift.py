@@ -264,7 +264,6 @@ def main(args: argparse.Namespace) -> None:
     config.correction.reject_samples.enabled = args.skip_samples
     config.correction.enabled = args.correct
     config.alignment.minimize_options.display = False
-    config.correction.minimize_options.display = False
 
     df, _, _ = get_processed_data(
         args.gantry,

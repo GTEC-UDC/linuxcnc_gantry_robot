@@ -45,28 +45,27 @@ from typing import Literal, TypedDict
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
-import scipy as scp
 from data import (
     AlignmentTransform,
+    CalibrationAlignmentConfig,
     CorrectionModel,
     interp_columns,
     load_correction,
     load_optitrack_data,
     load_optitrack_metadata,
-    samples_mse,
 )
+from data import fit_alignment as fit_alignment_arrays
 from defaults import CALIBRATION_FILE, DATASET_DIR
 
 logger = logging.getLogger("validate_dataset")
 
+# data.py logs the result of every alignment fit. There are many fits here, and
+# the alignments are logged below, so those messages are left out.
+logging.getLogger("data").setLevel(logging.WARNING)
+
 # Folders of the dataset with the OptiTrack recordings and with the gantry positions
 OPTITRACK_DIR = DATASET_DIR / "OPTITRACK_MEASUREMENTS_CSV"
 GROUND_TRUTH_DIR = DATASET_DIR / "GROUND_TRUTH"
-
-# Settings of the alignment fit
-ROT_CENTER = (0.0, 0.0, 1500.0)
-Z_ROT_GUESS = -1.6520  # rad (-94.66 degrees), initial guess of the rotation about z
-MAX_ROT = 0.15  # rad, max rotation for the alignment optimization
 
 # Default values of the command line options (see parse_args)
 TAKES = ["circle", "random1", "random2", "zigzag1", "zigzag2", "zigzag3", "zigzag4"]
@@ -118,46 +117,20 @@ def fit_alignment(
     ``optitrack`` and ``gantry`` have the columns time, x, y and z, and one row
     per sample. Only the samples selected by ``mask`` are used, or all of them
     if it is None.
+
+    The alignment is fitted as in the calibration (see ``fit_alignment`` in
+    data.py), starting with no time shift.
     """
-    if mask is not None:
-        optitrack = optitrack[mask].reset_index(drop=True)
-        gantry = gantry[mask].reset_index(drop=True)
-
-    optitrack_time = optitrack["time"].to_numpy()
-    optitrack_xyz = optitrack[XYZ].to_numpy()
     gantry_xyz = gantry[XYZ].to_numpy()
+    if mask is not None:
+        gantry_xyz = np.where(mask[:, None], gantry_xyz, np.nan)
 
-    def align(x: FloatArray) -> FloatArray:
-        """OptiTrack positions aligned with the alignment vector ``x``."""
-        alignment = AlignmentTransform.from_vector(x)
-        return alignment.apply(optitrack_time, optitrack_xyz, ROT_CENTER)
+    config = CalibrationAlignmentConfig(init_time_offset=0.0)
+    config.minimize_options.display = False
 
-    # Initial values of the parameters: no time shift, the known rotation about z,
-    # and the translation that makes the mean positions coincide after rotating
-    x0 = np.array([0.0, 0.0, 0.0, Z_ROT_GUESS, 0.0, 0.0, 0.0])
-    x0[4:7] = np.nanmean(gantry_xyz - align(x0), axis=0)
-
-    # Each rotation can move at most MAX_ROT from its initial value
-    bounds = [(None, None)] * 7
-    bounds[1] = (x0[1] - MAX_ROT, x0[1] + MAX_ROT)
-    bounds[2] = (x0[2] - MAX_ROT, x0[2] + MAX_ROT)
-    bounds[3] = (x0[3] - MAX_ROT, x0[3] + MAX_ROT)
-
-    # Search for the parameters that minimize the mean squared distance between
-    # the gantry positions and the aligned OptiTrack positions
-    res = scp.optimize.minimize(
-        fun=lambda x: samples_mse(gantry_xyz, align(x)),
-        x0=x0,
-        bounds=bounds,
-        tol=1e-9,
-        method="Powell",
-        options={"disp": False},
+    return fit_alignment_arrays(
+        optitrack["time"].to_numpy(), gantry_xyz, optitrack[XYZ].to_numpy(), config
     )
-
-    if not res.success:
-        logger.warning("The alignment fit did not converge: %s", res.message)
-
-    return AlignmentTransform.from_vector(res.x)
 
 
 def fit_alignment_without_tracking_errors(
@@ -185,9 +158,7 @@ def residual_vec(
 
     Returns one row per sample, with the difference in x, y and z, in mm.
     """
-    aligned = alignment.apply(
-        optitrack["time"].to_numpy(), optitrack[XYZ].to_numpy(), ROT_CENTER
-    )
+    aligned = alignment.apply(optitrack["time"].to_numpy(), optitrack[XYZ].to_numpy())
     return aligned - gantry[XYZ].to_numpy()
 
 

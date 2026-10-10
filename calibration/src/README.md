@@ -53,10 +53,10 @@ The calibration process performs two steps: **alignment** and **correction**. Th
 First, the OptiTrack data is transformed to the coordinate system of the gantry, to account for differences in coordinate systems and timing. This alignment process involves finding the following parameters:
 
 - **Translation**: Shifts in X, Y, and Z axes
-- **Rotation**: Rotations around X, Y, and Z axes. By default the rotation center is `(0, 0, 1500)`.
+- **Rotation**: Rotations around X, Y, and Z axes.
 - **Time Shift**: Temporal alignment to account for timing differences.
 
-The alignment parameters are found using numerical optimization with the `scipy.optimize.minimize` function (Powell method by default). The objective to minimize is the mean squared error between the gantry and the aligned OptiTrack positions.
+The alignment parameters minimize the mean squared error between the gantry and the aligned OptiTrack positions. For a given time shift, the rotation and the translation that minimize this error are found in closed form with the [Kabsch algorithm](https://en.wikipedia.org/wiki/Kabsch_algorithm). The time shift is found using numerical optimization with the `scipy.optimize.minimize_scalar` function (Brent method by default).
 
 ### Step 2: Correction
 
@@ -251,11 +251,9 @@ The contents of the configuration file used for the `2025-04-09` measurement are
 ```json
 {
   "alignment": {
-    "init_params": [50, 0, 0, -1.5707963267948966, 2500, 2500, -2500],
-    "max_rotation": null,
-    "rotation_center": [0, 0, 1500],
+    "init_time_offset": 50,
     "minimize_options": {
-      "method": "Powell",
+      "method": "brent",
       "tolerance": 1e-9,
       "display": true
     }
@@ -281,19 +279,9 @@ The contents of the configuration file used for the `2025-04-09` measurement are
 
 Some important considerations:
 
-- The initialization parameters in the `init_params` field of the `alignment` section are the initial values for the optimization of the calibration alignment step. If not specified, default values of 0 are used. The parameters are the following, in the order they are used in the optimization (see the `AlignmentTransform` class in `data.py`):
+- The `init_time_offset` field of the `alignment` section is the initial value, in seconds, of the time shift between OptiTrack and the gantry. If not specified, 0 is used.
 
-  - `time_shift`: Time shift in seconds
-  - `x_rotation`: Rotation around the x-axis in radians
-  - `y_rotation`: Rotation around the y-axis in radians
-  - `z_rotation`: Rotation around the z-axis in radians
-  - `x_shift`: Translation along the x-axis in mm
-  - `y_shift`: Translation along the y-axis in mm
-  - `z_shift`: Translation along the z-axis in mm
-
-  Important: These parameters may be needed to be set manually for the optimization to converge to the optimal value.
-
-- The `max_rotation` parameter is the maximum rotation, in radians, that the optimization can apply around each axis from its initial value. If not specified, $\pi/32$ is used. With `null` the rotations are not limited. If the rotations are not limited or the value is too large, the optimization may not converge to the optimal value.
+  Important: The search of the time shift is local, so this value may be needed to be set manually, close to the real time shift, for the optimization to converge to the optimal value.
 
 - The `degree` parameter of the `correction` section is the highest power of the x, y, and z coordinates in the correction transformation (see the Correction step above). If not specified, `[2, 2, 1]` is used. The same degree is used to reject samples.
 
@@ -323,73 +311,73 @@ The contents of the calibration file used for the `2025-04-09` measurement are t
 ```json
 {
   "alignment": {
-    "time_offset": 48.52745729893273,
+    "time_offset": 48.527457312184524,
     "rotation": [
-      0.016175827507814915,
-      0.0018425560471000747,
-      -1.6280108533762478
+      0.01617582728235245,
+      0.0018425559361148203,
+      -1.6280108535881137
     ],
     "translation": [
-      2431.9697236070406,
-      2435.007362734755,
-      -2447.4246000168782
+      2456.3507296139383,
+      2436.378890992471,
+      -2447.225815271697
     ]
   },
   "correction": {
     "c": [
-      8.468704217520418,
-      2.221450462543982,
-      3.838348453280993
+      8.468704125578851,
+      2.2214509447214588,
+      3.838349231714749
     ],
     "A": [
       [
         [
-          1.0045314403390107,
-          0.0006060826903485233,
-          0.011902603108565763
+          1.0045314403332957,
+          0.0006060828366739646,
+          0.011902603690562468
         ],
         [
-          -0.004710142890022349,
-          1.001237522104381,
-          0.003901566714995413
+          -0.004710142900705389,
+          1.001237521946603,
+          0.0039015666802358017
         ],
         [
-          0.0014726403070209617,
-          -0.005976848923450272,
-          1.0001358908134088
+          0.0014726401230069788,
+          -0.005976848978327256,
+          1.0001358908033262
         ]
       ],
       [
         [
-          -2.2856715856574925e-6,
-          4.970608098239568e-7,
+          -2.2856715591980916e-6,
+          4.970609252627938e-7,
           0.0
         ],
         [
-          1.3732389138206606e-6,
-          6.381111397460615e-7,
+          1.3732387582801378e-6,
+          6.381111925065698e-7,
           0.0
         ],
         [
-          -9.169289143547495e-7,
-          1.4606115453310274e-6,
+          -9.169289307488535e-7,
+          1.460611529997568e-6,
           0.0
         ]
       ],
       [
         [
-          3.0884395617449264e-10,
-          -1.726905932853275e-10,
+          3.088439507172301e-10,
+          -1.7269061732805576e-10,
           0.0
         ],
         [
-          -1.3106979866943501e-10,
-          -9.46137460273178e-11,
+          -1.3106977166940963e-10,
+          -9.461375016614813e-11,
           0.0
         ],
         [
-          1.405389173564769e-10,
-          -5.94146825492022e-11,
+          1.4053891906949058e-10,
+          -5.941468087431179e-11,
           0.0
         ]
       ]

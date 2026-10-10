@@ -85,7 +85,6 @@ def load_take(
     optitrack = alignment.apply(
         optitrack_unaligned["time"].to_numpy(),
         optitrack_unaligned[vd.XYZ].to_numpy(),
-        vd.ROT_CENTER,
     )
     gantry = gantry_corrected[vd.XYZ].to_numpy()
 

@@ -1,7 +1,6 @@
 import logging
 import re
 from abc import ABC, abstractmethod
-from collections.abc import Sequence
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Literal, cast
@@ -17,9 +16,6 @@ logger = logging.getLogger(__name__)
 
 FloatArray = npt.NDArray[np.float64]
 BoolArray = npt.NDArray[np.bool]
-
-# Center about which the rotations of the alignment are applied
-ROTATION_CENTER = (0.0, 0.0, 1500.0)
 
 
 def load_gantry_data(filename: str | Path) -> pd.DataFrame:
@@ -471,35 +467,17 @@ def interp_columns(t: FloatArray, t_src: FloatArray, values: FloatArray) -> Floa
 
 
 class MinimizeOptions(BaseModel):
-    # Options for scipy.optimize.minimize.
-    # Method should be one of the supported by scipy.optimize.minimize
-    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html
-    method: Literal[
-        "Nelder-Mead",
-        "Powell",
-        "CG",
-        "BFGS",
-        "Newton-CG",
-        "L-BFGS-B",
-        "TNC",
-        "COBYLA",
-        "COBYQA",
-        "SLSQP",
-        "trust-constr",
-        "dogleg",
-        "trust-ncg",
-        "trust-exact",
-        "trust-krylov",
-    ] = "Powell"
-    tolerance: float = 1e-9
+    # Options for scipy.optimize.minimize_scalar.
+    # Method should be one of the supported by scipy.optimize.minimize_scalar
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize_scalar.html
+    method: Literal["brent", "golden"] | None = "brent"
+    tolerance: float | None = 1e-9
     display: bool = True
 
 
 class CalibrationAlignmentConfig(BaseModel):
     enabled: bool = True
-    init_params: list[float] | None = None
-    max_rotation: float | None = np.pi / 32
-    rotation_center: tuple[float, float, float] = ROTATION_CENTER
+    init_time_offset: float | None = None
     minimize_options: MinimizeOptions = Field(default_factory=MinimizeOptions)
 
 
@@ -539,10 +517,9 @@ class AlignmentTransform(BaseModel):
 
     The aligned position at time t is
 
-        pos_aligned(t) = R @ (pos(t - time_offset) - center) + center + translation
+        pos_aligned(t) = R @ pos(t - time_offset) + translation
 
-    where pos is a position (x, y, z), R is the rotation matrix of ``rotation``
-    and center is the rotation center, which is not part of the alignment.
+    where pos is a position (x, y, z) and R is the rotation matrix of ``rotation``.
 
     Attributes:
         time_offset: Time shift in seconds.
@@ -569,36 +546,22 @@ class AlignmentTransform(BaseModel):
         self,
         time: FloatArray,
         samples: FloatArray,
-        rotation_center: Sequence[float] | FloatArray | None = ROTATION_CENTER,
     ) -> FloatArray:
         """Align positions.
 
-        The alignment shifts the time base, rotates about ``rotation_center`` and
-        translates.
+        The alignment shifts the time base, rotates, and translates.
 
         Args:
             time (FloatArray): Time of each sample in seconds, shape (N,) or (N, 1).
             samples (FloatArray): Positions, shape (N, 3).
-            rotation_center (Sequence[float] | FloatArray | None): Point about which
-                the rotation is applied, shape (3,). None is the origin.
 
         Returns:
             FloatArray: Aligned positions, shape (N, 3). The samples shifted outside
                 the time range are NaN.
         """
-        rotation_center = np.asarray(
-            [0, 0, 0] if rotation_center is None else rotation_center
-        )
-
         ret = interp_columns(time - self.time_offset, time, samples)
-        ret = (
-            scp_tr.Rotation.from_euler("xyz", self.rotation).apply(
-                ret - rotation_center
-            )
-            + rotation_center
-        )
+        ret = scp_tr.Rotation.from_euler("xyz", self.rotation).apply(ret)
         ret += np.asarray(self.translation)
-
         return ret
 
 
@@ -644,6 +607,30 @@ def samples_mean_distance(a: FloatArray, b: FloatArray) -> float:
     return float(np.nanmean(np.sqrt(np.sum((a - b) ** 2, axis=1))))
 
 
+def fit_rigid_transform(
+    source: FloatArray, target: FloatArray
+) -> tuple[FloatArray, FloatArray]:
+    """Find the rotation and the translation that best move ``source`` to ``target``.
+
+    Both arrays have one x, y, z row per point. The result minimizes the squared
+    distance between ``source @ rotation.T + translation`` and ``target``
+    (Kabsch algorithm).
+    """
+    valid = ~np.isnan(source).any(axis=1) & ~np.isnan(target).any(axis=1)
+    source = source[valid, :]
+    target = target[valid, :]
+
+    source_center = source.mean(axis=0)
+    target_center = target.mean(axis=0)
+
+    best_rotation, _ = scp_tr.Rotation.align_vectors(
+        target - target_center, source - source_center
+    )
+
+    rotation = best_rotation.as_matrix()
+    return rotation, target_center - rotation @ source_center
+
+
 def fit_alignment(
     time: FloatArray,
     gantry_samples: FloatArray,
@@ -652,10 +639,13 @@ def fit_alignment(
 ) -> AlignmentTransform:
     """Fit the alignment of the OptiTrack positions with the gantry positions.
 
-    The alignment shifts the OptiTrack positions in time, rotates them about the
-    rotation center of ``config`` and translates them (see ``AlignmentTransform``).
-    The parameters are found with a numerical minimization starting at
-    ``config.init_params``.
+    The alignment shifts the OptiTrack positions in time, rotates them and
+    translates them (see ``AlignmentTransform``). For a given time shift, the
+    rotation and the translation that minimize the mean squared error are found
+    with the Kabsch algorithm (see ``fit_rigid_transform``). The time shift is
+    found with a numerical minimization of that error, starting at
+    ``config.init_time_offset``. This minimization is local, so the initial time
+    shift must be close to the real one.
 
     Args:
         time (FloatArray): Time of each sample in seconds, shape (N,) or (N, 1).
@@ -670,54 +660,41 @@ def fit_alignment(
     """
     g_xyz, o_xyz = gantry_samples, optitrack_samples
     config = config or CalibrationAlignmentConfig()
-    rot_center = np.asarray(config.rotation_center)
+    t0 = config.init_time_offset or 0
 
-    # Initial alignment parameters
-    if config.init_params:
-        x0 = np.array(config.init_params)
-    else:
-        x0 = np.zeros(7)
-
-    bounds: list[tuple[float | None, float | None]] | None = None
-
-    if max_rotation := config.max_rotation:
-        bounds = [(None, None) for _ in range(len(x0))]
-        bounds[1] = (x0[1] - max_rotation, x0[1] + max_rotation)
-        bounds[2] = (x0[2] - max_rotation, x0[2] + max_rotation)
-        bounds[3] = (x0[3] - max_rotation, x0[3] + max_rotation)
-
-    min_opts = config.minimize_options
-
-    def opt_callback(intermediate_result):
-        if min_opts.display:
-            fval = getattr(intermediate_result, "fun", intermediate_result)
-            print(f"fval: {fval}")
+    def align_fn(time_offset: float) -> float:
+        optitrack_shift = interp_columns(time - time_offset, time, o_xyz)
+        rotation, translation = fit_rigid_transform(optitrack_shift, g_xyz)
+        return samples_mse(g_xyz, optitrack_shift @ rotation.T + translation)
 
     logger.info("Aligning OptiTrack data with gantry data...")
 
-    def align_fn(x) -> float:
-        alignment = AlignmentTransform.from_vector(x)
-        return samples_mse(g_xyz, alignment.apply(time, o_xyz, rot_center))
-
-    res = scp.optimize.minimize(
+    res = scp.optimize.minimize_scalar(
         fun=align_fn,
-        x0=x0,
-        bounds=bounds,
-        tol=min_opts.tolerance,
-        options={"disp": min_opts.display},
-        callback=opt_callback,
-        method=min_opts.method,
+        bracket=(t0 - 0.5, t0 + 0.5),
+        tol=config.minimize_options.tolerance,
+        options={"disp": 1 if config.minimize_options.display else 0},
+        method=config.minimize_options.method,
     )
 
     if not res.success:
         logger.warning("The alignment fit did not converge: %s", res.message)
 
-    alignment = AlignmentTransform.from_vector(res.x)
+    time_offset = float(res.x)
+    optitrack_shift = interp_columns(time - time_offset, time, optitrack_samples)
+    rotation, translation = fit_rigid_transform(optitrack_shift, gantry_samples)
+
+    alignment = AlignmentTransform(
+        time_offset=time_offset,
+        rotation=scp_tr.Rotation.from_matrix(rotation).as_euler("xyz").tolist(),
+        translation=translation.tolist(),
+    )
+
     logger.info("Alignment completed. Parameters: %s", alignment)
 
-    o_xyz_aligned = alignment.apply(time, o_xyz, rot_center)
-    mean_dist_err = samples_mean_distance(g_xyz, o_xyz_aligned)
-    mean_sq_err = samples_mse(g_xyz, o_xyz_aligned)
+    o_xyz_corrected = optitrack_shift @ rotation.T + translation
+    mean_dist_err = samples_mean_distance(g_xyz, o_xyz_corrected)
+    mean_sq_err = samples_mse(g_xyz, o_xyz_corrected)
 
     logger.info("Alignment mean distance error: %f", mean_dist_err)
     logger.info("Alignment mean square error: %f", mean_sq_err)
@@ -782,8 +759,6 @@ def get_processed_data(
     # Align the OptiTrack data with the gantry data
     # -------------------------------------------------------------------------
 
-    rotation_center = config.alignment.rotation_center
-
     alignment: AlignmentTransform | None = None
     if config.alignment.enabled and calibration_params.alignment is not None:
         alignment = calibration_params.alignment
@@ -799,7 +774,7 @@ def get_processed_data(
         time = df.loc[:, "time"].to_numpy()
         for x_col in [col for col in df.columns if col.startswith(("M.X", "RB.X"))]:
             cols = [x_col.replace(".X", f".{axis}", 1) for axis in "XYZ"]
-            df[cols] = alignment.apply(time, df[cols].to_numpy(), rotation_center)
+            df[cols] = alignment.apply(time, df[cols].to_numpy())
 
     # -------------------------------------------------------------------------
     # Skip samples

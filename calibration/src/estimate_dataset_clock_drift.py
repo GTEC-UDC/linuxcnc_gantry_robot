@@ -31,8 +31,8 @@ import numpy.typing as npt
 import scipy as scp
 import validate_dataset as vd
 from data import (
+    AlignmentTransform,
     CorrectionModel,
-    coord_align_array,
     load_correction,
     load_optitrack_metadata,
 )
@@ -68,7 +68,9 @@ class Take:
         return self.capture_start + self.time
 
 
-def load_take(take: str, model: CorrectionModel, alignment: npt.ArrayLike) -> Take:
+def load_take(
+    take: str, model: CorrectionModel, alignment: AlignmentTransform
+) -> Take:
     """Load a take and align its OptiTrack positions with the gantry.
 
     The take is loaded as in ``validate_dataset.py``: the rigid body of the gantry,
@@ -80,8 +82,7 @@ def load_take(take: str, model: CorrectionModel, alignment: npt.ArrayLike) -> Ta
     )
     valid = vd.apply_skip_initial(valid, optitrack_unaligned)
 
-    optitrack = coord_align_array(
-        np.asarray(alignment),
+    optitrack = alignment.apply(
         optitrack_unaligned["time"].to_numpy(),
         optitrack_unaligned[vd.XYZ].to_numpy(),
         vd.ROT_CENTER,

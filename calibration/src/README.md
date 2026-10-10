@@ -323,21 +323,25 @@ python ../../src/run_calibration.py
 
 By default, `run_calibration.py` reads the data and configuration files from the working directory and saves the alignment and correction parameters in a `calibration.json` file in the working directory. If the calibration file already exists, the script asks for confirmation before running the calibration again.
 
-The calibration file holds the alignment parameters and the correction parameters. The latter are the vector `c` and the list `A` of the matrices of the correction transformation, one per power, so the degree of the transformation is the number of matrices.
+The calibration file holds the alignment parameters and the correction parameters. The former are the time shift `time_offset`, in seconds, the `rotation` angles about the x, y and z axes, in radians, and the `translation`, in millimeters. The latter are the vector `c` and the list `A` of the matrices of the correction transformation, one per power, so the degree of the transformation is the number of matrices.
 
 The contents of the calibration file used for the `2025-04-09` measurement are the following:
 
 ```json
 {
-  "alignment": [
-    48.52745729893273,
-    0.016175827507814915,
-    0.0018425560471000747,
-    -1.6280108533762478,
-    2431.9697236070406,
-    2435.007362734755,
-    -2447.4246000168782
-  ],
+  "alignment": {
+    "time_offset": 48.52745729893273,
+    "rotation": [
+      0.016175827507814915,
+      0.0018425560471000747,
+      -1.6280108533762478
+    ],
+    "translation": [
+      2431.9697236070406,
+      2435.007362734755,
+      -2447.4246000168782
+    ]
+  },
   "correction": {
     "c": [
       8.468704217520418,

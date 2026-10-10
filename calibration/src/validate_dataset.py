@@ -13,9 +13,9 @@ compared with the commanded positions of the gantry. This is done twice:
 The difference between the two results is what the correction improves.
 
 First the OptiTrack positions are aligned with the gantry ones: they are shifted
-in time, rotated and translated. The alignment is defined by an array of time
-shift, Euler angle rotations in X, Y, Z, and displacements in X, Y, Z: (dt, rx,
-ry, rz, tx, ty, tz).
+in time, rotated and translated. The alignment is defined by a time shift, Euler
+angle rotations in X, Y, Z, and displacements in X, Y, Z (see AlignmentTransform
+in data.py).
 
 The "before" alignment is fitted with the recorded gantry positions. The "after"
 alignment with the corrected ones.
@@ -47,8 +47,8 @@ import numpy.typing as npt
 import pandas as pd
 import scipy as scp
 from data import (
+    AlignmentTransform,
     CorrectionModel,
-    coord_align_array,
     interp_columns,
     load_correction,
     load_optitrack_data,
@@ -93,7 +93,7 @@ class AlignmentResult(TypedDict):
     p95: float
     n: int  # number of samples
     n_drop: int  # number of samples excluded as tracking errors
-    params: list[float]  # alignment used (dt, rx, ry, rz, tx, ty, tz)
+    alignment: AlignmentTransform  # alignment used
     resid: FloatArray  # residual of the samples kept (3D distance)
     rvec: FloatArray  # residual of the samples kept (one x, y ,z row per sample)
     rmax: float  # largest residual of the samples kept
@@ -112,14 +112,12 @@ class TakeResult(TypedDict):
 
 def fit_alignment(
     optitrack: pd.DataFrame, gantry: pd.DataFrame, mask: BoolArray | None = None
-) -> FloatArray:
+) -> AlignmentTransform:
     """Find the rigid alignment that maps OptiTrack onto the gantry.
 
     ``optitrack`` and ``gantry`` have the columns time, x, y and z, and one row
     per sample. Only the samples selected by ``mask`` are used, or all of them
     if it is None.
-
-    Returns the 7 parameters of the alignment: (dt, rx, ry, rz, tx, ty, tz).
     """
     if mask is not None:
         optitrack = optitrack[mask].reset_index(drop=True)
@@ -129,11 +127,15 @@ def fit_alignment(
     optitrack_xyz = optitrack[XYZ].to_numpy()
     gantry_xyz = gantry[XYZ].to_numpy()
 
+    def align(x: FloatArray) -> FloatArray:
+        """OptiTrack positions aligned with the alignment vector ``x``."""
+        alignment = AlignmentTransform.from_vector(x)
+        return alignment.apply(optitrack_time, optitrack_xyz, ROT_CENTER)
+
     # Initial values of the parameters: no time shift, the known rotation about z,
     # and the translation that makes the mean positions coincide after rotating
     x0 = np.array([0.0, 0.0, 0.0, Z_ROT_GUESS, 0.0, 0.0, 0.0])
-    rotated = coord_align_array(x0, optitrack_time, optitrack_xyz, ROT_CENTER)
-    x0[4:7] = np.nanmean(gantry_xyz - rotated, axis=0)
+    x0[4:7] = np.nanmean(gantry_xyz - align(x0), axis=0)
 
     # Each rotation can move at most MAX_ROT from its initial value
     bounds = [(None, None)] * 7
@@ -144,10 +146,7 @@ def fit_alignment(
     # Search for the parameters that minimize the mean squared distance between
     # the gantry positions and the aligned OptiTrack positions
     res = scp.optimize.minimize(
-        fun=lambda x: samples_mse(
-            gantry_xyz,
-            coord_align_array(x, optitrack_time, optitrack_xyz, ROT_CENTER),
-        ),
+        fun=lambda x: samples_mse(gantry_xyz, align(x)),
         x0=x0,
         bounds=bounds,
         tol=1e-9,
@@ -158,12 +157,12 @@ def fit_alignment(
     if not res.success:
         logger.warning("The alignment fit did not converge: %s", res.message)
 
-    return res.x
+    return AlignmentTransform.from_vector(res.x)
 
 
 def fit_alignment_without_tracking_errors(
     optitrack: pd.DataFrame, gantry: pd.DataFrame, valid: BoolArray
-) -> FloatArray:
+) -> AlignmentTransform:
     """Fit an alignment discarding the tracking errors of OptiTrack.
 
     The alignment is fitted twice. The first time it uses all the valid
@@ -171,7 +170,7 @@ def fit_alignment_without_tracking_errors(
     or more from the gantry. These samples are considered tracking
     errors of the OptiTrack.
 
-    Returns the 7 parameters of the second alignment.
+    Returns the second alignment.
     """
     first = fit_alignment(optitrack, gantry, mask=valid)
     residual = residual_3d(optitrack, gantry, first)
@@ -180,23 +179,20 @@ def fit_alignment_without_tracking_errors(
 
 
 def residual_vec(
-    optitrack: pd.DataFrame, gantry: pd.DataFrame, alignment: npt.ArrayLike
+    optitrack: pd.DataFrame, gantry: pd.DataFrame, alignment: AlignmentTransform
 ) -> FloatArray:
     """Aligned OptiTrack positions minus the gantry positions.
 
     Returns one row per sample, with the difference in x, y and z, in mm.
     """
-    aligned = coord_align_array(
-        np.asarray(alignment),
-        optitrack["time"].to_numpy(),
-        optitrack[XYZ].to_numpy(),
-        ROT_CENTER,
+    aligned = alignment.apply(
+        optitrack["time"].to_numpy(), optitrack[XYZ].to_numpy(), ROT_CENTER
     )
     return aligned - gantry[XYZ].to_numpy()
 
 
 def residual_3d(
-    optitrack: pd.DataFrame, gantry: pd.DataFrame, alignment: npt.ArrayLike
+    optitrack: pd.DataFrame, gantry: pd.DataFrame, alignment: AlignmentTransform
 ) -> FloatArray:
     """Distance between the aligned OptiTrack positions and the gantry ones.
 
@@ -304,7 +300,7 @@ def eval_alignment(
     valid: BoolArray,
     take: str,
     label: str,
-    alignment: npt.ArrayLike,
+    alignment: AlignmentTransform,
 ) -> AlignmentResult:
     """Compare OptiTrack positions with gantry positions, given an alignment.
 
@@ -315,8 +311,6 @@ def eval_alignment(
 
     ``take`` and ``label`` are only used in the log message.
     """
-    alignment = np.asarray(alignment)
-
     # Distance between the aligned OptiTrack positions and the gantry ones
     residual = residual_3d(optitrack, gantry, alignment)
 
@@ -343,7 +337,7 @@ def eval_alignment(
         "p95": p95,
         "n": n,
         "n_drop": n_drop,
-        "params": alignment.tolist(),
+        "alignment": alignment,
         "resid": residual[keep],
         "rvec": residual_xyz,
         "rmax": float(np.nanmax(residual[keep])),
@@ -354,7 +348,7 @@ def eval_alignment(
 
 def _fit_alignment_for_take(
     take: str, model: CorrectionModel, target: Target
-) -> FloatArray:
+) -> AlignmentTransform:
     """Fit the alignment of a take."""
     optitrack, gantry_before, gantry_after, valid = load_take(
         take, model, FRAME_BODY
@@ -366,7 +360,7 @@ def _fit_alignment_for_take(
 
 def fit_single_alignment(
     ref_take: str, model: CorrectionModel, target: Target
-) -> FloatArray:
+) -> AlignmentTransform:
     """Fit one alignment to use with all the takes.
 
     With ``ref_take`` set to "all", an alignment is fitted with each take and the
@@ -383,7 +377,7 @@ def fit_single_alignment(
         take_alignments = []
 
         for take in TAKES:
-            alignment = _fit_alignment_for_take(take, model, target)
+            alignment = _fit_alignment_for_take(take, model, target).to_vector()
             take_alignments.append(alignment)
             logger.info("  [%s] %s", take, np.round(alignment, 4).tolist())
 
@@ -401,7 +395,7 @@ def fit_single_alignment(
             np.round(alignments.std(axis=0), 4).tolist(),
         )
 
-        return mean_alignment
+        return AlignmentTransform.from_vector(mean_alignment)
 
     logger.info(
         "Fitting single alignment on reference take '%s' (%s gantry)...",
@@ -414,13 +408,15 @@ def fit_single_alignment(
     logger.info(
         "Single alignment (%s) (dt, rx, ry, rz, tx, ty, tz) = %s",
         target,
-        np.round(alignment, 4).tolist(),
+        np.round(alignment.to_vector(), 4).tolist(),
     )
 
     return alignment
 
 
-def fit_take_alignments(take: str, model: CorrectionModel) -> dict[str, FloatArray]:
+def fit_take_alignments(
+    take: str, model: CorrectionModel
+) -> dict[str, AlignmentTransform]:
     """Fit the two alignments of a take.
 
     Returns the "before" alignment, fitted with the uncorrected gantry positions,
@@ -432,7 +428,7 @@ def fit_take_alignments(take: str, model: CorrectionModel) -> dict[str, FloatArr
     )
     valid = apply_skip_initial(valid, optitrack)
 
-    alignments: dict[str, FloatArray] = {}
+    alignments: dict[str, AlignmentTransform] = {}
     gantry_positions = {"before": gantry_before, "after": gantry_after}
 
     for label, gantry in gantry_positions.items():
@@ -450,7 +446,7 @@ def process_take(
     take: str,
     model: CorrectionModel,
     bodies: list[str],
-    alignments: Mapping[str, npt.ArrayLike],
+    alignments: Mapping[str, AlignmentTransform],
 ) -> TakeResult:
     """Compare the OptiTrack positions of the rigid bodies of a take with the gantry.
 

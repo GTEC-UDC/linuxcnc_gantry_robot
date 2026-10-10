@@ -536,8 +536,76 @@ class CalibrationConfig(BaseModel):
     )
 
 
+class AlignmentTransform(BaseModel):
+    """Alignment of the OptiTrack positions with the gantry positions.
+
+    The aligned position at time t is
+
+        pos_aligned(t) = R @ (pos(t - time_offset) - center) + center + translation
+
+    where pos is a position (x, y, z), R is the rotation matrix of ``rotation``
+    and center is the rotation center, which is not part of the alignment.
+
+    Attributes:
+        time_offset: Time shift in seconds.
+        rotation: Rotation angles (rx, ry, rz) in radians about the fixed x, y and
+            z axes, applied in that order (R = Rz @ Ry @ Rx).
+        translation: Translation (tx, ty, tz) in mm.
+    """
+
+    time_offset: float
+    rotation: Vector3
+    translation: Vector3
+
+    @classmethod
+    def from_vector(cls, x: npt.ArrayLike) -> "AlignmentTransform":
+        """Build alignment from vector (dt, rx, ry, rz, tx, ty, tz)."""
+        dt, rx, ry, rz, tx, ty, tz = np.asarray(x, dtype=float).tolist()
+        return cls(time_offset=dt, rotation=(rx, ry, rz), translation=(tx, ty, tz))
+
+    def to_vector(self) -> FloatArray:
+        """Alignment as vector (dt, rx, ry, rz, tx, ty, tz)."""
+        return np.array([self.time_offset, *self.rotation, *self.translation])
+
+    def apply(
+        self,
+        time: FloatArray,
+        samples: FloatArray,
+        rotation_center: Sequence[float] | FloatArray | None = ROTATION_CENTER,
+    ) -> FloatArray:
+        """Align positions.
+
+        The alignment shifts the time base, rotates about ``rotation_center`` and
+        translates.
+
+        Args:
+            time (FloatArray): Time of each sample in seconds, shape (N,) or (N, 1).
+            samples (FloatArray): Positions, shape (N, 3).
+            rotation_center (Sequence[float] | FloatArray | None): Point about which
+                the rotation is applied, shape (3,). None is the origin.
+
+        Returns:
+            FloatArray: Aligned positions, shape (N, 3). The samples shifted outside
+                the time range are NaN.
+        """
+        rotation_center = np.asarray(
+            [0, 0, 0] if rotation_center is None else rotation_center
+        )
+
+        ret = interp_columns(time - self.time_offset, time, samples)
+        ret = (
+            scp_tr.Rotation.from_euler("xyz", self.rotation).apply(
+                ret - rotation_center
+            )
+            + rotation_center
+        )
+        ret += np.asarray(self.translation)
+
+        return ret
+
+
 class CalibrationParams(BaseModel):
-    alignment: list[float] | None = None
+    alignment: AlignmentTransform | None = None
     correction: PolynomialCorrection | None = None
 
 
@@ -550,44 +618,6 @@ def load_correction(filename: str | Path) -> PolynomialCorrection:
         raise ValueError(f"No correction parameters in {filename}")
 
     return calibration_params.correction
-
-
-def coord_align_array(
-    x: FloatArray,
-    time: FloatArray,
-    samples: FloatArray,
-    rotation_center: Sequence[float] | FloatArray | None = ROTATION_CENTER,
-) -> FloatArray:
-    """Align OptiTrack coordinates with the gantry coordinates.
-
-    The alignment shifts the time base, rotates about ``rotation_center`` and
-    translates.
-
-    Args:
-        x (FloatArray): Alignment parameters (dt, rx, ry, rz, tx, ty, tz), shape
-            (7,): time shift in seconds, rotation angles in radians about the
-            fixed x, y and z axes, applied in that order, and translation.
-        time (FloatArray): Time of each sample in seconds, shape (N,) or (N, 1).
-        samples (FloatArray): OptiTrack positions, shape (N, 3).
-        rotation_center (Sequence[float] | FloatArray | None): Point about which
-            the rotation is applied, shape (3,). None is the origin.
-
-    Returns:
-        FloatArray: Aligned positions, shape (N, 3). The samples shifted outside
-            the time range are NaN.
-    """
-    rotation_center = np.asarray(
-        [0, 0, 0] if rotation_center is None else rotation_center
-    )
-
-    ret = interp_columns(time - x[0], time, samples)
-    ret = (
-        scp_tr.Rotation.from_euler("xyz", x[1:4]).apply(ret - rotation_center)
-        + rotation_center
-    )
-    ret += np.asarray(x[4:7])
-
-    return ret
 
 
 def samples_mse(a: FloatArray, b: FloatArray) -> float:
@@ -621,11 +651,11 @@ def fit_alignment(
     gantry_samples: FloatArray,
     optitrack_samples: FloatArray,
     config: CalibrationAlignmentConfig | None = None,
-) -> FloatArray:
+) -> AlignmentTransform:
     """Fit the alignment of the OptiTrack positions with the gantry positions.
 
     The alignment shifts the OptiTrack positions in time, rotates them about the
-    rotation center of ``config`` and translates them (see ``coord_align_array``).
+    rotation center of ``config`` and translates them (see ``AlignmentTransform``).
     The parameters are found with a numerical minimization starting at
     ``config.init_params``.
 
@@ -638,7 +668,7 @@ def fit_alignment(
             uses the default ones.
 
     Returns:
-        FloatArray: Alignment parameters (dt, rx, ry, rz, tx, ty, tz), shape (7,).
+        AlignmentTransform: Fitted alignment.
     """
     g_xyz, o_xyz = gantry_samples, optitrack_samples
     config = config or CalibrationAlignmentConfig()
@@ -669,10 +699,12 @@ def fit_alignment(
 
     logger.info("Aligning OptiTrack data with gantry data...")
 
+    def align_fn(x) -> float:
+        alignment = AlignmentTransform.from_vector(x)
+        return objective_fn(g_xyz, alignment.apply(time, o_xyz, rot_center))
+
     res = scp.optimize.minimize(
-        fun=lambda x: objective_fn(
-            g_xyz, coord_align_array(x, time, o_xyz, rot_center)
-        ),
+        fun=align_fn,
         x0=x0,
         bounds=bounds,
         tol=min_opts.tolerance,
@@ -687,14 +719,16 @@ def fit_alignment(
     alignment_params_array = res.x
     logger.info("Alignment completed. Parameters: %s", alignment_params_array)
 
-    o_xyz_aligned = coord_align_array(res.x, time, o_xyz, rot_center)
+    alignment = AlignmentTransform.from_vector(res.x)
+
+    o_xyz_aligned = alignment.apply(time, o_xyz, rot_center)
     mean_dist_err = samples_mean_distance(g_xyz, o_xyz_aligned)
     mean_sq_err = samples_mse(g_xyz, o_xyz_aligned)
 
     logger.info("Alignment mean distance error: %f", mean_dist_err)
     logger.info("Alignment mean square error: %f", mean_sq_err)
 
-    return alignment_params_array
+    return alignment
 
 
 def fit_correction_with_config(
@@ -845,24 +879,22 @@ def get_processed_data(
 
     rotation_center = config.alignment.rotation_center
 
-    alignment_params_array: FloatArray | None = None
+    alignment: AlignmentTransform | None = None
     if config.alignment.enabled and calibration_params.alignment is not None:
-        alignment_params_array = np.array(calibration_params.alignment)
+        alignment = calibration_params.alignment
     elif config.alignment.enabled:
         time = df.loc[:, ["time"]].to_numpy()
         g_xyz = df.loc[:, ["GAN.X", "GAN.Y", "GAN.Z"]].to_numpy()  # Gantry data
         o_xyz = df.loc[:, ["RB.X", "RB.Y", "RB.Z"]].to_numpy()  # OptiTrack data
 
-        alignment_params_array = fit_alignment(time, g_xyz, o_xyz, config.alignment)
+        alignment = fit_alignment(time, g_xyz, o_xyz, config.alignment)
 
-    if alignment_params_array is not None:
+    if alignment is not None:
         # Transform all the OptiTrack coordinates in the dataframe
         time = df.loc[:, "time"].to_numpy()
         for x_col in [col for col in df.columns if col.startswith(("M.X", "RB.X"))]:
             cols = [x_col.replace(".X", f".{axis}", 1) for axis in "XYZ"]
-            df[cols] = coord_align_array(
-                alignment_params_array, time, df[cols].to_numpy(), rotation_center
-            )
+            df[cols] = alignment.apply(time, df[cols].to_numpy(), rotation_center)
 
     # -------------------------------------------------------------------------
     # Skip samples
@@ -979,11 +1011,8 @@ def get_processed_data(
     # Create the CalibrationParams object to return
     # -------------------------------------------------------------------------
 
-    def np_to_list(x: FloatArray | None) -> list[float] | None:
-        return x.tolist() if x is not None else None
-
     calibration_params = CalibrationParams(
-        alignment=np_to_list(alignment_params_array),
+        alignment=alignment,
         correction=correction,
     )
 

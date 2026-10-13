@@ -6,10 +6,8 @@ position minus gantry position) is plotted against time.
 
 The plots show:
 
-- In red: the samples with an error of --dropout-mm or more. These are the ones
-  that ``validate_dataset.py`` excludes as tracking errors.
-- Shaded: the first seconds of each take (--skip-initial-s). They are plotted,
-  but they are not used to fit the alignment.
+The samples with an error of --dropout-mm or more are plotted in red. These are
+the ones that ``validate_dataset.py`` excludes as tracking errors.
 """
 
 import argparse
@@ -51,15 +49,9 @@ def compute_errors(
     optitrack, gantry_before, gantry_after, valid = vd.load_take(take, model)
     gantry = gantry_after if target == "corrected" else gantry_before
 
-    # The alignment is fitted without the first seconds of the take and without
-    # the tracking errors of OptiTrack
-    valid_after_skip = vd.apply_skip_initial(valid, optitrack)
-    alignment = vd.fit_alignment_without_tracking_errors(
-        optitrack, gantry, valid_after_skip
-    )
+    # The alignment is fitted without the tracking errors of OptiTrack
+    alignment = vd.fit_alignment_without_tracking_errors(optitrack, gantry, valid)
 
-    # The error is computed for all the samples, also the ones of the first
-    # seconds, so that they can be seen in the plot
     error_xyz = vd.residual_vec(optitrack, gantry, alignment)
     error_abs = vd.residual_3d(optitrack, gantry, alignment)
     errors = np.column_stack([error_xyz, error_abs])
@@ -73,13 +65,12 @@ def compute_errors(
     errors[~valid] = np.nan
 
     logger.info(
-        "[%s] target=%s  valid=%d  excluded(>%.0fmm)=%d  skip=%.0fs",
+        "[%s] target=%s  valid=%d  excluded(>%.0fmm)=%d",
         take,
         target,
         int(valid.sum()),
         vd.DROPOUT_MM,
         int(excluded.sum()),
-        vd.SKIP_INITIAL_S,
     )
     return time, errors, excluded
 
@@ -100,43 +91,28 @@ def plot_take(
     import matplotlib.pyplot as plt
 
     dropout_mm = vd.DROPOUT_MM
-    skip_s = vd.SKIP_INITIAL_S
 
-    # Values of the horizontal axis, and where the first seconds end in it
+    # Values of the horizontal axis
     if x_axis == "samples":
         x = np.arange(len(time), dtype=float)
         xlabel = "sample index"
-        skip_end = float(np.searchsorted(time, skip_s))
     else:
         x = time
         xlabel = "time (s)"
-        skip_end = skip_s
 
     num_excluded = int(excluded.sum())
 
     fig, axs = plt.subplots(4, 1, figsize=(11, 8), sharex=True)
-    title = (
+    fig.suptitle(
         f"{take}  (OptiTrack − {target} gantry, "
-        f"{num_excluded} samples > {dropout_mm:g} mm"
+        f"{num_excluded} samples > {dropout_mm:g} mm)"
     )
-    title += f", skip first {skip_s:g} s)" if skip_s > 0 else ")"
-    fig.suptitle(title)
 
     for i, (name, ax) in enumerate(zip(AXES_NAMES, axs)):
         # The labels of the legend are only set in the first plot
         first = i == 0
 
         ax.axhline(0.0, color="0.7", lw=0.8)
-
-        # Shade the first seconds of the take
-        if skip_s > 0:
-            ax.axvspan(
-                x[0],
-                skip_end,
-                color="0.85",
-                zorder=0,
-                label="skipped" if first else None,
-            )
 
         ax.plot(x, errors[:, i], lw=0.6, color="tab:blue")
 
@@ -166,7 +142,7 @@ def plot_take(
             ax.set_ylabel(f"e_{name} (mm)")
 
         ax.grid(True, alpha=0.3)
-        if first and (num_excluded or skip_s > 0):
+        if first and num_excluded:
             ax.legend(loc="upper right", fontsize=8)
 
     axs[-1].set_xlabel(xlabel)
@@ -225,13 +201,6 @@ def parse_args() -> argparse.Namespace:
         "are marked in red (default: %(default)s)",
     )
     p.add_argument(
-        "--skip-initial-s",
-        type=float,
-        default=vd.SKIP_INITIAL_S,
-        help="first seconds of each take that are not used to fit the alignment. "
-        "They are shaded in the plots (default: %(default)s)",
-    )
-    p.add_argument(
         "--x-axis",
         choices=["seconds", "samples"],
         default="seconds",
@@ -275,7 +244,6 @@ def main() -> None:
     vd.GROUND_TRUTH_DIR = args.dataset_dir / "GROUND_TRUTH"
     vd.OPTITRACK_DIR = args.dataset_dir / "OPTITRACK_MEASUREMENTS_CSV"
     vd.DROPOUT_MM = args.dropout_mm
-    vd.SKIP_INITIAL_S = args.skip_initial_s
 
     model = load_correction(args.calib)
     outdir = args.outdir if args.save else None

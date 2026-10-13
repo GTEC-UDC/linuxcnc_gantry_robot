@@ -68,19 +68,16 @@ class Take:
         return self.capture_start + self.time
 
 
-def load_take(
-    take: str, model: CorrectionModel, alignment: AlignmentTransform
-) -> Take:
+def load_take(take: str, model: CorrectionModel, alignment: AlignmentTransform) -> Take:
     """Load a take and align its OptiTrack positions with the gantry.
 
-    The take is loaded as in ``validate_dataset.py``: the rigid body of the gantry,
-    the gantry positions corrected with ``model``, and without the first seconds.
+    The take is loaded as in ``validate_dataset.py``: the rigid body of the gantry
+    and the gantry positions corrected with ``model``.
     """
     logger.info("[%s] loading...", take)
     optitrack_unaligned, _, gantry_corrected, valid = vd.load_take(
         take, model, vd.FRAME_BODY
     )
-    valid = vd.apply_skip_initial(valid, optitrack_unaligned)
 
     optitrack = alignment.apply(
         optitrack_unaligned["time"].to_numpy(),
@@ -227,9 +224,7 @@ def print_takes(takes: list[Take], span: float) -> None:
         )
 
 
-def print_scan(
-    takes: list[Take], t_ref: float, scan: list[float], span: float
-) -> None:
+def print_scan(takes: list[Take], t_ref: float, scan: list[float], span: float) -> None:
     """Print the RMS for several values of the drift.
 
     ``scan`` gives the first value, the last value and the step, in ppm. The offset

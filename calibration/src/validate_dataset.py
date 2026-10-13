@@ -27,12 +27,9 @@ take uses the alignments fitted with it.
 The alignments are always fitted with the rigid body of the z-axis platform of
 the gantry ("Grua"), and then they are used with the other rigid bodies too.
 
-Note that the following samples are excluded by default:
-
-- The first seconds of each take (--skip-initial-s). The RoboLoc-G data missed
-  some data at the start, so the first seconds are excluded.
-- The samples in which OptiTrack is farther than a threshold from the gantry
-  (--dropout-mm). They are considered tracking errors of OptiTrack.
+Note that the samples in which OptiTrack is farther than a threshold from the
+gantry (--dropout-mm) are excluded by default. They are considered tracking
+errors of OptiTrack.
 """
 
 import argparse
@@ -72,7 +69,6 @@ TAKES = ["circle", "random1", "random2", "zigzag1", "zigzag2", "zigzag3", "zigza
 BODIES = ["Grua", "UWB_tag", "FTM_tag", "Feet"]  # rigid bodies tracked by OptiTrack
 FRAME_BODY = "Grua"  # rigid body of the gantry, used to fit the alignments
 DROPOUT_MM = 15.0  # mm, samples farther than this from the gantry are left out
-SKIP_INITIAL_S = 6.0  # s, time at the start of each take that is left out
 SENS_THRESHOLDS = [1e9, 200, 100, 50, 30, 20, 15]  # mm, see --sensitivity-thresholds
 
 XYZ = ["x", "y", "z"]
@@ -254,17 +250,6 @@ def load_take(
     return optitrack, gantry_before, gantry_after, valid
 
 
-def apply_skip_initial(valid: BoolArray, optitrack: pd.DataFrame) -> BoolArray:
-    """Mark as not valid the samples of the first SKIP_INITIAL_S seconds of a take.
-
-    In that time the robot moves from rest to the start of its trajectory.
-    """
-    if SKIP_INITIAL_S > 0:
-        t = optitrack["time"].to_numpy()
-        valid = valid & ((t - t[0]) >= SKIP_INITIAL_S)
-    return valid
-
-
 def eval_alignment(
     optitrack: pd.DataFrame,
     gantry: pd.DataFrame,
@@ -321,11 +306,8 @@ def _fit_alignment_for_take(
     take: str, model: CorrectionModel, target: Target
 ) -> AlignmentTransform:
     """Fit the alignment of a take."""
-    optitrack, gantry_before, gantry_after, valid = load_take(
-        take, model, FRAME_BODY
-    )
+    optitrack, gantry_before, gantry_after, valid = load_take(take, model, FRAME_BODY)
     gantry = gantry_after if target == "corrected" else gantry_before
-    valid = apply_skip_initial(valid, optitrack)
     return fit_alignment_without_tracking_errors(optitrack, gantry, valid)
 
 
@@ -394,10 +376,7 @@ def fit_take_alignments(
     and the "after" alignment, fitted with the gantry positions corrected with
     ``model``.
     """
-    optitrack, gantry_before, gantry_after, valid = load_take(
-        take, model, FRAME_BODY
-    )
-    valid = apply_skip_initial(valid, optitrack)
+    optitrack, gantry_before, gantry_after, valid = load_take(take, model, FRAME_BODY)
 
     alignments: dict[str, AlignmentTransform] = {}
     gantry_positions = {"before": gantry_before, "after": gantry_after}
@@ -436,10 +415,7 @@ def process_take(
     out: TakeResult = {"take": take, "bodies": {}}
 
     for body in bodies:
-        optitrack, gantry_before, gantry_after, valid = load_take(
-            take, model, body
-        )
-        valid = apply_skip_initial(valid, optitrack)
+        optitrack, gantry_before, gantry_after, valid = load_take(take, model, body)
 
         gantry_positions = {"before": gantry_before, "after": gantry_after}
         for label, gantry in gantry_positions.items():
@@ -500,12 +476,6 @@ def parse_args() -> argparse.Namespace:
         "(default: %(default)s)",
     )
     p.add_argument(
-        "--skip-initial-s",
-        type=float,
-        default=SKIP_INITIAL_S,
-        help="exclude the first seconds of each take, (default: %(default)s)",
-    )
-    p.add_argument(
         "--per-take-alignment",
         action="store_true",
         help="fit the alignments with each take, instead of using a single alignment "
@@ -536,7 +506,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     global DATASET_DIR, OPTITRACK_DIR, GROUND_TRUTH_DIR, CALIBRATION_FILE, TAKES
-    global DROPOUT_MM, SKIP_INITIAL_S
+    global DROPOUT_MM
 
     args = parse_args()
     logging.basicConfig(
@@ -551,7 +521,6 @@ def main() -> None:
     CALIBRATION_FILE = args.calib
     TAKES = args.takes
     DROPOUT_MM = args.dropout_mm
-    SKIP_INITIAL_S = args.skip_initial_s
 
     thresholds = None
     if args.sensitivity_thresholds is not None:
@@ -566,8 +535,7 @@ def main() -> None:
         else "per-take alignment (full 7 params)"
     )
     print(f"Alignment mode: {mode}")
-    print(f"Glitch-rejection threshold --dropout-mm = {DROPOUT_MM:g} mm")
-    print(f"Skip initial --skip-initial-s = {SKIP_INITIAL_S:g} s\n")
+    print(f"Glitch-rejection threshold --dropout-mm = {DROPOUT_MM:g} mm\n")
 
     single_alignments = None
     if single:

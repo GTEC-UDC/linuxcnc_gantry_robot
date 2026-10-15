@@ -415,7 +415,7 @@ def reject_samples(
         logger.info("Rejected %d intervals:", len(starts))
         for start, end in zip(starts, ends):
             logger.info(
-                "  %.2f - %.2f s (%d samples), max residual %.1f",
+                "  %.2f - %.2f s (%d samples), max residual %.1f mm",
                 time[start],
                 time[end],
                 end - start + 1,
@@ -776,13 +776,17 @@ def get_processed_data(
     # non-aligned data points.
     # -------------------------------------------------------------------------
 
-    # The marker count is kept, so that the excluded samples can be inspected
+    # The marker count is kept, and the excluded samples are marked in the
+    # SKIPPED and REJECTED columns, so that they can be inspected
     coord_cols = [col for col in df.columns if col not in ("time", "M.COUNT")]
+    df["SKIPPED"] = False
+    df["REJECTED"] = False
 
     if config.correction.skip_samples.enabled:
         for start, end in config.correction.skip_samples.ranges:
             logger.info("Skipping samples %d to %d", start, end)
             df.loc[start:end, coord_cols] = np.nan
+            df.loc[start:end, "SKIPPED"] = True
 
     # -------------------------------------------------------------------------
     # Reject samples
@@ -818,6 +822,7 @@ def get_processed_data(
         )
 
         df.loc[df.index[valid][~keep], coord_cols] = np.nan
+        df.loc[df.index[valid][~keep], "REJECTED"] = True
 
     # -------------------------------------------------------------------------
     # Correct the gantry positions

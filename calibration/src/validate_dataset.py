@@ -4,10 +4,10 @@ The correction model is fitted with the calibration capture. This script checks
 how well it works with the RoboLoc-G dataset.
 
 For each take of the RoboLoc-G dataset, the positions measured by OptiTrack are
-compared with the commanded positions of the gantry. This is done twice:
+compared with the encoder positions of the gantry. This is done twice:
 
-- "before": with the commanded gantry positions.
-- "after": with the commanded gantry positions corrected with the model, which
+- "before": with the gantry encoder positions.
+- "after": with the gantry encoder positions corrected with the model, which
   should give approximately the "real" gantry positions.
 
 The difference between the two results is what the correction improves.

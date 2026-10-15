@@ -18,7 +18,7 @@ timing error with the geometric deviation of the gantry: a scale error, or any s
 position-dependent deviation left by the correction model, produces a residual along
 the direction of travel that is indistinguishable from a time offset. Velocity avoids
 that, and to remove any remaining scale or linear mismatch a free 3x3 matrix mapping
-the commanded velocity onto the measured one is re-estimated by least squares for
+the gantry velocity onto the measured one is re-estimated by least squares for
 every candidate pair, so only the timing is left for (dt, drift) to explain.
 """
 
@@ -36,7 +36,7 @@ from data import CalibrationConfig, CalibrationParams, get_processed_data
 from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
 from scipy.signal import savgol_filter
 
-# Columns holding the aligned OptiTrack position and the commanded gantry position
+# Columns holding the aligned OptiTrack position and the gantry encoder position
 RB_COLS = ["RB.X", "RB.Y", "RB.Z"]
 GAN_COLS = ["GAN.X", "GAN.Y", "GAN.Z"]
 GAN_COLS_CALIBRATED = ["GAN.CALIBRATED.X", "GAN.CALIBRATED.Y", "GAN.CALIBRATED.Z"]
@@ -105,7 +105,7 @@ def velocity_residual(
 ) -> Array:
     """Velocity mismatch for a given time transformation, in mm/s.
 
-    With ``fit_matrix``, the linear map from the commanded velocity to the measured one
+    With ``fit_matrix``, the linear map from the gantry velocity to the measured one
     is re-estimated by least squares, which absorbs any scale or linear mismatch
     between the two records.
     """

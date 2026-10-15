@@ -29,6 +29,7 @@ The system consists of several scripts to process and analyze the data:
    - `plot_errors_scatter.py`: Plot positioning errors scatter plots.
    - `plot_errors_probability.py`: Plot positioning errors probability distributions.
    - `print_errors_summary.py`: Print a statistical summary of the positioning errors.
+   - `print_rejected_samples.py`: Print the samples rejected from the correction fit and the markers reconstructed in them.
    - `plot_marker_errors.py`: Plot the OptiTrack marker residuals and the centroid error.
    - `plot_calibration_2d.py` and `plot_calibration_3d.py`: Plot the correction transformation.
    - `compare_correction_models.py`: Compare correction models with different terms.

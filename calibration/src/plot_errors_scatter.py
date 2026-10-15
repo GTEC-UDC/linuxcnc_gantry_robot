@@ -130,8 +130,8 @@ def plot_errors_scatter(
                 y = df.loc[mask, err].to_numpy(np.float64)
 
                 if pos[-1] in ["X", "Y"]:
-                    legend_str = "Quadratic fit"
-                    z = np.polyfit(x, y, 2)
+                    legend_str = "Cubic fit"
+                    z = np.polyfit(x, y, 3)
                     x = np.linspace(in_plane_min, in_plane_max, 100)
                     ax.set_xlim(in_plane_min, in_plane_max)
                 else:

@@ -159,11 +159,11 @@ class PointPlayer(Player[PointFrameData]):
 
     def init(self):
         title = self.set_title()
-        self.point.set_data_3d([], [], [])
+        self.point.set_data_3d(np.empty(0), np.empty(0), np.empty(0))
         ret = [self.point, title]
 
         if self.trail:
-            self.trail.set_data_3d([], [], [])
+            self.trail.set_data_3d(np.empty(0), np.empty(0), np.empty(0))
             ret.append(self.trail)
 
         if self.init_cb:
@@ -177,8 +177,11 @@ class PointPlayer(Player[PointFrameData]):
         if frame_data is None:
             return [title]
 
+        # Matplotlib >= 3.11 requires arrays to draw NaN coordinates
         self.point.set_data_3d(
-            [frame_data.pos[0]], [frame_data.pos[1]], [frame_data.pos[2]]
+            np.array([frame_data.pos[0]]),
+            np.array([frame_data.pos[1]]),
+            np.array([frame_data.pos[2]]),
         )
         ret = [self.point, title]
 

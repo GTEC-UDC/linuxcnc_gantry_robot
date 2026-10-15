@@ -224,15 +224,15 @@ class MultiPointPlayer(Player[MultiPointFrameData]):
         ret = [title]
 
         for point in self.points:
-            point.set_data_3d([], [], [])
+            point.set_data_3d(np.empty(0), np.empty(0), np.empty(0))
             ret.append(point)
 
         for marker in self.markers:
-            marker.set_data_3d([], [], [])
+            marker.set_data_3d(np.empty(0), np.empty(0), np.empty(0))
             ret.append(marker)
 
         for trail in self.trails:
-            trail.set_data_3d([], [], [])
+            trail.set_data_3d(np.empty(0), np.empty(0), np.empty(0))
             ret.append(trail)
 
         if self.init_cb:
@@ -248,10 +248,11 @@ class MultiPointPlayer(Player[MultiPointFrameData]):
             return ret
 
         for i, point in enumerate(self.points):
+            # Matplotlib >= 3.11 requires arrays to draw NaN coordinates
             point.set_data_3d(
-                [frame_data.points[i][0]],
-                [frame_data.points[i][1]],
-                [frame_data.points[i][2]],
+                np.array([frame_data.points[i][0]]),
+                np.array([frame_data.points[i][1]]),
+                np.array([frame_data.points[i][2]]),
             )
             ret.append(point)
 

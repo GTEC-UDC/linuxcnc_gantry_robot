@@ -22,7 +22,7 @@ def plot_errors(
     calibration_file: str | Path = CALIBRATION_FILE,
     correct: bool = True,
     skip_samples: bool = True,
-    time_unit: Literal["s", "frames"] = "s",
+    time_unit: Literal["s", "samples"] = "s",
     time_limit: tuple[float, float] | None = None,
     position_limit: tuple[float, float] | None = None,
     error_limit: tuple[float, float] | None = None,
@@ -39,8 +39,9 @@ def plot_errors(
         calibration_file: Path to calibration parameters file
         remove_bad_frames: Whether to remove bad frames from the data
         bad_frames_file: Path to file with bad frames ranges
-        time_unit: Time unit for the x-axis (s, frames)
-        time_limit: Optional (min, max) tuple for x-axis time limits (seconds or frames)
+        time_unit: Unit of the x-axis: 's', or 'samples' for the row of the
+            processed data, as used by the skip_samples ranges of the configuration
+        time_limit: Optional (min, max) tuple for x-axis limits (seconds or samples)
         position_limit: Optional (min, max) tuple for position plot y-axis limits (mm)
         error_limit: Optional (min, max) tuple for error plots y-axis limits (mm)
     """
@@ -113,7 +114,7 @@ def plot_errors(
         )
 
     # Select the time column based on the time unit
-    time_data = df["time"] if time_unit == "s" else df["frame"]
+    time_data = df["time"] if time_unit == "s" else df.index
 
     # Plot all positions in the same subplot
     ax_pos.plot(time_data, df[f"GAN{sep}X"], "b-", linewidth=0.5, label="Gantry X")
@@ -156,7 +157,7 @@ def plot_errors(
     ax_y_err.set_ylabel("Y Error (mm)")
     ax_z_err.set_ylabel("Z Error (mm)")
     ax_abs_err.set_ylabel("Absolute Error (mm)")
-    ax_abs_err.set_xlabel(f"Time ({time_unit})")
+    ax_abs_err.set_xlabel("Time (s)" if time_unit == "s" else "Sample")
 
     # Set time limits
     if time_limit is not None:
@@ -234,9 +235,9 @@ def main():
     parser.add_argument(
         "--time-unit",
         type=str,
-        choices=["s", "frames"],
+        choices=["s", "samples"],
         default="s",
-        help="Time unit for the x-axis (s, frames)",
+        help="Unit of the x-axis: seconds, or the row of the processed data",
     )
 
     parser.add_argument(

@@ -6,6 +6,7 @@ from typing import Literal
 
 import matplotlib.axes as mpl_axes
 import matplotlib.pyplot as plt
+import numpy as np
 from argutils import parse_limit
 from data import CalibrationConfig, CalibrationParams, get_processed_data
 from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
@@ -18,7 +19,7 @@ def plot_marker_errors(
     calibration_file: str | Path = CALIBRATION_FILE,
     correct: bool = True,
     skip_samples: bool = True,
-    time_unit: Literal["s", "frames"] = "s",
+    time_unit: Literal["s", "samples"] = "s",
     time_limit: tuple[float, float] | None = None,
     abs_error_limit: tuple[float, float] | None = None,
     show_centroid: bool = True,
@@ -30,8 +31,9 @@ def plot_marker_errors(
     Two optional panels are drawn:
     - Centroid: absolute error between the OptiTrack rigid-body position and the
       gantry position (GAN.ERR[.CALIBRATED.]Abs).
-    - Markers: per-marker absolute residual with respect to the rigid-body estimate
-      (ERR.Abs{i}), and optionally their mean (ERR.Abs_mean).
+    - Markers: per-marker distance between the measured marker position (M.X{i})
+      and the one expected from the rigid-body pose (RB.X{i}), and optionally
+      their mean over the markers reconstructed in each sample.
 
     Args:
         gantry_file: Path to gantry CSV file.
@@ -40,7 +42,8 @@ def plot_marker_errors(
         calibration_file: Path to calibration parameters file.
         correct: Apply the non-linear coordinate correction step.
         skip_samples: Apply the sample exclusions of the configuration file.
-        time_unit: Time unit for the x-axis ('s' or 'frames').
+        time_unit: Unit of the x-axis: 's', or 'samples' for the row of the
+            processed data, as used by the skip_samples ranges of the configuration.
         time_limit: Optional (min, max) x-axis limits in the chosen time unit.
         abs_error_limit: Optional (min, max) y-axis limits shared by all panels (mm).
         show_centroid: Show the centroid-vs-gantry absolute error panel.
@@ -76,22 +79,38 @@ def plot_marker_errors(
     _, ax = plt.subplots(figsize=(10, 4))
     ax.grid(True)
 
-    time_data = df["time"] if time_unit == "s" else df["frame"]
+    time_data = df["time"] if time_unit == "s" else df.index
     sep = ".CALIBRATED." if correct else "."
+
+    marker_errors = np.column_stack(
+        [
+            np.linalg.norm(
+                df[[f"M.{axis}{i}" for axis in "XYZ"]].to_numpy()
+                - df[[f"RB.{axis}{i}" for axis in "XYZ"]].to_numpy(),
+                axis=1,
+            )
+            for i in range(1, num_markers + 1)
+        ]
+    )
 
     if show_markers:
         for i in range(1, num_markers + 1):
             ax.plot(
                 time_data,
-                df[f"ERR.Abs{i}"],
+                marker_errors[:, i - 1],
                 linewidth=0.5,
                 label=f"Marker {i} error",
             )
 
     if show_marker_mean:
+        # Mean over the markers present; NaN where none is
+        present = ~np.isnan(marker_errors)
+        marker_mean = np.where(present, marker_errors, 0).sum(axis=1) / np.where(
+            present.any(axis=1), present.sum(axis=1), np.nan
+        )
         ax.plot(
             time_data,
-            df["ERR.Abs_mean"],
+            marker_mean,
             "k--",
             linewidth=1.0,
             label="Marker mean error",
@@ -107,7 +126,7 @@ def plot_marker_errors(
         )
 
     ax.set_ylabel("Absolute Error (mm)")
-    ax.set_xlabel(f"Time ({time_unit})")
+    ax.set_xlabel("Time (s)" if time_unit == "s" else "Sample")
     ax.legend()
 
     if time_limit is not None:
@@ -175,8 +194,8 @@ def main():
     parser.add_argument(
         "--time-unit",
         type=str,
-        choices=["s", "frames"],
-        default="frames",
+        choices=["s", "samples"],
+        default="samples",
         help="Time unit for the x-axis",
     )
 

@@ -491,7 +491,7 @@ The positioning errors between gantry and OptiTrack data over time can be plotte
 python plot_errors.py
 ```
 
-The script accepts the option `--time-unit` to specify the time unit of the x-axis. The available options are `s` (seconds) and `frames`. The default is `s` (seconds). The `frames` options can be used to check the ranges of frames with poor tracking quality, then they can be skipped by setting them in the configuration file.
+The script accepts the option `--time-unit` to specify the unit of the x-axis. The available options are `s` (seconds) and `samples`, the row of the processed data. The default is `s` (seconds). The `samples` option can be used to check the ranges of samples with poor tracking quality, which can then be skipped by setting them in the `skip_samples` ranges of the configuration file.
 
 The script also accepts the `--no-correct` flag to show the errors without applying the correction transformation to the gantry position.
 

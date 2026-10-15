@@ -90,8 +90,8 @@ def load_optitrack_data(
 ) -> tuple[pd.DataFrame, int]:
     """Load and process OptiTrack motion capture data from a CSV file.
 
-    This function loads OptiTrack data, processes marker positions, calculates errors
-    between raw and rigid body markers, and computes various statistics.
+    This function loads the position of the rigid body, the positions of its
+    markers expected from that pose, and the measured positions of the markers.
 
     Args:
         filename (str | Path): Path to the OptiTrack CSV file.
@@ -100,8 +100,8 @@ def load_optitrack_data(
 
     Returns:
         tuple[pd.DataFrame, int]: A tuple containing:
-            - DataFrame with processed OptiTrack data including marker positions,
-              rigid body positions, errors, and centroids
+            - DataFrame with the time, the rigid body position (RB.X/Y/Z), and
+              the expected and measured marker positions (RB.X1..., M.X1...)
             - Number of markers detected
 
     Raises:
@@ -149,46 +149,10 @@ def load_optitrack_data(
     # Create a new dataframe with the columns we want to keep
     df = df.loc[:, df_cols]
     df.columns = pd.Index(df_col_names)
-
-    # Calculate errors for the markers
-    for i in range(1, num_m + 1):
-        for coord in ["X", "Y", "Z"]:
-            rb_coords = df[f"RB.{coord}{i}"]
-            raw_coords = df[f"M.{coord}{i}"]
-            df[f"ERR.{coord}{i}"] = raw_coords - rb_coords
-
-        df[f"ERR.Abs{i}"] = np.sqrt(
-            df[f"ERR.X{i}"] ** 2 + df[f"ERR.Y{i}"] ** 2 + df[f"ERR.Z{i}"] ** 2
-        )
-
-    # Calculate the mean errors across all markers
-    for coord in ["X", "Y", "Z"]:
-        # Calculate mean error for each coordinate
-        error_cols = [f"ERR.{coord}{i}" for i in range(1, num_m + 1)]
-        df[f"ERR.{coord}_mean"] = df[error_cols].mean(axis=1)
-
-    # Calculate mean absolute error
-    abs_error_cols = [f"ERR.Abs{i}" for i in range(1, num_m + 1)]
-    df["ERR.Abs_mean"] = df[abs_error_cols].mean(axis=1)
+    df = df.drop(columns="frame")
 
     # Find the frames where no raw markers were detected
     raw_markers_na = df[[f"M.X{i}" for i in range(1, num_m + 1)]].isna().all(axis=1)
-
-    # Calculate the centroid of the markers
-    for coord in ["X", "Y", "Z"]:
-        cols = [f"M.{coord}{i}" for i in range(1, num_m + 1)]
-        df_coords = df[cols]
-
-        # Interpolate the OptiTrack data to fill the missing values
-        df_coords = df_coords.interpolate(
-            method="linear", axis=0, limit_area="inside", inplace=False
-        )
-
-        df[f"M.{coord}_centroid"] = df_coords.mean(axis=1)
-
-    # Set to NA the coordinates where no raw markers were detected
-    m_centroid_cols = [f"M.{coord}_centroid" for coord in ["X", "Y", "Z"]]
-    df.loc[raw_markers_na, m_centroid_cols] = np.nan
 
     rb_cols = ["RB.X", "RB.Y", "RB.Z"] + [
         f"RB.{coord}{i}" for i in range(1, num_m + 1) for coord in ["X", "Y", "Z"]
@@ -414,6 +378,7 @@ def reject_samples(
         BoolArray: Mask of the samples to keep, shape (N,).
     """
     keep = np.ones(len(gantry_samples), dtype=bool)
+    residual = np.zeros(len(gantry_samples))
 
     for _ in range(max(iterations, 1)):
         correction = fit_correction(
@@ -440,6 +405,22 @@ def reject_samples(
             rejected = np.cumsum(edges[:-1]) > 0
 
         keep = ~rejected
+
+    # log rejected intervals
+    if not keep.all():
+        idx = np.flatnonzero(~keep)
+        breaks = np.flatnonzero(np.diff(idx) > 1)
+        starts = np.r_[idx[0], idx[breaks + 1]]
+        ends = np.r_[idx[breaks], idx[-1]]
+        logger.info("Rejected %d intervals:", len(starts))
+        for start, end in zip(starts, ends):
+            logger.info(
+                "  %.2f - %.2f s (%d samples), max residual %.1f",
+                time[start],
+                time[end],
+                end - start + 1,
+                residual[start : end + 1].max(),
+            )
 
     return keep
 
@@ -780,6 +761,11 @@ def get_processed_data(
             cols = [x_col.replace(".X", f".{axis}", 1) for axis in "XYZ"]
             df[cols] = alignment.apply(time, df[cols].to_numpy())
 
+    # Number of markers reconstructed in each sample
+    df["M.COUNT"] = (
+        df[[f"M.X{i}" for i in range(1, num_markers + 1)]].notna().sum(axis=1)
+    )
+
     # -------------------------------------------------------------------------
     # Skip samples
     #
@@ -790,7 +776,8 @@ def get_processed_data(
     # non-aligned data points.
     # -------------------------------------------------------------------------
 
-    coord_cols = [col for col in df.columns if col not in ("time", "frame")]
+    # The marker count is kept, so that the excluded samples can be inspected
+    coord_cols = [col for col in df.columns if col not in ("time", "M.COUNT")]
 
     if config.correction.skip_samples.enabled:
         for start, end in config.correction.skip_samples.ranges:

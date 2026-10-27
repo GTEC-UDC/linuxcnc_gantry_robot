@@ -26,6 +26,7 @@ The system consists of several scripts to process and analyze the data:
    - `print_calibxyzkins_config.py`: Print the HAL configuration for the `calibxyzkins` module.
    - `plot_movement.py`: Visualize the gantry and OptiTrack path.
    - `plot_errors.py`: Plot positioning errors over time.
+   - `plot_kinematics.py`: Plot the position, velocity and acceleration of the gantry and of the platform over time, and print their maximum values.
    - `plot_errors_scatter.py`: Plot positioning errors scatter plots.
    - `plot_errors_probability.py`: Plot positioning errors probability distributions.
    - `print_errors_summary.py`: Print a statistical summary of the positioning errors.

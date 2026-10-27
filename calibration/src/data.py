@@ -22,6 +22,17 @@ BoolArray = npt.NDArray[np.bool]
 # start time as a local time without time zone.
 OPTITRACK_TZ = ZoneInfo("Europe/Madrid")
 
+# Columns of the processed data with the aligned OptiTrack position, the gantry
+# encoder position, the corrected gantry position and the residual of the latter
+RB_COLS = ["RB.X", "RB.Y", "RB.Z"]
+GAN_COLS = ["GAN.X", "GAN.Y", "GAN.Z"]
+GAN_COLS_CALIBRATED = ["GAN.CALIBRATED.X", "GAN.CALIBRATED.Y", "GAN.CALIBRATED.Z"]
+ERR_COLS_CALIBRATED = [
+    "GAN.ERR.CALIBRATED.X",
+    "GAN.ERR.CALIBRATED.Y",
+    "GAN.ERR.CALIBRATED.Z",
+]
+
 
 def load_gantry_data(filename: str | Path) -> pd.DataFrame:
     """Load gantry position data from a CSV file.
@@ -590,6 +601,31 @@ def samples_mean_distance(a: FloatArray, b: FloatArray) -> float:
         float: Mean of the distances, ignoring the pairs with NaN.
     """
     return float(np.nanmean(np.sqrt(np.sum((a - b) ** 2, axis=1))))
+
+
+def rms3d(err: FloatArray) -> float:
+    """3D RMS of a set of residuals, given with one row per sample."""
+    return float(np.sqrt((err**2).sum(axis=1).mean()))
+
+
+def fill_gaps(pos: FloatArray) -> tuple[FloatArray, BoolArray]:
+    """Fill interior NaN gaps in a track sampled on the (evenly-spaced) OptiTrack
+    clock, e.g. from ``skip_samples`` ranges or marker occlusion.
+
+    The gaps are filled with a linear interpolation so they don't corrupt the
+    Savitzky-Golay filter, the same way ``plot_errors.py`` handles them for its
+    acceleration overlay. The returned mask flags the filled points, so callers can
+    drop them again once the filtering is done.
+    """
+    gap = cast(BoolArray, np.isnan(pos).any(axis=1))
+    pos_filled = (
+        pd.DataFrame(pos)
+        .interpolate(method="linear", limit_area="inside")
+        .ffill()
+        .bfill()
+        .to_numpy()
+    )
+    return pos_filled, gap
 
 
 def fit_rigid_transform(

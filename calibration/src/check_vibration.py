@@ -26,14 +26,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 from argutils import parse_limit
-from data import CalibrationConfig, CalibrationParams, get_processed_data
+from data import (
+    ERR_COLS_CALIBRATED,
+    GAN_COLS,
+    RB_COLS,
+    CalibrationConfig,
+    CalibrationParams,
+    fill_gaps,
+    get_processed_data,
+    rms3d,
+)
 from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
-from estimate_calibration_clock_drift import GAN_COLS, RB_COLS, fill_gaps, rms3d
 from scipy.signal import butter, savgol_filter, sosfiltfilt, welch
 
 Array = npt.NDArray[np.float64]
-
-ERR_COLS = ["GAN.ERR.CALIBRATED.X", "GAN.ERR.CALIBRATED.Y", "GAN.ERR.CALIBRATED.Z"]
 
 
 def derivative(
@@ -88,7 +94,7 @@ def main(args: argparse.Namespace) -> None:
     rate = (len(time) - 1) / (time[-1] - time[0])
 
     # Residual, with the gaps filled; ``kept`` marks the samples that are not filled
-    err, gap = fill_gaps(df[ERR_COLS].to_numpy())
+    err, gap = fill_gaps(df[ERR_COLS_CALIBRATED].to_numpy())
     kept = ~gap
 
     # Velocity and acceleration of the gantry and of the platform

@@ -25,45 +25,28 @@ every candidate pair, so only the timing is left for (dt, drift) to explain.
 import argparse
 import logging
 from pathlib import Path
-from typing import cast
 
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
 import scipy as scp
-from data import CalibrationConfig, CalibrationParams, get_processed_data
+from data import (
+    GAN_COLS,
+    GAN_COLS_CALIBRATED,
+    RB_COLS,
+    CalibrationConfig,
+    CalibrationParams,
+    fill_gaps,
+    get_processed_data,
+    rms3d,
+)
 from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
 from scipy.signal import savgol_filter
-
-# Columns holding the aligned OptiTrack position and the gantry encoder position
-RB_COLS = ["RB.X", "RB.Y", "RB.Z"]
-GAN_COLS = ["GAN.X", "GAN.Y", "GAN.Z"]
-GAN_COLS_CALIBRATED = ["GAN.CALIBRATED.X", "GAN.CALIBRATED.Y", "GAN.CALIBRATED.Z"]
 
 Array = npt.NDArray[np.float64]
 
 logger = logging.getLogger(__name__)
-
-
-def fill_gaps(pos: Array) -> tuple[Array, npt.NDArray[np.bool]]:
-    """Fill interior NaN gaps in a track sampled on the (evenly-spaced) OptiTrack
-    clock, e.g. from ``skip_samples`` ranges or marker occlusion.
-
-    The gaps are filled with a linear interpolation so they don't corrupt the
-    Savitzky-Golay filter, the same way ``plot_errors.py`` handles them for its
-    acceleration overlay. The returned mask flags the filled points, so callers can
-    drop them again once the filtering is done.
-    """
-    gap = cast(npt.NDArray[np.bool], np.isnan(pos).any(axis=1))
-    pos_filled = (
-        pd.DataFrame(pos)
-        .interpolate(method="linear", limit_area="inside")
-        .ffill()
-        .bfill()
-        .to_numpy()
-    )
-    return pos_filled, gap
 
 
 def velocity(time: Array, pos: Array, smooth: float, rate: float) -> Array:
@@ -116,10 +99,6 @@ def velocity_residual(
         params, _, _, _ = np.linalg.lstsq(g, o[mask], rcond=None)
         g = g @ params
     return o[mask] - g
-
-
-def rms3d(err: Array) -> float:
-    return float(np.sqrt((err**2).sum(axis=1).mean()))
 
 
 def fit_drift(

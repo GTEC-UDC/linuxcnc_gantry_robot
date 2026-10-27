@@ -15,15 +15,18 @@ import pandas as pd
 import scipy as scp
 from data import (
     DEFAULT_DEGREE,
+    GAN_COLS,
+    RB_COLS,
     CalibrationConfig,
     CalibrationParams,
     Degree,
     PolynomialCorrection,
     fit_correction,
     get_processed_data,
+    rms3d,
 )
 from defaults import CALIBRATION_FILE, CONFIG_FILE, GANTRY_FILE, OPTITRACK_FILE
-from estimate_calibration_clock_drift import GAN_COLS, RB_COLS, rms3d, time_shifted
+from estimate_calibration_clock_drift import time_shifted
 
 logger = logging.getLogger(__name__)
 

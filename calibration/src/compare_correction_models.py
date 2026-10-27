@@ -33,11 +33,14 @@ import numpy.typing as npt
 import pandas as pd
 import validate_dataset as vd
 from data import (
+    GAN_COLS,
+    RB_COLS,
     CalibrationConfig,
     CalibrationParams,
     CorrectionModel,
     correction_scale,
     get_processed_data,
+    rms3d,
 )
 from defaults import (
     CALIBRATION_FILE,
@@ -46,10 +49,6 @@ from defaults import (
     GANTRY_FILE,
     OPTITRACK_FILE,
 )
-
-# Columns of the processed data with the OptiTrack and the gantry positions
-RB_COLS = ["RB.X", "RB.Y", "RB.Z"]
-GAN_COLS = ["GAN.X", "GAN.Y", "GAN.Z"]
 
 # A monomial x**i * y**j * z**k, given by its exponents (i, j, k). A model is the
 # list of its monomials, on top of the constant that every model includes.
@@ -91,11 +90,6 @@ FORMATS = {
     "RMSE": "{:.2f}",
     "P95": "{:.2f}",
 }
-
-
-def rms3d(err: npt.NDArray[np.float64]) -> float:
-    """3D RMS of a set of residuals, given with one row per sample."""
-    return float(np.sqrt((err**2).sum(axis=1).mean()))
 
 
 def design(

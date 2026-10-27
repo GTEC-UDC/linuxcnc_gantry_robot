@@ -33,6 +33,7 @@ The system consists of several scripts to process and analyze the data:
    - `plot_marker_errors.py`: Plot the OptiTrack marker residuals and the centroid error.
    - `plot_calibration_2d.py` and `plot_calibration_3d.py`: Plot the correction transformation.
    - `compare_correction_models.py`: Compare correction models with different terms.
+   - `check_vibration.py`: Check the effect of an oscillation of the platform on the positioning residual, by computing it with and without a low-pass filter.
 
 4. **Clock drift**: Scripts to estimate the clock drift between the gantry and OptiTrack in the calibration measurement:
    - `estimate_calibration_clock_drift.py`: Estimate the time offset and the clock drift.

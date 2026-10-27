@@ -36,7 +36,7 @@ The system consists of several scripts to process and analyze the data:
 
 4. **Clock drift**: Scripts to estimate the clock drift between the gantry and OptiTrack in the calibration measurement:
    - `estimate_calibration_clock_drift.py`: Estimate the time offset and the clock drift.
-   - `calibration_clock_drift_impact.py`: Check the effect of a clock drift on the calibration.
+   - `check_clock_drift_impact.py`: Check the effect of a clock drift on the calibration.
 
 5. **Validation with the RoboLoc-G dataset**: Scripts that apply the correction to the takes of the RoboLoc-G dataset, which were not used in the calibration:
    - `validate_dataset.py`: Compare the OptiTrack and gantry positions of the dataset, before and after the correction.

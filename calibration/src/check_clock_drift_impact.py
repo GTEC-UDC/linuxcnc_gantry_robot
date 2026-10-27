@@ -17,8 +17,8 @@ from data import (
     DEFAULT_DEGREE,
     CalibrationConfig,
     CalibrationParams,
-    PolynomialCorrection,
     Degree,
+    PolynomialCorrection,
     fit_correction,
     get_processed_data,
 )
